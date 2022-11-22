@@ -86,8 +86,6 @@ public class Grid {
 			output[1] = y;
 		}
 
-		System.out.println(output[0] + ":" + output[1]);
-
 		return output;
 	}
 
@@ -104,22 +102,22 @@ public class Grid {
 	 */
 	public boolean canFillPoint(int x, int y) {
 		if (x < 0) {
-			System.out.print("Left overflow\n");
+			// System.out.print("Left overflow\n");
 			return false;
 		}
 		
 		if (x > 9) {
-			System.out.print("Right overflow\n");
+			// System.out.print("Right overflow\n");
 			return false;
 		}
 
 		if (y < 0) {
-			System.out.print("Top overflow\n");
+			// System.out.print("Top overflow\n");
 			return false;
 		}
 		
 		if (y > 9) {
-			System.out.print("Bottom overflow\n");
+			// System.out.print("Bottom overflow\n");
 			return false;
 		}
 
@@ -180,14 +178,10 @@ public class Grid {
 
 					coords[i][0] = point[0] + i * vector[0];
 					coords[i][1] = point[1] + i * vector[1];
-
-					// System.out.print(("VECTOR(" + vector[0] + ":" + vector[1] + ") "));
-					// System.out.print(point[0] + i * vector[0] + ":" + (point[1] + i * vector[1]) + " \n");
 				}
 
 				if (canPlace) {
 					for (int i = 0; i < length; i++) {
-						// System.out.print(coords[i][0] + ":" + coords[i][1] + " ");
 						grid[coords[i][0]][coords[i][1]] = label;
 					}
 					break;
