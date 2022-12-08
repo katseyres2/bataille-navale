@@ -147,6 +147,15 @@ public class Grid {
 		return true;
 	}
 
+	/*
+	 * 
+	 */
+	public void placeBoat(int coord[][], String label) {
+		for (int[] c : coord) {
+			this.grid[c[0]][c[1]] = label;
+		}
+	}
+
 	/**
 	 * For one boat, get a random point.
 	 * Once the point is selected, select a random vector.
@@ -160,10 +169,23 @@ public class Grid {
 		int[][] vectors;
 		boolean canPlace = false;
 
+		// PI = [A, 1]
+		// V1 = [1, 0]
+		// V2 = [-1, -1]
+		// PI + 4 * V1 = [A, 1] + 4 * [1, 0] = [A, 1] + [4, 0] = [A+4, 1+0] = [E, 1]
+		// PI + V2 = [A-1, 1-1] = [J, 0]
+
 		while (!canPlace) {
 			point = getRandomPoint();
 			vectors = getVectors();
 			coords = new int[length][2];
+			/**
+			 * [
+			 * 	[A, 1],
+			 * 	[A, 2],
+			 * 	[A, 3]
+			 * ]
+			 */
 			
 			// gets a vector
 			for (int[] vector : vectors) {
