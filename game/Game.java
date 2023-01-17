@@ -1,7 +1,7 @@
 package game;
 import java.util.*;
 
-import grid.Grid;  
+import game.grid.Grid;  
 
 public class Game {
 	private static final String ANSI_RESET = "\u001B[0m";

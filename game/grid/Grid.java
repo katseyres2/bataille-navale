@@ -1,4 +1,4 @@
-package grid;
+package game.grid;
 
 import java.util.Random;
 
@@ -13,11 +13,11 @@ public class Grid {
 	final private static int[][] VECTORS = getFullVectors();
 	final private Random random;
 	
-//	public final static int AIRCRAFT_CARRIER_LENGTH = 5;
-//	public final static int BATTLESHIP_LENGTH = 4;
-//	public final static int CRUISER_LENGTH = 3;
-//	public final static int SUBMARINE_LENGTH = 3;
-//	public final static int DESTROYER_LENGTH = 2;
+	public final static int AIRCRAFT_CARRIER_LENGTH = 5;
+	public final static int BATTLESHIP_LENGTH = 4;
+	public final static int CRUISER_LENGTH = 3;
+	public final static int SUBMARINE_LENGTH = 3;
+	public final static int DESTROYER_LENGTH = 2;
 
 	final private String [][] grid;
 

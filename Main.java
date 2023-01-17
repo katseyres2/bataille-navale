@@ -1,8 +1,8 @@
 
-import chat.Client;
-import chat.Server;
 import game.Game;
-import grid.Grid;
+import game.grid.Grid;
+import socket.Client;
+import socket.Server;
 
 public class Main {
 	public static void main(String[] args) {
@@ -23,7 +23,7 @@ public class Main {
 		Grid grid = new Grid();
 		grid.placeBoat(coord, "H");
 		grid.placeBoat(coord2, "L");
-		grid.show();
+		// grid.show();
 		
 		// int[] point = grid.getRandomPoint();
 		// // System.out.println(grid.canFillPoint(point[0], point[1]));
@@ -37,22 +37,22 @@ public class Main {
 		// Game game = new Game();
 		// game.start();
 
-		// int port;
-		
-		// if (args.length == 0) {
-		// 	Server server = new Server();
-		// 	server.listen();
-		// 	return;
-		// }
+		int port;
 
-		// try {
-		// 	port = Integer.parseInt(args[0]);
-		// } catch (NumberFormatException e) {
-		// 	System.out.println("Invalid port format");
-		// 	return;
-		// }
+		if (args.length == 0) {
+			Server server = new Server();
+			server.start(5000);
+			return;
+		}
 
-		// Client client = new Client(port);
-		// client.start();
+		try {
+			port = Integer.parseInt(args[0]);
+		} catch (NumberFormatException e) {
+			System.out.println("Invalid port format");
+			return;
+		}
+
+		Client client = new Client();
+		client.start(port);
 	}
 }
