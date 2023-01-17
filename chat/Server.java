@@ -145,8 +145,9 @@ public class Server {
 											// Game game = new Game(clientSocket, remoteHost);
 											// games.add(game);
 
-											// remoteWriter.println(game.showGrids(remoteHost));
-											// remoteWriter.flush();
+											remoteWriter.println("you get a invitation from " + ip + ":" + port + ", do you accept ? (you must send '/accept host:port' or '/decline host:port')");
+											remoteWriter.flush();
+											output = "invitation sent";
 										}
 									}
 								}
