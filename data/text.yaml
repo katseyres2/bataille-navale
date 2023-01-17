@@ -1,0 +1,9 @@
+presentation:
+  welcome: "Hi, welcome to our Naval Battle Game."
+  whatsYourName: "What's your name?"
+  buildNewGrid: "We're going to build a new grid for you."
+  gridIsBuilt: "Done, there is your grid!"
+
+beforeGame:
+  doYouWantStartANewGame: "Do you want start a new game?"
+  
