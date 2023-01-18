@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 import game.Game;
+import services.FormatService;
 import socket.commands.ServerCommandHandler;
 
 public class Server extends SocketUser implements ISocket {
@@ -30,7 +31,7 @@ public class Server extends SocketUser implements ISocket {
 	}
 
 	@Override
-	public Thread buildSender(Socket socket, BufferedReader bufferedReader, PrintWriter printWriter, Scanner scanner) {
+	public Thread buildSender(SocketUser user) {
 		// create a new thread with a callback function
 		// "Runnable" must implement run()
 		return new Thread(new Runnable() {
@@ -38,64 +39,93 @@ public class Server extends SocketUser implements ISocket {
 
 			@Override
 			public void run() {
+				msg = "Welcome ! Use the command /signup to create a new account or /signin you're already registered 🙂";
+				user.getPrintWriter().println(msg);
+				user.getPrintWriter().flush();
+
 				while(true) {
 					// wait for the user input
-					msg = scanner.nextLine();
+					msg = user.getScanner().nextLine();
 					// send the message on the client host:port
-					printWriter.println(msg);
+					user.getPrintWriter().println(msg);
 					// clear the memory cell
-					printWriter.flush();
+					user.getPrintWriter().flush();
 				}
 			}
 		});
 	}
 
 	@Override
-	public Thread buildReceiver(Socket socket, BufferedReader bufferedReader, PrintWriter printWriter, Scanner scanner) {
+	public Thread buildReceiver(SocketUser user) {
+		Client client = (Client)user;
+
 		// create a new thread that receives sockets
 		return new Thread(new Runnable() {
 			String msg;
-			ServerCommandHandler commandHandler = new ServerCommandHandler(printWriter);
+			ServerCommandHandler commandHandler = new ServerCommandHandler(client.getPrintWriter());
 
 			@Override
 			public void run() {
 				try {
 					// catch the message from the remote host
-					msg = bufferedReader.readLine();
-					
+					msg = client.getBufferedReader().readLine();
+
 					// while the buffer is not empty, there is still a message inside
 					while (msg != null) {
-						System.out.println(socket.getInetAddress().getHostAddress() + ":" + socket.getPort() +" : " + msg);
+						if (msg.length() > 0) {
+							System.out.println("[" + FormatService.getCurrentTime() + "] " + client.getAddress() + ":" + client.getPort() +" : " + msg);
+						}
+
 						String[] args = msg.split(" ");
+
+						if (! client.isLogged()) {
+							boolean allowedCommand = false;
+
+							for (String cmd : new String[]{"/help", "/signin", "/signup"}) {
+								if (args[0].compareTo(cmd) == 0) {
+									allowedCommand = true;
+									break;
+								}
+							}
+
+							if (! allowedCommand) {
+								client.getPrintWriter().println("Not connected, please /signin or /signup. 🔒");
+								client.getPrintWriter().flush();
+								msg = client.getBufferedReader().readLine();
+								continue;
+							}
+						}
 
 						switch (args[0]) {
 							case "/ping"	: commandHandler.pong();			break;
+							case "/signin"	: commandHandler.signIn();			break;
+							case "/signup"	: commandHandler.signUp();			break;
+							case "/signout"	: commandHandler.signOut();			break;
 							case "/users"	: commandHandler.users(hosts);		break;
 							case "/help"	: commandHandler.help();			break;
 							case "/invite"	: commandHandler.invite();			break;
 							default			: commandHandler.notFound();		break;
 						}
 						
-						msg = bufferedReader.readLine();
+						msg = client.getBufferedReader().readLine();
 					}
 
-					System.out.println(socket.getInetAddress() + ":" + socket.getPort() +  " --> closed");
+					System.out.println(client.getAddress() + ":" + client.getPort() +  " --> closed");
 				
 					// close the connection between the local host and the remote host
-					printWriter.close();
-					socket.close();
-					scanner.close();
-					removeHost(socket, bufferedReader, printWriter);
+					client.getPrintWriter().close();
+					client.close();
+					//TODO
+					// removeHost(socket, bufferedReader, client.getPrintWriter());
 				} catch (IOException e) {
 					try {
-						socket.close();
+						client.close();
+						//TODO
+						// removeHost(socket, bufferedReader, client.getPrintWriter());
+						System.out.println(client.getAddress() + ":" + client.getPort() +  " (has left the server)");
 					} catch (IOException er) {
-						System.out.println("ERRORRRRRR");
+						System.out.println(er.getMessage());
 					}
-					printWriter.close();
-					scanner.close();
-					removeHost(socket, bufferedReader, printWriter);
-					System.out.println(socket.getInetAddress().getHostAddress() + ":" + socket.getPort() +  " (has left the server)");
 				}
 			}
 		});
@@ -114,28 +144,35 @@ public class Server extends SocketUser implements ISocket {
 		System.out.println("Listening on " + serverSocket.getLocalSocketAddress());
 		
 		while (true) {
-			final Socket clientSocket;
+			final Socket socket;
 			final BufferedReader bufferedReader;
 			final PrintWriter printWriter;
 			
 			try {
 				// if the host does not send a message, it can not create this object
 				// and can not send messages to this host
-				clientSocket = serverSocket.accept();
-				printWriter = new PrintWriter(clientSocket.getOutputStream());
-				bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-				addHost(clientSocket, bufferedReader, printWriter);
+				socket = serverSocket.accept();
+				printWriter = new PrintWriter(socket.getOutputStream());
+				bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				addHost(socket, bufferedReader, printWriter);
 			} catch (IOException e) {
 				System.out.println("Client not accepted.");
 				break;
 			}
 			
-			final Scanner scanner = new Scanner(System.in);
-			System.out.println("" + clientSocket.getInetAddress().getHostAddress() + ":" + clientSocket.getPort() + " (has joined the server)");
+			
+			Scanner scanner = new Scanner(System.in);
+			Client client = new Client();
+			client.setSocket(socket);
+			client.setPrintWriter(printWriter);
+			client.setBufferedReader(bufferedReader);
+			client.setScanner(scanner);
+
+			System.out.println("" + client.getAddress() + ":" + client.getPort() + " (has joined the server)");
 
 			// builds and starts threads
-			buildSender(clientSocket, bufferedReader, printWriter, scanner).start();
-			buildReceiver(clientSocket, bufferedReader, printWriter, scanner).start();
+			buildSender(client).start();
+			buildReceiver(client).start();
 		}
 
 		try {
@@ -143,9 +180,5 @@ public class Server extends SocketUser implements ISocket {
 		} catch (IOException e) {
 			System.out.println();
 		}
-	}
-	
-	public static void main(String[] args) {
-		
 	}
 }

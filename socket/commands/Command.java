@@ -9,7 +9,7 @@ public class Command {
 	public Command(String name, String[] optionalParameters, String[] mandatoryParameters, String documentation) {
 		this.name = name;
 		this.optionalParameters = optionalParameters != null ? optionalParameters : new String[]{};
-		this.mandatoryParameters = mandatoryParameters != null ? optionalParameters : new String[]{};
+		this.mandatoryParameters = mandatoryParameters != null ? mandatoryParameters : new String[]{};
 		this.documentation = documentation;
 	}
 
@@ -23,7 +23,7 @@ public class Command {
 			output += "["+ parameter +"] ";
 		}
 		for (String parameter : mandatoryParameters) {
-			output += ""+ parameter +" ";
+			output += "<"+ parameter +"> ";
 		}
 		
 		return output;

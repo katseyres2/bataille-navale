@@ -8,7 +8,23 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client extends SocketUser implements ISocket {
-	public Thread buildSender(Socket socket, BufferedReader bufferedReader, PrintWriter printWriter, Scanner scanner) {
+	private boolean logged;
+	private String username;
+	private String password;
+
+	public Client() {
+		logged = false;
+	}
+
+	public boolean checkCredentials(String username, String password) {
+		return this.username == username && this.password == password;
+	}
+
+	public boolean isLogged() { return logged; }
+	public String getUsername() { return username; }
+	public void toggleLog() { logged = !logged; }
+
+	public Thread buildSender(SocketUser user) {
 		return new Thread(new Runnable() {
 			String msg;
 
@@ -18,9 +34,9 @@ public class Client extends SocketUser implements ISocket {
 				
 				while (true) {
 					try {
-						msg = scanner.nextLine();
-						printWriter.println(msg);
-						printWriter.flush();
+						msg = user.getScanner().nextLine();
+						user.getPrintWriter().println(msg);
+						user.getPrintWriter().flush();
 					} catch (Exception e) {
 						Thread.currentThread().interrupt();
 						System.out.println("\n\nGoodbye!");
@@ -28,19 +44,23 @@ public class Client extends SocketUser implements ISocket {
 					}
 				}
 
-				close(socket, bufferedReader, scanner, printWriter);
+				try {
+					close();
+				} catch (IOException e) {
+					System.out.println(e.getMessage());
+				}
 			}
 		});
 	}
 
-	public Thread buildReceiver(Socket socket, BufferedReader bufferedReader, PrintWriter printWriter, Scanner scanner) {
+	public Thread buildReceiver(SocketUser user) {
 		return new Thread(new Runnable() {
 			String msg;
 
 			@Override
 			public void run() {
 				try {
-					msg = bufferedReader.readLine();
+					msg = user.getBufferedReader().readLine();
 					
 					while (msg != null) {
 						// String line = FormatService.fromMessage(msg);
@@ -57,11 +77,11 @@ public class Client extends SocketUser implements ISocket {
 						}
 
 						System.out.print("\n" + message + "\n>>> ");
-						msg = bufferedReader.readLine();
+						msg = user.getBufferedReader().readLine();
 					}
 
 					System.out.println("Server out of service");
-					close(socket, bufferedReader, scanner, printWriter);
+					close();
 				} catch (IOException e) {
 					Thread.currentThread().interrupt();
 					System.out.println("\n\nServer out of service ! Please contact the administrator.");
@@ -84,11 +104,17 @@ public class Client extends SocketUser implements ISocket {
 			System.out.println("Unable to create the server socket");
 			return;
 		}
-		
-		final Scanner scanner = new Scanner(System.in);
-		System.out.println("Your address is " + socket.getInetAddress().getHostAddress() + ":" + Integer.toString(socket.getLocalPort()));
 
-		buildSender(socket, bufferedReader, printWriter, scanner).start();
-		buildReceiver(socket, bufferedReader, printWriter, scanner).start();
+		final Scanner scanner = new Scanner(System.in);
+
+		super.setScanner(scanner);
+		super.setSocket(socket);
+		super.setBufferedReader(bufferedReader);
+		super.setPrintWriter(printWriter);
+		
+		System.out.println("Your address is " + super.getSocket().getInetAddress().getHostAddress() + ":" + Integer.toString(socket.getLocalPort()));
+
+		buildSender(this).start();
+		buildReceiver(this).start();
 	}
 }

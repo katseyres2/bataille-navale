@@ -29,11 +29,31 @@ public class ServerCommandHandler {
 	}
 
 	public void invite() {
-		
+		String message = "TODO";
+		printWriter.println(message);
+		printWriter.flush();
+	}
+
+	public void signIn() {
+		String message = "TODO";
+		printWriter.println(message);
+		printWriter.flush();
+	}
+
+	public void signUp() {
+		String message = "TODO";
+		printWriter.println(message);
+		printWriter.flush();
+	}
+
+	public void signOut() {
+		String message = "TODO";
+		printWriter.println(message);
+		printWriter.flush();
 	}
 
 	public void notFound() {
-		String message = "command not found";
+		String message = "Command not found, please send the command /help for more information.";
 		printWriter.println(message);
 		printWriter.flush();
 	}
@@ -42,7 +62,7 @@ public class ServerCommandHandler {
 		String message = "List Of Commands;─┬───────────────; │;";
 
 		for (Command command : ClientCommandHandler.COMMANDS) {
-			int totalLength = 25;
+			int totalLength = 30;
 			int fillWithSpace = totalLength - command.getName().length() - command.getParameters().length();
 			message += " ├─ /" + command.getName() + " " + command.getParameters() + " ".repeat(fillWithSpace) + " : " + command.help() + ";";
 		}

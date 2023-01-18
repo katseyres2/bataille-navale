@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class FormatService {
-	public static String getActualTime() {
+	public static String getCurrentTime() {
 		return DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalDateTime.now());
 	}
 
@@ -28,7 +28,7 @@ public class FormatService {
 	public static String toMessage(Socket socket, String msg) {
 		String output = "";
 
-		output += "["+ FormatService.getActualTime() +"]   TO=\"" + socket.getLocalAddress().getHostAddress() + ":" + socket.getPort() + "\", ";
+		output += "["+ FormatService.getCurrentTime() +"]   TO=\"" + socket.getLocalAddress().getHostAddress() + ":" + socket.getPort() + "\", ";
 		output += "MESSAGE=\"";
 		
 		if (msg.contains(";")) {
