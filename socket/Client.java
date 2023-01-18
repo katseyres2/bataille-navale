@@ -5,11 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 import services.FormatService;
@@ -21,12 +16,13 @@ public class Client extends SocketUser implements ISocket {
 
 			@Override
 			public void run() {
+				System.out.print(">>> ");
+				
 				while (true) {
 					try {
 						msg = scanner.nextLine();
 						printWriter.println(msg);
 						printWriter.flush();
-						// System.out.println(FormatService.toMessage(socket, msg));
 					} catch (Exception e) {
 						Thread.currentThread().interrupt();
 						System.out.println("\n\nGoodbye!");
@@ -46,12 +42,23 @@ public class Client extends SocketUser implements ISocket {
 			@Override
 			public void run() {
 				try {
-					System.out.print("\n>>> ");
 					msg = bufferedReader.readLine();
-
+					
 					while (msg != null) {
-						System.out.println(FormatService.fromMessage(socket, msg));
-						System.out.print("\n>>> ");
+						// String line = FormatService.fromMessage(msg);
+						String message = "";
+						String[] lines = msg.split(";");
+
+						if (msg.contains(";")) {
+							for (String line : lines) {
+								message += line + "\n";
+							}
+						}
+						else {
+							message = msg;
+						}
+
+						System.out.print("\n" + message + "\n>>> ");
 						msg = bufferedReader.readLine();
 					}
 

@@ -13,7 +13,10 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.imageio.IIOException;
+
 import game.Game;
+import socket.commands.ServerCommand;
 
 public class Server extends SocketUser implements ISocket {
 	private final int PORT = 5000;
@@ -61,7 +64,7 @@ public class Server extends SocketUser implements ISocket {
 		// create a new thread that receives sockets
 		return new Thread(new Runnable() {
 			String msg;
-			String output = "";
+			ServerCommand commandHandler = new ServerCommand(printWriter);
 
 			@Override
 			public void run() {
@@ -71,66 +74,53 @@ public class Server extends SocketUser implements ISocket {
 					
 					// while the buffer is not empty, there is still a message inside
 					while (msg != null) {
-						output = "";
 						System.out.println(socket.getInetAddress().getHostAddress() + ":" + socket.getPort() +" : " + msg);
-						
-						if (msg.contentEquals("/ping")) {
-							output = "pong";
+						switch (msg.split(" ")[0]) {
+							case "/ping"	: commandHandler.pong();			break;
+							case "/users"	: commandHandler.users(hosts);		break;
+							case "/help"	: commandHandler.help();			break;
+							case "/invite"	: commandHandler.invite();			break;
+							default			: commandHandler.notFound();		break;
 						}
 						
-						if (msg.contains("/users")) {
-							for (int i = 0; i < hosts.size(); i++) {
-								output += hosts.get(i).getInetAddress().getHostAddress() + ":" + hosts.get(i).getPort() + ", ";
-							}
-						}
-						
-						if (msg.contains("/invite")) {
-							String args[] = msg.split(" ");
+						// if (msg.contains("/invite")) {
+						// 	String args[] = msg.split(" ");
 
-							if (args.length != 2) {
-								output = "require one connected host as argument";
-							} else {
-								String address = args[1];
-								Pattern pattern = Pattern.compile("^([0-9]{1,3}.){3}[0-9]{1,3}:[0-9]{1,5}$");
-								Matcher matcher = pattern.matcher(args[1]);
-								boolean hasMatch = matcher.matches();
+						// 	if (args.length != 2) {
+						// 		output = "require one connected host as argument";
+						// 	} else {
+						// 		String address = args[1];
+						// 		Pattern pattern = Pattern.compile("^([0-9]{1,3}.){3}[0-9]{1,3}:[0-9]{1,5}$");
+						// 		Matcher matcher = pattern.matcher(args[1]);
+						// 		boolean hasMatch = matcher.matches();
 
-								if (!hasMatch) {
-									output = "host:port not found";
-								} else {
-									String elements[] = address.split(":");
-									String ip = elements[0];
-									int port = Integer.parseInt(elements[1]);
+						// 		if (!hasMatch) {
+						// 			output = "host:port not found";
+						// 		} else {
+						// 			String elements[] = address.split(":");
+						// 			String ip = elements[0];
+						// 			int port = Integer.parseInt(elements[1]);
 									
-									for (int i = 0; i < hosts.size(); i++) {
-										Socket remoteHost = hosts.get(i);
-										PrintWriter remoteWriter = writers.get(i);
+						// 			for (int i = 0; i < hosts.size(); i++) {
+						// 				Socket remoteHost = hosts.get(i);
+						// 				PrintWriter remoteWriter = writers.get(i);
 										
-										if (!remoteHost.getInetAddress().getHostAddress().contentEquals(ip)) continue;
-										if (remoteHost.getPort() != port) continue;
+						// 				if (!remoteHost.getInetAddress().getHostAddress().contentEquals(ip)) continue;
+						// 				if (remoteHost.getPort() != port) continue;
 
-										// start a new game
+						// 				// start a new game
 																					
-										// Game game = new Game(clientSocket, remoteHost);
-										// games.add(game);
+						// 				// Game game = new Game(clientSocket, remoteHost);
+						// 				// games.add(game);
 
-										// remoteWriter.println(game.showGrids(remoteHost));
-										// remoteWriter.flush();
-									}
-								}
-							}
+						// 				// remoteWriter.println(game.showGrids(remoteHost));
+						// 				// remoteWriter.flush();
+						// 			}
+						// 		}
+						// 	}
 
-						}
+						// }
 						
-						if (output.length() == 0) {
-							output = "unsupported message";
-						}
-						
-						// prepare message
-						printWriter.println(output);
-						// send the message to the remote host
-						printWriter.flush();
-
 						msg = bufferedReader.readLine();
 					}
 
@@ -142,6 +132,13 @@ public class Server extends SocketUser implements ISocket {
 					scanner.close();
 					removeHost(socket, bufferedReader, printWriter);
 				} catch (IOException e) {
+					try {
+						socket.close();
+					} catch (IOException er) {
+						System.out.println("ERRORRRRRR");
+					}
+					printWriter.close();
+					scanner.close();
 					removeHost(socket, bufferedReader, printWriter);
 					System.out.println(socket.getInetAddress().getHostAddress() + ":" + socket.getPort() +  " (has left the server)");
 				}
