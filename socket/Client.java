@@ -7,8 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-import services.FormatService;
-
 public class Client extends SocketUser implements ISocket {
 	public Thread buildSender(Socket socket, BufferedReader bufferedReader, PrintWriter printWriter, Scanner scanner) {
 		return new Thread(new Runnable() {
@@ -55,7 +53,7 @@ public class Client extends SocketUser implements ISocket {
 							}
 						}
 						else {
-							message = msg;
+							message = msg + "\n";
 						}
 
 						System.out.print("\n" + message + "\n>>> ");

@@ -1,3 +1,4 @@
+package game;
 import socket.Client;
 
 public class Match {

@@ -4,10 +4,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ServerCommand {
+public class ServerCommandHandler {
 	private PrintWriter printWriter;
 	
-	public ServerCommand(PrintWriter printWriter) {
+	public ServerCommandHandler(PrintWriter printWriter) {
 		this.printWriter = printWriter;
 	}
 
@@ -39,15 +39,17 @@ public class ServerCommand {
 	}
 
 	public void help() {
-		String message = "LIST OF COMMANDS;"
-			.concat("─┬───────────────;")
-			.concat(" ├─ /help   : all available commands;")
-			.concat(" ├─ /users  : list of connected users;")
-			.concat(" ├─ /invite : invite a user to play a game;")
-			.concat(" └─ /ping   : ping the server");
+		String message = "List Of Commands;─┬───────────────; │;";
 
-		System.out.println(message);
-		
+		for (Command command : ClientCommandHandler.COMMANDS) {
+			int totalLength = 25;
+			int fillWithSpace = totalLength - command.getName().length() - command.getParameters().length();
+			message += " ├─ /" + command.getName() + " " + command.getParameters() + " ".repeat(fillWithSpace) + " : " + command.help() + ";";
+		}
+
+		message += " │;";
+		message += " └───────────────";
+
 		printWriter.println(message);
 		printWriter.flush();
 	}

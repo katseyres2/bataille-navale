@@ -6,21 +6,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.imageio.IIOException;
-
 import game.Game;
-import socket.commands.ServerCommand;
+import socket.commands.ServerCommandHandler;
 
 public class Server extends SocketUser implements ISocket {
-	private final int PORT = 5000;
-	
 	private ArrayList<Socket> hosts = new ArrayList<>();
 	private ArrayList<BufferedReader> readers = new ArrayList<>();
 	private ArrayList<PrintWriter> writers = new ArrayList<>();
@@ -64,7 +55,7 @@ public class Server extends SocketUser implements ISocket {
 		// create a new thread that receives sockets
 		return new Thread(new Runnable() {
 			String msg;
-			ServerCommand commandHandler = new ServerCommand(printWriter);
+			ServerCommandHandler commandHandler = new ServerCommandHandler(printWriter);
 
 			@Override
 			public void run() {
@@ -75,51 +66,15 @@ public class Server extends SocketUser implements ISocket {
 					// while the buffer is not empty, there is still a message inside
 					while (msg != null) {
 						System.out.println(socket.getInetAddress().getHostAddress() + ":" + socket.getPort() +" : " + msg);
-						switch (msg.split(" ")[0]) {
+						String[] args = msg.split(" ");
+
+						switch (args[0]) {
 							case "/ping"	: commandHandler.pong();			break;
 							case "/users"	: commandHandler.users(hosts);		break;
 							case "/help"	: commandHandler.help();			break;
 							case "/invite"	: commandHandler.invite();			break;
 							default			: commandHandler.notFound();		break;
 						}
-						
-						// if (msg.contains("/invite")) {
-						// 	String args[] = msg.split(" ");
-
-						// 	if (args.length != 2) {
-						// 		output = "require one connected host as argument";
-						// 	} else {
-						// 		String address = args[1];
-						// 		Pattern pattern = Pattern.compile("^([0-9]{1,3}.){3}[0-9]{1,3}:[0-9]{1,5}$");
-						// 		Matcher matcher = pattern.matcher(args[1]);
-						// 		boolean hasMatch = matcher.matches();
-
-						// 		if (!hasMatch) {
-						// 			output = "host:port not found";
-						// 		} else {
-						// 			String elements[] = address.split(":");
-						// 			String ip = elements[0];
-						// 			int port = Integer.parseInt(elements[1]);
-									
-						// 			for (int i = 0; i < hosts.size(); i++) {
-						// 				Socket remoteHost = hosts.get(i);
-						// 				PrintWriter remoteWriter = writers.get(i);
-										
-						// 				if (!remoteHost.getInetAddress().getHostAddress().contentEquals(ip)) continue;
-						// 				if (remoteHost.getPort() != port) continue;
-
-						// 				// start a new game
-																					
-						// 				// Game game = new Game(clientSocket, remoteHost);
-						// 				// games.add(game);
-
-						// 				// remoteWriter.println(game.showGrids(remoteHost));
-						// 				// remoteWriter.flush();
-						// 			}
-						// 		}
-						// 	}
-
-						// }
 						
 						msg = bufferedReader.readLine();
 					}

@@ -1,5 +1,4 @@
 
-import game.Game;
 import game.grid.Grid;
 import socket.Client;
 import socket.Server;
