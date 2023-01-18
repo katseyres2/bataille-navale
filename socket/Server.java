@@ -13,22 +13,8 @@ import services.FormatService;
 import socket.commands.ServerCommandHandler;
 
 public class Server extends SocketUser implements ISocket {
-	private ArrayList<Socket> hosts = new ArrayList<>();
-	private ArrayList<BufferedReader> readers = new ArrayList<>();
-	private ArrayList<PrintWriter> writers = new ArrayList<>();
+	private ArrayList<Client> clients = new ArrayList<Client>();
 	private ArrayList<Game> games = new ArrayList<>();
-
-	private void addHost(Socket host, BufferedReader reader, PrintWriter writer) {
-		hosts.add(host);
-		readers.add(reader);
-		writers.add(writer);
-	}
-
-	private void removeHost(Socket host, BufferedReader reader, PrintWriter writer) {
-		hosts.remove(host);
-		readers.remove(reader);
-		writers.add(writer);
-	}
 
 	@Override
 	public Thread buildSender(SocketUser user) {
@@ -72,11 +58,13 @@ public class Server extends SocketUser implements ISocket {
 
 					// while the buffer is not empty, there is still a message inside
 					while (msg != null) {
-						if (msg.length() > 0) {
-							System.out.println("[" + FormatService.getCurrentTime() + "] " + client.getAddress() + ":" + client.getPort() +" : " + msg);
-						}
-
 						String[] args = msg.split(" ");
+
+						if (msg.length() > 0) {
+							System.out.print("[" + FormatService.getCurrentTime());
+							if (client.isLogged()) System.out.print(" " + FormatService.ANSI_YELLOW + client.getUsername() + FormatService.ANSI_RESET);
+							System.out.print("] " + client.getAddress() + ":" + client.getPort() + FormatService.ANSI_RESET + " : " + args[0] + "\n");
+						}
 
 						if (! client.isLogged()) {
 							boolean allowedCommand = false;
@@ -97,16 +85,17 @@ public class Server extends SocketUser implements ISocket {
 						}
 
 						switch (args[0]) {
-							case "/ping"	: commandHandler.pong();			break;
-							case "/signin"	: commandHandler.signIn();			break;
-							case "/signup"	: commandHandler.signUp();			break;
-							case "/signout"	: commandHandler.signOut();			break;
-							case "/users"	: commandHandler.users(hosts);		break;
-							case "/help"	: commandHandler.help();			break;
-							case "/invite"	: commandHandler.invite();			break;
-							default			: commandHandler.notFound();		break;
+							case "/ping"	: commandHandler.pong();						break;
+							case "/signin"	: commandHandler.signIn(args, client, clients);	break;
+							case "/signup"	: commandHandler.signUp(args, client, clients);	break;
+							case "/signout"	: commandHandler.signOut(client);				break;
+							case "/users"	: commandHandler.users(clients);				break;
+							case "/help"	: commandHandler.help();						break;
+							case "/invite"	: commandHandler.invite();						break;
+							default			: commandHandler.notFound();					break;
 						}
 						
+						client.getPrintWriter().flush();
 						msg = client.getBufferedReader().readLine();
 					}
 
@@ -154,7 +143,7 @@ public class Server extends SocketUser implements ISocket {
 				socket = serverSocket.accept();
 				printWriter = new PrintWriter(socket.getOutputStream());
 				bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				addHost(socket, bufferedReader, printWriter);
+				// addHost(socket, bufferedReader, printWriter);
 			} catch (IOException e) {
 				System.out.println("Client not accepted.");
 				break;

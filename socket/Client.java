@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
+import services.expections.NotConnectedException;
+
 public class Client extends SocketUser implements ISocket {
 	private boolean logged;
 	private String username;
@@ -17,11 +19,29 @@ public class Client extends SocketUser implements ISocket {
 	}
 
 	public boolean checkCredentials(String username, String password) {
-		return this.username == username && this.password == password;
+		return this.username.compareTo(username) == 0 && this.password.compareTo(password) == 0;
+	}
+
+	public boolean compareTo(Client client) {
+		return client.checkCredentials(username, password);
+	}
+
+	private void clearCredentials() {
+		username = null;
+		password = null;
+	}
+
+	public void signOut() throws NotConnectedException {
+		if (!logged) {
+			throw new NotConnectedException();
+		}
+		logged = false;
 	}
 
 	public boolean isLogged() { return logged; }
 	public String getUsername() { return username; }
+	public void setUsername(String value) { username = value; }
+	public void setPassword(String value) { password = value; }
 	public void toggleLog() { logged = !logged; }
 
 	public Thread buildSender(SocketUser user) {
