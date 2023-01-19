@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.Scanner;
 import services.FormatService;
@@ -34,6 +36,27 @@ public class Server extends SocketUser implements ISocket {
 					user.getPrintWriter().println(msg);
 					// clear the memory cell
 					user.getPrintWriter().flush();
+				}
+			}
+		});
+	}
+
+	public Thread checkConnection() {
+		return new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					for (Client client : clients) {
+						if (client.isLogged() && !client.getLastConnection().plus(10, ChronoUnit.SECONDS).isAfter(FormatService.getCurrentTime())) {
+							client.toggleLog();
+						}
+					}
+					
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+						System.out.println(e.getMessage());
+					}
 				}
 			}
 		});
@@ -163,6 +186,7 @@ public class Server extends SocketUser implements ISocket {
 		}
 
 		System.out.println("Listening on " + serverSocket.getLocalSocketAddress());
+		checkConnection().start();
 		
 		while (true) {
 			final Socket socket;

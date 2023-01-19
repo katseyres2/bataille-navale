@@ -130,7 +130,8 @@ public class Client extends SocketUser implements ISocket {
 		final PrintWriter printWriter;
 		
 		try {
-			String host = "45.147.97.136";
+			String host = "127.0.0.1";
+			// String host = "45.147.97.136";
 			System.out.println(host + ":" + port);
 			socket = new Socket(host, port);
 			printWriter = new PrintWriter(socket.getOutputStream());
