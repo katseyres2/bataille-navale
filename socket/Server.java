@@ -107,6 +107,7 @@ public class Server extends SocketUser implements ISocket {
 							: messageToSend;
 						
 						if (client.isLogged()) {
+							client.refreshLastConnection();
 							messageToSend += ";;" + color + "(" + client.getUsername() + ")──┤" + FormatService.ANSI_RESET;
 						} else {
 							messageToSend += ";;(?)──┤";

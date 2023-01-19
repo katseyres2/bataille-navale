@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 import services.expections.NotConnectedException;
@@ -13,9 +14,19 @@ public class Client extends SocketUser implements ISocket {
 	private boolean logged;
 	private String username;
 	private String password;
+	private LocalDateTime lastConnectionAt;
 
 	public Client() {
 		logged = false;
+		lastConnectionAt = LocalDateTime.now();
+	}
+
+	public LocalDateTime getLastConnection() {
+		return lastConnectionAt;
+	}
+
+	public void refreshLastConnection() {
+		lastConnectionAt = LocalDateTime.now();
 	}
 
 	public boolean checkCredentials(String username, String password) {

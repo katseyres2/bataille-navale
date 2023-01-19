@@ -13,7 +13,7 @@ public class ServerCommandHandler {
 
 		for (int i = 0; i < clients.size(); i++) {
 			if (clients.get(i).getUsername().compareTo(client.getUsername()) == 0) continue;
-			message += " ├─ " + (clients.get(i).isLogged() ? "🟢 " : "🔴 ") + clients.get(i).getUsername() + " (" + (clients.get(i).isLogged() ? "online" : "offline") + ");";
+			message += " ├─ " + (clients.get(i).isLogged() ? "🟢 " : "🔴 ") + clients.get(i).getUsername() + " is " + (clients.get(i).isLogged() ? "online" : "offline") + " (last connection : " + FormatService.LocalDateTimeToString(clients.get(i).getLastConnection()) + ");";
 		}
 
 		return message += " │; └────────────";

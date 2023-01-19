@@ -31,8 +31,12 @@ public class FormatService {
 		return colors[(new Random()).nextInt(colors.length - 1)];
 	}
 
-	public static String getCurrentTime() {
-		return DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalDateTime.now());
+	public static String LocalDateTimeToString(LocalDateTime dateTime) {
+		return DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").format(dateTime);
+	}
+
+	public static LocalDateTime getCurrentTime() {
+		return LocalDateTime.now();
 	}
 
 	public static String formatSpace(int length, String word, boolean alignLeft) {
@@ -48,13 +52,13 @@ public class FormatService {
 			true
 		);
 
-		return "[" + FormatService.getCurrentTime() + " " + username + "] ";
+		return "[" + FormatService.LocalDateTimeToString(FormatService.getCurrentTime()) + " " + username + "] ";
 	}
 
 	public static String toMessage(Socket socket, String msg) {
 		String output = "";
 
-		output += "["+ FormatService.getCurrentTime() +"]   TO=\"" + socket.getLocalAddress().getHostAddress() + ":" + socket.getPort() + "\", ";
+		output += "["+ FormatService.LocalDateTimeToString(FormatService.getCurrentTime()) +"]   TO=\"" + socket.getLocalAddress().getHostAddress() + ":" + socket.getPort() + "\", ";
 		output += "MESSAGE=\"";
 		
 		if (msg.contains(";")) {
