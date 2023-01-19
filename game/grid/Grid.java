@@ -1,4 +1,4 @@
-package grid;
+package game.grid;
 
 import java.util.Random;
 
@@ -6,6 +6,7 @@ import java.util.Random;
  * 
  */
 public class Grid {
+	static final char POSITIONS[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
 	final private static int ROWS = 10;
 	final private static int COLUMNS = 10;
 	final private static int VECTORS_LENGTH = 9;
@@ -219,9 +220,27 @@ public class Grid {
 	 */
 	public void show() {
 		System.out.print("\n");
-		for (String[] strings : grid) {
-			for (String string : strings) {
-				System.out.print((string == null ? "-" : string) + " ");
+		for (int i = 0; i < 11;i++){
+			for(int j = 0; j < 11; j++){
+				// Affiche la lettre sur la première colonne
+				if(j==1){
+					if(i>=1){
+						System.out.print(POSITIONS[i-1] + " ");
+					}
+				}
+				// Affiche la position ( chiffre ) sur la première ligne
+				if(i==0){
+					if(j==0){
+						System.out.print("\\ ");
+					}
+					if(j>=1){
+						System.out.printf(" %d ", j);
+					}
+				}else if (j>=1 && (grid[i-1][j-1] == null)) {
+					System.out.print(" • ");
+				}else if(j>=1 && (grid[i-1][j-1] != null)){
+					System.out.print(" "+ grid[i-1][j-1] +" ");
+				}
 			}
 			System.out.print("\n");
 		}
