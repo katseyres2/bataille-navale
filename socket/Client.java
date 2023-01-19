@@ -26,15 +26,8 @@ public class Client extends SocketUser implements ISocket {
 		return client.checkCredentials(username, password);
 	}
 
-	private void clearCredentials() {
-		username = null;
-		password = null;
-	}
-
 	public void signOut() throws NotConnectedException {
-		if (!logged) {
-			throw new NotConnectedException();
-		}
+		if (!logged) throw new NotConnectedException();
 		logged = false;
 	}
 
@@ -50,16 +43,23 @@ public class Client extends SocketUser implements ISocket {
 
 			@Override
 			public void run() {
-				System.out.print(">>> ");
-				
 				while (true) {
 					try {
 						msg = user.getScanner().nextLine();
 						user.getPrintWriter().println(msg);
 						user.getPrintWriter().flush();
 					} catch (Exception e) {
+						user.getPrintWriter().println("/q!");
+						user.getPrintWriter().flush();
+
+						try {
+							user.close();
+						} catch (IOException er) {
+							System.out.println(er.getMessage());
+						}
+
 						Thread.currentThread().interrupt();
-						System.out.println("\n\nGoodbye!");
+						System.out.println("\n\nGoodbye!\n");
 						break;
 					}
 				}
@@ -83,20 +83,22 @@ public class Client extends SocketUser implements ISocket {
 					msg = user.getBufferedReader().readLine();
 					
 					while (msg != null) {
-						// String line = FormatService.fromMessage(msg);
 						String message = "";
 						String[] lines = msg.split(";");
 
 						if (msg.contains(";")) {
 							for (String line : lines) {
-								message += line + "\n";
+								message += line;
+								if (line.compareTo(lines[lines.length - 1]) != 0) {
+									message += "\n";
+								}
 							}
 						}
 						else {
 							message = msg + "\n";
 						}
 
-						System.out.print("\n" + message + "\n>>> ");
+						System.out.print("\n" + message + "$ ");
 						msg = user.getBufferedReader().readLine();
 					}
 
@@ -104,7 +106,7 @@ public class Client extends SocketUser implements ISocket {
 					close();
 				} catch (IOException e) {
 					Thread.currentThread().interrupt();
-					System.out.println("\n\nServer out of service ! Please contact the administrator.");
+					System.out.println("\n\nServer out of service ! Please contact the administrator.\n");
 					System.exit(1);
 				}
 			}
@@ -132,7 +134,7 @@ public class Client extends SocketUser implements ISocket {
 		super.setBufferedReader(bufferedReader);
 		super.setPrintWriter(printWriter);
 		
-		System.out.println("Your address is " + super.getSocket().getInetAddress().getHostAddress() + ":" + Integer.toString(socket.getLocalPort()));
+		System.out.print("\nYour address is " + super.getSocket().getInetAddress().getHostAddress() + ":" + Integer.toString(socket.getLocalPort()));
 
 		buildSender(this).start();
 		buildReceiver(this).start();

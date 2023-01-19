@@ -4,6 +4,9 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Random;
+
+import socket.Client;
 
 public class FormatService {
 	public static final String ANSI_RESET	= "\u001B[0m";
@@ -16,23 +19,36 @@ public class FormatService {
 	public static final String ANSI_CYAN	= "\u001B[36m";
 	public static final String ANSI_WHITE	= "\u001B[37m";
 
+	public static final int USERNAME_MAX_LENGTH = 10;
+	public static final int PASSWORD_MAX_LENGTH = 10;
+
+	public static String getRandomColor() {
+		String[] colors = {
+			ANSI_RED, ANSI_GREEN, ANSI_YELLOW,
+			ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN,
+		};
+
+		return colors[(new Random()).nextInt(colors.length - 1)];
+	}
+
 	public static String getCurrentTime() {
 		return DateTimeFormatter.ofPattern("HH:mm:ss").format(LocalDateTime.now());
 	}
 
-	public static String fromMessage(String msg) {
-		String output = "SERVER | ";
+	public static String formatSpace(int length, String word, boolean alignLeft) {
+		return (alignLeft == true ? word : "") + " ".repeat(length - word.length()) + (alignLeft == true ? "" : word);
+	}
 
-		if (msg.contains(";")) {
-			for (String row : msg.split(";")) {
-				output += row + "::";
-			}
-		}
-		else {
-			output += msg;
-		}
+	public static String serverLogPrefix(Client client) {
+		String username = FormatService.formatSpace(
+			FormatService.USERNAME_MAX_LENGTH,
+			client != null && client.getUsername() != null
+				? client.getUsername()
+				: "?",
+			true
+		);
 
-		return "hi ";
+		return "[" + FormatService.getCurrentTime() + " " + username + "] ";
 	}
 
 	public static String toMessage(Socket socket, String msg) {

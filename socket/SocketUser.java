@@ -35,7 +35,6 @@ public class SocketUser {
 		try {
 			bufferedReader.close();
 			socket.close();
-			scanner.close();
 			printWriter.close();
 			clear();
 		} catch (IOException e) {

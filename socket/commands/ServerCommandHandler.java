@@ -1,120 +1,134 @@
 package socket.commands;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 
+import services.FormatService;
 import services.expections.NotConnectedException;
 import socket.Client;
 
 public class ServerCommandHandler {
-	private PrintWriter printWriter;
-	
-	public ServerCommandHandler(PrintWriter printWriter) {
-		this.printWriter = printWriter;
+	public String users(Client client, ArrayList<Client> clients) {
+		String message = "List Of Users;"
+			.concat("─┬────────────; │;");
+
+		for (int i = 0; i < clients.size(); i++) {
+			if (clients.get(i).getUsername().compareTo(client.getUsername()) == 0) continue;
+			message += " ├─ " + (clients.get(i).isLogged() ? "🟢 " : "🔴 ") + clients.get(i).getUsername() + " (" + (clients.get(i).isLogged() ? "online" : "offline") + ");";
+		}
+
+		return message += " │; └────────────";
 	}
 
-	public void users(ArrayList<Client> clients) {
+	public String pong() {
+		String message = "pong";
+		return message;
+	}
+
+	public String invite() {
+		String message = "TODO";
+		return message;
+	}
+
+	public String signIn(String[] args, Client client, ArrayList<Client> clients) {
 		String message = "";
 		
-		for (int i = 0; i < clients.size(); i++) {
-			message += clients.get(i).getAddress() + ":" + clients.get(i).getPort() + ", ";
-		}
-
-		printWriter.println(message);
-		printWriter.flush();
-	}
-
-	public void pong() {
-		String message = "pong";
-		printWriter.println(message);
-		printWriter.flush();
-	}
-
-	public void invite() {
-		String message = "TODO";
-		printWriter.println(message);
-		printWriter.flush();
-	}
-
-	public void signIn(String[] args, Client client, ArrayList<Client> clients) {
-		if (client.isLogged()) {
-			client.getPrintWriter().println("You're already connected.");
-			return;
-		}
-
 		if (args.length != 3) {
-			client.getPrintWriter().println("You must specify <username> <password>.");
-			return;
-		}
+			message += "You must specify <username> <password>.";
+		} else {
+			if (client.isLogged()) {
+				message += "You're already connected.";
+			} else {
+				boolean userMatch = false;
 
-		for (Client registeredClient : clients) {
-			if (registeredClient.checkCredentials(args[1], args[2]) && !registeredClient.isLogged()) {
-				registeredClient.toggleLog();
-				registeredClient.setBufferedReader(client.getBufferedReader());										
-				registeredClient.setPrintWriter(client.getPrintWriter());										
-				registeredClient.setScanner(client.getScanner());
-				registeredClient.setSocket(client.getSocket());
+				for (Client registeredClient : clients) {
+					String username = args[1];
+					String password = args[2];
+					
+					if (registeredClient.getUsername().compareTo(username) == 0) {
+						userMatch = true;
 
-				client.getPrintWriter().println("Welcome " + registeredClient.getUsername());
-				return;
+						if (registeredClient.checkCredentials(username, password)) {
+							if (registeredClient.isLogged()) {
+								message += "You're connected on another device.";
+							} else {
+								clients.remove(registeredClient);
+								client.setUsername(username);
+								client.setPassword(password);
+								client.toggleLog();
+								clients.add(client);				
+
+								message += "Welcome back " + registeredClient.getUsername() + " ! 😎;;";
+								message += users(registeredClient, clients);
+							}
+						} else {
+							message += "Invalid credentials.";
+						}
+
+						break;
+					}
+				}
+				
+				if (!userMatch) {
+					message += "The user does not exist.";
+				}
 			}
 		}
 
-		client.getPrintWriter().println("Invalid credentials.");
+		return message;
 	}
 
-	public void signUp(String[] args, Client client, ArrayList<Client> clients) {
+	public String signUp(String[] args, Client client, ArrayList<Client> clients) {
+		String message = "";
+		
 		if (client.isLogged()) {
-			client.getPrintWriter().println("You're already connected.");
-			return;
-		}
+			message += "You're already connected.";
+		} else if (args.length != 3) {
+			message += "You must specify <username> <password>.";
+		} else if (args[1].length() > FormatService.USERNAME_MAX_LENGTH) {
+			message += "The username must have up to "+ FormatService.USERNAME_MAX_LENGTH +" characters.";
+		} else if (args[2].length() > FormatService.PASSWORD_MAX_LENGTH) {
+			message += "The password must have up to "+ FormatService.PASSWORD_MAX_LENGTH +" characters.";
+		} else {
+			boolean usernameExists = false;
+			
+			for (Client registeredClient : clients) {
+				if (registeredClient.getUsername().compareTo(args[1]) == 0) {
+					usernameExists = true;
+					break;
+				}
+			}
 
-		if (args.length != 3) {
-			client.getPrintWriter().println("You must specify <username> <password>.");
-			return;
-		}
-
-		boolean usernameExists = false;
-
-		for (Client registeredClient : clients) {
-			if (registeredClient.getUsername().compareTo(args[1]) == 0) {
-				usernameExists = true;
-				break;
+			if (usernameExists) {
+				message += "This username already exists.";
+			} else {
+				client.setUsername(args[1]);
+				client.setPassword(args[2]);
+				client.toggleLog();
+				clients.add(client);
+				
+				message += "Your have created a new account, welcome " + client.getUsername() + ".;;";
+				message += users(client, clients);
 			}
 		}
 
-		if (usernameExists) {
-			client.getPrintWriter().println("This username already exists.");
-			return;
-		}
-
-		client.setUsername(args[1]);
-		client.setPassword(args[2]);
-		client.toggleLog();
-		clients.add(client);
-
-		client.getPrintWriter().println("Your have created a new account, welcome " + client.getUsername() + ".");
+		return message;
 	}
 
-	public void signOut(Client client) {
+	public String signOut(Client client, ArrayList<Client> clients) {
 		try {
 			client.signOut();
 		} catch (NotConnectedException e) {
 			System.out.println(e.getMessage());
 		}
 
-		client.getPrintWriter().println("You're disconnected.");
+		return "You're disconnected, see you soon. 🙂";
 	}
 
-	public void notFound() {
-		String message = "Command not found, please send the command /help for more information.";
-		printWriter.println(message);
-		printWriter.flush();
+	public String notFound() {
+		return "Command not found, please send the command /help for more information.";
 	}
 
-	public void help() {
+	public String help() {
 		String message = "List Of Commands;─┬───────────────; │;";
 
 		for (Command command : ClientCommandHandler.COMMANDS) {
@@ -126,7 +140,6 @@ public class ServerCommandHandler {
 		message += " │;";
 		message += " └───────────────";
 
-		printWriter.println(message);
-		printWriter.flush();
+		return message;
 	}
 }

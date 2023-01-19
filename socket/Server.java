@@ -8,13 +8,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
-import game.Game;
 import services.FormatService;
 import socket.commands.ServerCommandHandler;
 
 public class Server extends SocketUser implements ISocket {
 	private ArrayList<Client> clients = new ArrayList<Client>();
-	private ArrayList<Game> games = new ArrayList<>();
 
 	@Override
 	public Thread buildSender(SocketUser user) {
@@ -25,8 +23,8 @@ public class Server extends SocketUser implements ISocket {
 
 			@Override
 			public void run() {
-				msg = "Welcome ! Use the command /signup to create a new account or /signin you're already registered 🙂";
-				user.getPrintWriter().println(msg);
+				msg = "Welcome ! Use the command /signup to create a new account or /signin you're already registered.;;(?)──┤\n";
+				user.getPrintWriter().print(msg);
 				user.getPrintWriter().flush();
 
 				while(true) {
@@ -44,14 +42,15 @@ public class Server extends SocketUser implements ISocket {
 	@Override
 	public Thread buildReceiver(SocketUser user) {
 		Client client = (Client)user;
-
+		
 		// create a new thread that receives sockets
 		return new Thread(new Runnable() {
 			String msg;
-			ServerCommandHandler commandHandler = new ServerCommandHandler(client.getPrintWriter());
-
+			ServerCommandHandler commandHandler = new ServerCommandHandler();
+			
 			@Override
 			public void run() {
+				String color = FormatService.getRandomColor();
 				try {
 					// catch the message from the remote host
 					msg = client.getBufferedReader().readLine();
@@ -59,43 +58,76 @@ public class Server extends SocketUser implements ISocket {
 					// while the buffer is not empty, there is still a message inside
 					while (msg != null) {
 						String[] args = msg.split(" ");
+						String messageToSend = "";
+						String logMessage = "";
+						boolean closeClient = false;
 
-						if (msg.length() > 0) {
-							System.out.print("[" + FormatService.getCurrentTime());
-							if (client.isLogged()) System.out.print(" " + FormatService.ANSI_YELLOW + client.getUsername() + FormatService.ANSI_RESET);
-							System.out.print("] " + client.getAddress() + ":" + client.getPort() + FormatService.ANSI_RESET + " : " + args[0] + "\n");
+						if (msg.length() > 0 && args[0].compareTo("/q!") != 0) {
+							logMessage += args[0];
 						}
 
-						if (! client.isLogged()) {
-							boolean allowedCommand = false;
+						if (args[0].compareTo("/q!") == 0) {
+							if (client.isLogged()) {
+								commandHandler.signOut(client, clients);
+							}
 
-							for (String cmd : new String[]{"/help", "/signin", "/signup"}) {
+							closeClient = true;
+							logMessage += FormatService.ANSI_RED + "has left the room." + FormatService.ANSI_RESET;
+						}
+						
+						boolean allowedCommand = false;
+
+						if (!client.isLogged()) {
+							for (String cmd : new String[]{"/signin", "/signup", "/help"}) {						
 								if (args[0].compareTo(cmd) == 0) {
+									if (cmd.compareTo("/signin") == 0 || cmd.compareToIgnoreCase("signup") == 0) color = FormatService.getRandomColor();
 									allowedCommand = true;
 									break;
 								}
 							}
+						}
+							
+						if (client.isLogged() || allowedCommand) {
+							switch (args[0]) {
+								case "/ping"	: messageToSend += commandHandler.pong();							break;
+								case "/signin"	: messageToSend += commandHandler.signIn(args, client, clients);	break;
+								case "/signup"	: messageToSend += commandHandler.signUp(args, client, clients);	break;
+								case "/signout"	: messageToSend += commandHandler.signOut(client, clients);			break;
+								case "/users"	: messageToSend += commandHandler.users(client, clients);			break;
+								case "/help"	: messageToSend += commandHandler.help();							break;
+								case "/invite"	: messageToSend += commandHandler.invite();							break;
+								default			: messageToSend += commandHandler.notFound();						break;
+							}
+						} else {
+							messageToSend += "Not connected, please /signin or /signup. 🔒";
+						}
 
-							if (! allowedCommand) {
-								client.getPrintWriter().println("Not connected, please /signin or /signup. 🔒");
-								client.getPrintWriter().flush();
-								msg = client.getBufferedReader().readLine();
-								continue;
+						messageToSend = client.isLogged()
+							? color + "▓ " + FormatService.ANSI_RESET + messageToSend.replace(";", ";" + color + "▓ " + FormatService.ANSI_RESET)
+							: messageToSend;
+						
+						if (client.isLogged()) {
+							messageToSend += ";;" + color + "(" + client.getUsername() + ")──┤" + FormatService.ANSI_RESET;
+						} else {
+							messageToSend += ";;(?)──┤";
+						}
+
+						client.getPrintWriter().println(messageToSend);
+						client.getPrintWriter().flush();
+
+						logMessage = FormatService.serverLogPrefix(client.isLogged() ? client : null) + logMessage;
+						
+						System.out.print(logMessage + "\n");
+
+						if (closeClient) {
+							try {
+								client.close();
+								return;
+							} catch (IOException e) {
+								System.out.print(" can't be closed.");
 							}
 						}
 
-						switch (args[0]) {
-							case "/ping"	: commandHandler.pong();						break;
-							case "/signin"	: commandHandler.signIn(args, client, clients);	break;
-							case "/signup"	: commandHandler.signUp(args, client, clients);	break;
-							case "/signout"	: commandHandler.signOut(client);				break;
-							case "/users"	: commandHandler.users(clients);				break;
-							case "/help"	: commandHandler.help();						break;
-							case "/invite"	: commandHandler.invite();						break;
-							default			: commandHandler.notFound();					break;
-						}
-						
-						client.getPrintWriter().flush();
 						msg = client.getBufferedReader().readLine();
 					}
 
@@ -111,7 +143,6 @@ public class Server extends SocketUser implements ISocket {
 						client.close();
 						//TODO
 						// removeHost(socket, bufferedReader, client.getPrintWriter());
-						System.out.println(client.getAddress() + ":" + client.getPort() +  " (has left the server)");
 					} catch (IOException er) {
 						System.out.println(er.getMessage());
 					}
@@ -157,7 +188,7 @@ public class Server extends SocketUser implements ISocket {
 			client.setBufferedReader(bufferedReader);
 			client.setScanner(scanner);
 
-			System.out.println("" + client.getAddress() + ":" + client.getPort() + " (has joined the server)");
+			System.out.print(FormatService.serverLogPrefix(client) + FormatService.ANSI_GREEN + "has joined the room." + FormatService.ANSI_RESET + "\n");
 
 			// builds and starts threads
 			buildSender(client).start();
