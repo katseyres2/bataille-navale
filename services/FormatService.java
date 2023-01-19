@@ -17,17 +17,14 @@ public class FormatService {
 	public static final String ANSI_CYAN	= "\u001B[36m";
 	public static final String ANSI_WHITE	= "\u001B[37m";
 
+	public static final String[] colors = {
+		ANSI_RESET, ANSI_BLACK, ANSI_RED,
+		ANSI_GREEN, ANSI_YELLOW, ANSI_BLUE,
+		ANSI_PURPLE, ANSI_CYAN, ANSI_WHITE,
+	};
+
 	public static final int USERNAME_MAX_LENGTH = 10;
 	public static final int PASSWORD_MAX_LENGTH = 10;
-
-	public static String getRandomColor() {
-		String[] colors = {
-			ANSI_RED, ANSI_GREEN, ANSI_YELLOW,
-			ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN,
-		};
-
-		return colors[(new Random()).nextInt(colors.length - 1)];
-	}
 
 	public static String LocalDateTimeToString(LocalDateTime dateTime) {
 		return DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").format(dateTime);

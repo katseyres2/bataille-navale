@@ -6,19 +6,32 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.time.LocalDateTime;
+import java.util.Random;
 import java.util.Scanner;
 
+import services.FormatService;
 import services.expections.NotConnectedException;
 
 public class Client extends SocketUser implements ISocket {
 	private boolean logged;
 	private String username;
 	private String password;
+	private String color;
 	private LocalDateTime lastConnectionAt;
 
 	public Client() {
 		logged = false;
 		lastConnectionAt = LocalDateTime.now();
+		refreshColor();
+	}
+
+	public String getColor() {
+		return color;
+	}
+
+	public void refreshColor() {
+		String[] colors = FormatService.colors;
+		color =  colors[(new Random()).nextInt(colors.length - 1)];
 	}
 
 	public LocalDateTime getLastConnection() {

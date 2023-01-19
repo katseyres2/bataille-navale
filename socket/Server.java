@@ -47,7 +47,7 @@ public class Server extends SocketUser implements ISocket {
 			public void run() {
 				while (true) {
 					for (Client client : clients) {
-						if (client.isLogged() && !client.getLastConnection().plus(10, ChronoUnit.SECONDS).isAfter(FormatService.getCurrentTime())) {
+						if (client.isLogged() && !client.getLastConnection().plus(5, ChronoUnit.MINUTES).isAfter(FormatService.getCurrentTime())) {
 							client.toggleLog();
 						}
 					}
@@ -73,7 +73,7 @@ public class Server extends SocketUser implements ISocket {
 			
 			@Override
 			public void run() {
-				String color = FormatService.getRandomColor();
+				client.refreshColor();
 				try {
 					// catch the message from the remote host
 					msg = client.getBufferedReader().readLine();
@@ -103,7 +103,7 @@ public class Server extends SocketUser implements ISocket {
 						if (!client.isLogged()) {
 							for (String cmd : new String[]{"/signin", "/signup", "/help"}) {						
 								if (args[0].compareTo(cmd) == 0) {
-									if (cmd.compareTo("/signin") == 0 || cmd.compareToIgnoreCase("signup") == 0) color = FormatService.getRandomColor();
+									if (cmd.compareTo("/signin") == 0 || cmd.compareToIgnoreCase("signup") == 0) client.refreshColor();
 									allowedCommand = true;
 									break;
 								}
@@ -112,26 +112,26 @@ public class Server extends SocketUser implements ISocket {
 							
 						if (client.isLogged() || allowedCommand) {
 							switch (args[0]) {
-								case "/ping"	: messageToSend += commandHandler.pong();							break;
-								case "/signin"	: messageToSend += commandHandler.signIn(args, client, clients);	break;
-								case "/signup"	: messageToSend += commandHandler.signUp(args, client, clients);	break;
-								case "/signout"	: messageToSend += commandHandler.signOut(client, clients);			break;
-								case "/users"	: messageToSend += commandHandler.users(client, clients);			break;
-								case "/help"	: messageToSend += commandHandler.help();							break;
-								case "/invite"	: messageToSend += commandHandler.invite();							break;
-								default			: messageToSend += commandHandler.notFound();						break;
+								case "/ping"	: messageToSend += commandHandler.pong();								break;
+								case "/signin"	: messageToSend += commandHandler.signIn(args, client, clients);		break;
+								case "/signup"	: messageToSend += commandHandler.signUp(args, client, clients);		break;
+								case "/signout"	: messageToSend += commandHandler.signOut(client, clients);				break;
+								case "/users"	: messageToSend += commandHandler.users(client, clients);				break;
+								case "/help"	: messageToSend += commandHandler.help();								break;
+								case "/invite"	: messageToSend += commandHandler.invite(args, client, clients);		break;
+								default			: messageToSend += commandHandler.notFound();							break;
 							}
 						} else {
 							messageToSend += "Not connected, please /signin or /signup. 🔒";
 						}
 
 						messageToSend = client.isLogged()
-							? color + "▓ " + FormatService.ANSI_RESET + messageToSend.replace(";", ";" + color + "▓ " + FormatService.ANSI_RESET)
+							? client.getColor() + "▓ " + FormatService.ANSI_RESET + messageToSend.replace(";", ";" + client.getColor() + "▓ " + FormatService.ANSI_RESET)
 							: messageToSend;
 						
 						if (client.isLogged()) {
 							client.refreshLastConnection();
-							messageToSend += ";;" + color + "(" + client.getUsername() + ")──┤" + FormatService.ANSI_RESET;
+							messageToSend += ";;" + client.getColor() + "(" + client.getUsername() + ")──┤" + FormatService.ANSI_RESET;
 						} else {
 							messageToSend += ";;(?)──┤";
 						}

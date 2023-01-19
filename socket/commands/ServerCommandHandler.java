@@ -13,7 +13,11 @@ public class ServerCommandHandler {
 
 		for (int i = 0; i < clients.size(); i++) {
 			if (clients.get(i).getUsername().compareTo(client.getUsername()) == 0) continue;
-			message += " ├─ " + (clients.get(i).isLogged() ? "🟢 " : "🔴 ") + clients.get(i).getUsername() + " is " + (clients.get(i).isLogged() ? "online" : "offline") + " (last connection : " + FormatService.LocalDateTimeToString(clients.get(i).getLastConnection()) + ");";
+			message += " ├─ " + (clients.get(i).isLogged() ? "🟢 " : "🔴 ") + clients.get(i).getUsername()
+			         + " is " + (clients.get(i).isLogged() ? "online" : "offline") + " (last message sent : "
+					 + FormatService.LocalDateTimeToString(clients.get(i).getLastConnection()) + ") "
+					//  + "victories (" + 
+					 + ";";
 		}
 
 		return message += " │; └────────────";
@@ -21,11 +25,6 @@ public class ServerCommandHandler {
 
 	public String pong() {
 		String message = "pong";
-		return message;
-	}
-
-	public String invite() {
-		String message = "TODO";
 		return message;
 	}
 
@@ -139,6 +138,35 @@ public class ServerCommandHandler {
 
 		message += " │;";
 		message += " └───────────────";
+
+		return message;
+	}
+
+	public String invite(String[] args, Client client, ArrayList<Client> clients) {
+		String message = "";
+		
+		if (args.length != 2) {
+			message += "You must specify <username>.";
+		} else if (args[1].compareTo(client.getUsername()) == 0) {
+			message += "You can't invite yourself. 🤪";
+		} else {
+			String username = args[1];
+			boolean clientMatch = false;
+			
+			for (Client registeredClient : clients) {
+				if (registeredClient.isLogged() && registeredClient.getUsername().compareTo(username) == 0) {
+					registeredClient.getPrintWriter().println(";The user " + client.getColor() + client.getUsername() + FormatService.ANSI_RESET + " sent you an invitation.;;" + registeredClient.getColor() + "(" + registeredClient.getUsername() + ")──┤" + FormatService.ANSI_RESET);
+					registeredClient.getPrintWriter().flush();
+					message += "Invitation sent to " + registeredClient.getColor() + registeredClient.getUsername() + FormatService.ANSI_RESET + ".";
+					clientMatch = true;
+					break;
+				}
+			}
+
+			if (!clientMatch) {
+				message += "There is no user with this username.";
+			}
+		}
 
 		return message;
 	}
