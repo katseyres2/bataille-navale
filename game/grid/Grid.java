@@ -9,7 +9,7 @@ public class Grid {
 	static final char POSITIONS[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
 	final private static int ROWS = 10;
 	final private static int COLUMNS = 10;
-	final private static int VECTORS_LENGTH = 9;
+	// final private static int VECTORS_LENGTH = 9;
 	final private static int[][] VECTORS = getFullVectors();
 	final private Random random;
 	

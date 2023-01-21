@@ -14,6 +14,9 @@ public class ClientCommandHandler {
 		new Command("invite", new String[]{"username"}, null,
 			"Invite your friends to play a new game."
 		),
+		new Command("confirm", null, new String[]{"username"},
+			"Confirm the invitation."
+		),
 		new Command("users", null, null,
 			"List all connected users."
 		),
@@ -24,7 +27,10 @@ public class ClientCommandHandler {
 			"Create a new account."
 		),
 		new Command("signout", null, null,
-			"Disconnect from your account"
+			"Disconnect from your account."
+		),
+		new Command("info", null, null,
+			"Get all information about the player."
 		)
 	));
 }
