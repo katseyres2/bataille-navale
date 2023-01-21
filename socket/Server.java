@@ -63,7 +63,7 @@ public class Server extends SocketUser implements ISocket {
 					for (Client client : clients) {
 						if (client.isLogged() && !client.getLastConnection().plus(5, ChronoUnit.MINUTES).isAfter(FormatService.getCurrentTime())) {
 							client.toggleLog();
-							System.out.println(FormatService.serverLogPrefix(client) + "timeout connection");
+							System.out.println(FormatService.serverLogPrefix(client) + FormatService.ANSI_YELLOW + "timeout connection, kick user." + FormatService.ANSI_RESET);
 						}
 					}
 					
