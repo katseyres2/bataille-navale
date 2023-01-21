@@ -1,5 +1,4 @@
 package game;
-import java.util.Random;
 
 import game.grid.Cell;
 import game.grid.Grid;

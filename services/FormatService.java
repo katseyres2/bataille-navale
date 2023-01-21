@@ -3,7 +3,6 @@ package services;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Random;
 import socket.Client;
 
 public class FormatService {

@@ -180,13 +180,9 @@ public class Server extends SocketUser implements ISocket {
 					// close the connection between the local host and the remote host
 					client.getPrintWriter().close();
 					client.close();
-					//TODO
-					// removeHost(socket, bufferedReader, client.getPrintWriter());
 				} catch (IOException e) {
 					try {
 						client.close();
-						//TODO
-						// removeHost(socket, bufferedReader, client.getPrintWriter());
 					} catch (IOException er) {
 						System.out.println(er.getMessage());
 					}
