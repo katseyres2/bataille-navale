@@ -7,14 +7,28 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import game.Player;
 import services.FormatService;
 import socket.commands.ServerCommandHandler;
 
 public class Server extends SocketUser implements ISocket {
+	private static enum Log {
+		INFO,
+		DEBUG,
+		WARNING,
+		ERROR,
+	}
+	
 	private ArrayList<Client> clients = new ArrayList<Client>();
+	private static Log logLevel = Log.INFO;
+
+	public static void logDebug(String value)    { if (logLevel == Log.DEBUG)    System.out.print(value); }
+	public static void logInfo(String value)     { if (logLevel == Log.INFO)     System.out.print(value); }
+	public static void logWarning(String value)  { if (logLevel == Log.WARNING)  System.out.print(value); }
+	public static void logError(String value)    { if (logLevel == Log.ERROR)    System.out.print(value); }
 
 	@Override
 	public Thread buildSender(SocketUser user) {
@@ -49,6 +63,7 @@ public class Server extends SocketUser implements ISocket {
 					for (Client client : clients) {
 						if (client.isLogged() && !client.getLastConnection().plus(5, ChronoUnit.MINUTES).isAfter(FormatService.getCurrentTime())) {
 							client.toggleLog();
+							System.out.println(FormatService.serverLogPrefix(client) + "timeout connection");
 						}
 					}
 					
@@ -74,6 +89,7 @@ public class Server extends SocketUser implements ISocket {
 			@Override
 			public void run() {
 				client.refreshColor();
+
 				try {
 					// catch the message from the remote host
 					msg = client.getBufferedReader().readLine();
@@ -109,6 +125,8 @@ public class Server extends SocketUser implements ISocket {
 								}
 							}
 						}
+
+						Server.logDebug("username = " + client.getUsername());
 							
 						if (client.isLogged() || allowedCommand) {
 							switch (args[0]) {
@@ -119,6 +137,8 @@ public class Server extends SocketUser implements ISocket {
 								case "/users"	: messageToSend += commandHandler.users(client, clients);				break;
 								case "/help"	: messageToSend += commandHandler.help();								break;
 								case "/invite"	: messageToSend += commandHandler.invite(args, client, clients);		break;
+								case "/confirm"	: messageToSend += commandHandler.confirm(args, client, clients);		break;
+								case "/info"	: messageToSend += commandHandler.info((Player) client);				break;
 								default			: messageToSend += commandHandler.notFound();							break;
 							}
 						} else {
@@ -141,7 +161,7 @@ public class Server extends SocketUser implements ISocket {
 
 						logMessage = FormatService.serverLogPrefix(client.isLogged() ? client : null) + logMessage;
 						
-						System.out.print(logMessage + "\n");
+						Server.logInfo(logMessage + "\n");
 
 						if (closeClient) {
 							try {
@@ -207,7 +227,7 @@ public class Server extends SocketUser implements ISocket {
 			
 			
 			Scanner scanner = new Scanner(System.in);
-			Client client = new Client();
+			Client client = new Player();
 			client.setSocket(socket);
 			client.setPrintWriter(printWriter);
 			client.setBufferedReader(bufferedReader);

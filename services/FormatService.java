@@ -18,9 +18,8 @@ public class FormatService {
 	public static final String ANSI_WHITE	= "\u001B[37m";
 
 	public static final String[] colors = {
-		ANSI_RESET, ANSI_BLACK, ANSI_RED,
-		ANSI_GREEN, ANSI_YELLOW, ANSI_BLUE,
-		ANSI_PURPLE, ANSI_CYAN, ANSI_WHITE,
+		ANSI_RESET, ANSI_RED, ANSI_GREEN, ANSI_YELLOW,
+		ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN,
 	};
 
 	public static final int USERNAME_MAX_LENGTH = 10;

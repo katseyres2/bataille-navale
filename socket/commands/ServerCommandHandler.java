@@ -2,9 +2,14 @@ package socket.commands;
 
 import java.util.ArrayList;
 
+import game.Player;
 import services.FormatService;
+import services.expections.InvitationAlreadySentException;
+import services.expections.NoInvitationReceivedException;
 import services.expections.NotConnectedException;
+import services.expections.UserAlreadyInvitedYouException;
 import socket.Client;
+import socket.Server;
 
 public class ServerCommandHandler {
 	public String users(Client client, ArrayList<Client> clients) {
@@ -30,6 +35,8 @@ public class ServerCommandHandler {
 
 	public String signIn(String[] args, Client client, ArrayList<Client> clients) {
 		String message = "";
+
+		Server.logDebug("User source command -> " + client.getUsername() + ":" + client.getPassword());
 		
 		if (args.length != 3) {
 			message += "You must specify <username> <password>.";
@@ -42,6 +49,12 @@ public class ServerCommandHandler {
 				for (Client registeredClient : clients) {
 					String username = args[1];
 					String password = args[2];
+
+					for (String arg : args) {
+						Server.logDebug(arg);
+					}
+
+					Server.logDebug("THIS : " + username + ":" + password + ", CLIENT_OF_LIST : " + registeredClient.getUsername() + ":" + registeredClient.getPassword());
 					
 					if (registeredClient.getUsername().compareTo(username) == 0) {
 						userMatch = true;
@@ -50,11 +63,11 @@ public class ServerCommandHandler {
 							if (registeredClient.isLogged()) {
 								message += "You're connected on another device.";
 							} else {
-								clients.remove(registeredClient);
-								client.setUsername(username);
-								client.setPassword(password);
-								client.toggleLog();
-								clients.add(client);				
+								// clients.remove(registeredClient);
+								registeredClient.setUsername(username);
+								registeredClient.setPassword(password);
+								registeredClient.toggleLog();
+								// clients.add(client);
 
 								message += "Welcome back " + registeredClient.getUsername() + " ! 😎;;";
 								message += users(registeredClient, clients);
@@ -91,6 +104,8 @@ public class ServerCommandHandler {
 			boolean usernameExists = false;
 			
 			for (Client registeredClient : clients) {
+				Server.logDebug("RC=" + registeredClient.getUsername() + ":" + registeredClient.getPassword() + ", C=" + client.getUsername() + ":" + client.getPassword());
+				
 				if (registeredClient.getUsername().compareTo(args[1]) == 0) {
 					usernameExists = true;
 					break;
@@ -104,6 +119,8 @@ public class ServerCommandHandler {
 				client.setPassword(args[2]);
 				client.toggleLog();
 				clients.add(client);
+
+				Server.logDebug("NEW CLIENT : " + client.getUsername() + ":" + client.getPassword());
 				
 				message += "Your have created a new account, welcome " + client.getUsername() + ".;;";
 				message += users(client, clients);
@@ -142,6 +159,72 @@ public class ServerCommandHandler {
 		return message;
 	}
 
+	public String info(Player player) {
+		String message = "";
+
+		message += "Username    : " + player.getUsername();
+		message += ";Victories   : " + player.getVictories();
+		message += ";Defeats     : " + player.getDefeats();
+		message += ";Total games : " + player.getNumberOfGamesPlayed();
+
+		return message;
+	}
+
+	public String confirm(String[] args, Client client, ArrayList<Client> clients) {
+		String message = "";
+
+		if (args.length != 2) {
+			message += "You must specify <username>.";
+		} else {
+			String username = args[1];
+			boolean clientMatch = false;
+
+			for (Client registeredClient : clients) {
+				if (registeredClient.isLogged() && registeredClient.getUsername().compareTo(username) == 0) {
+					clientMatch = true;
+
+					try {
+						client.tryConfirm(registeredClient);
+
+						registeredClient.getPrintWriter().println(";"
+							+ registeredClient.getColor() 
+							+ "▓"
+							+ FormatService.ANSI_RESET
+							+ " The user "
+							+ client.getColor()
+							+ client.getUsername()
+							+ FormatService.ANSI_RESET
+							+ " sent you a /confirm, create a <LINK BETWEEN THEM>;;"
+							+ registeredClient.getColor()
+							+ "("
+							+ registeredClient.getUsername()
+							+ ")──┤"
+							+ FormatService.ANSI_RESET);
+
+						registeredClient.getPrintWriter().flush();
+						message += "You confirmed the /invite of " + registeredClient.getColor() + registeredClient.getUsername() + FormatService.ANSI_RESET + ".";
+						
+						client.removeFromUserWhoInvitedYou(client);
+						registeredClient.removeFromUsersYouInvited(client);
+					} catch (NoInvitationReceivedException e) {
+						message += "You can't confirm to " + registeredClient.getUsername()
+								+  " because you have not received his invitation.";
+					} catch (InvitationAlreadySentException e) {
+						message += "You can't confirm to " + registeredClient.getUsername() + " because you already sent him an invitation.;Please wait his confirmation to play with him.";
+					}
+
+					break;
+				}
+			}
+			
+			if (! clientMatch) {
+				message += "This username does not exist.";
+			}
+		}
+
+		return message;
+	}
+
 	public String invite(String[] args, Client client, ArrayList<Client> clients) {
 		String message = "";
 		
@@ -155,16 +238,45 @@ public class ServerCommandHandler {
 			
 			for (Client registeredClient : clients) {
 				if (registeredClient.isLogged() && registeredClient.getUsername().compareTo(username) == 0) {
-					registeredClient.getPrintWriter().println(";The user " + client.getColor() + client.getUsername() + FormatService.ANSI_RESET + " sent you an invitation.;;" + registeredClient.getColor() + "(" + registeredClient.getUsername() + ")──┤" + FormatService.ANSI_RESET);
-					registeredClient.getPrintWriter().flush();
-					message += "Invitation sent to " + registeredClient.getColor() + registeredClient.getUsername() + FormatService.ANSI_RESET + ".";
 					clientMatch = true;
+
+					try {
+						client.tryInvite(registeredClient);
+
+						registeredClient.getPrintWriter().println(";"
+						+ registeredClient.getColor() 
+						+ "▓"
+						+ FormatService.ANSI_RESET
+						+ " The user "
+						+ client.getColor()
+						+ client.getUsername()
+						+ FormatService.ANSI_RESET
+						+ " sent you a /invite, confirm by sending the command \"/confirm "
+						+ client.getUsername()
+						+ "\".;;"
+						+ registeredClient.getColor()
+						+ "("
+						+ registeredClient.getUsername()
+						+ ")──┤"
+						+ FormatService.ANSI_RESET);
+						
+						registeredClient.getPrintWriter().flush();
+						message += "Invitation sent to " + registeredClient.getColor() + registeredClient.getUsername() + FormatService.ANSI_RESET + ".";
+						
+						client.addInUsersYouInvited(registeredClient);
+						registeredClient.addInUsersWhoInvitedYou(client);
+					} catch (UserAlreadyInvitedYouException e) {
+						message += "You can't invite " + registeredClient.getUsername() + " because he already sent you an invitation. Please send \"/confirm " + registeredClient.getUsername() + "\" to play with him.";
+					} catch (InvitationAlreadySentException e) {
+						message += "You can't invite " + registeredClient.getUsername() + " because you already sent him an invitation. Please wait for his \"/confirm\" to play with him.";
+					}
+
 					break;
 				}
 			}
 
-			if (!clientMatch) {
-				message += "There is no user with this username.";
+			if (! clientMatch) {
+				message += "This username does not exist.";
 			}
 		}
 

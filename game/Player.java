@@ -10,10 +10,9 @@ public class Player extends Client {
 	private int victories;
 	private int defeats;
 
-	public Player(String username, int port) {
+	public Player() {
 		defeats = 0;
 		victories = 0;
-		this.username = username;
 	}
 
 	public String getUsername() { return username; }
