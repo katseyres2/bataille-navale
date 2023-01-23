@@ -7,9 +7,9 @@ if ($null -ne $fileName) {
 	if ($null -ne $oldFile) { Remove-Item $oldFile }
 	Get-ChildItem "$fileName.java" -Recurse | ForEach-Object {
 		if ($IsLinux) {
-			javac -d .\exports $_.FullName
+			javac -d exports $_.FullName
 		} elseif ($IsWindows) {
-			javac.exe -d .\exports $_.FullName
+			javac.exe -d exports $_.FullName
 		}
 	}
 	Write-Host "File $fileName.java compiled."
@@ -17,9 +17,9 @@ if ($null -ne $fileName) {
 	Get-ChildItem *.class -Recurse | ForEach-Object {Remove-Item $_}
 
 	if ($IsLinux) {
-		javac -d .\exports "Main.java"
+		javac -d exports "Main.java"
 	} elseif ($IsWindows) {
-		javac.exe -d .\exports "Main.java"
+		javac.exe -d exports "Main.java"
 	}
 }
 
