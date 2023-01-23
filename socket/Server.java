@@ -15,7 +15,7 @@ import services.FormatService;
 import socket.commands.ServerCommandHandler;
 
 public class Server extends SocketUser implements ISocket {
-	private static enum Log {
+	public static enum Log {
 		INFO,
 		DEBUG,
 		WARNING,
@@ -23,8 +23,9 @@ public class Server extends SocketUser implements ISocket {
 	}
 	
 	private ArrayList<Client> clients = new ArrayList<Client>();
-	private static Log logLevel = Log.INFO;
+	private static Log logLevel = Log.DEBUG;
 
+	public static void setLogLevel(Log value) 	 { logLevel = value; }
 	public static void logDebug(String value)    { if (logLevel == Log.DEBUG)    System.out.print(value); }
 	public static void logInfo(String value)     { if (logLevel == Log.INFO)     System.out.print(value); }
 	public static void logWarning(String value)  { if (logLevel == Log.WARNING)  System.out.print(value); }
@@ -126,7 +127,7 @@ public class Server extends SocketUser implements ISocket {
 							}
 						}
 
-						Server.logDebug("username = " + client.getUsername());
+						Server.logDebug("username = " + client.getUsername() + "\n");
 							
 						if (client.isLogged() || allowedCommand) {
 							switch (args[0]) {

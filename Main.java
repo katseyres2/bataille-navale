@@ -38,6 +38,7 @@ public class Main {
 		int port;
 
 		if (args.length == 0) {
+			Server.setLogLevel(Server.Log.INFO);
 			Server server = new Server();
 			server.start(5000);
 			return;

@@ -63,11 +63,14 @@ public class ServerCommandHandler {
 							if (registeredClient.isLogged()) {
 								message += "You're connected on another device.";
 							} else {
-								// clients.remove(registeredClient);
+								// updates client in array
 								registeredClient.setUsername(username);
 								registeredClient.setPassword(password);
 								registeredClient.toggleLog();
-								// clients.add(client);
+								// updates this client
+								client.setUsername(username);
+								client.setPassword(password);
+								client.toggleLog();
 
 								message += "Welcome back " + registeredClient.getUsername() + " ! 😎;;";
 								message += users(registeredClient, clients);
@@ -115,15 +118,23 @@ public class ServerCommandHandler {
 			if (usernameExists) {
 				message += "This username already exists.";
 			} else {
+				Client newClient = new Player();
+				
+				// set client array information
+				newClient.setUsername(args[1]);
+				newClient.setPassword(args[2]);
+				newClient.toggleLog();
+				// set current client information				
 				client.setUsername(args[1]);
 				client.setPassword(args[2]);
 				client.toggleLog();
-				clients.add(client);
 
-				Server.logDebug("NEW CLIENT : " + client.getUsername() + ":" + client.getPassword());
+				clients.add(newClient);
+
+				Server.logDebug("NEW CLIENT : " + newClient.getUsername() + ":" + newClient.getPassword() + "\n");
 				
-				message += "Your have created a new account, welcome " + client.getUsername() + ".;;";
-				message += users(client, clients);
+				message += "Your have created a new account, welcome " + newClient.getUsername() + ".;;";
+				message += users(newClient, clients);
 			}
 		}
 
@@ -132,7 +143,14 @@ public class ServerCommandHandler {
 
 	public String signOut(Client client, ArrayList<Client> clients) {
 		try {
-			client.signOut();
+			for (Client cli : clients) {
+				if (client.getUsername().compareTo(cli.getUsername()) == 0) {
+					Server.logDebug(cli.getUsername() + " signed out.\n");
+					cli.signOut();
+					client.signOut();
+					break;
+				}
+			}
 		} catch (NotConnectedException e) {
 			System.out.println(e.getMessage());
 		}
