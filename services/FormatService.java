@@ -3,7 +3,10 @@ package services;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import socket.Client;
+import java.util.Random;
+
+import socket.Player;
+import socket.SocketClient;
 
 public class FormatService {
 	public static final String ANSI_RESET	= "\u001B[0m";
@@ -17,12 +20,16 @@ public class FormatService {
 	public static final String ANSI_WHITE	= "\u001B[37m";
 
 	public static final String[] colors = {
-		ANSI_RESET, ANSI_RED, ANSI_GREEN, ANSI_YELLOW,
+		ANSI_RED, ANSI_GREEN, ANSI_YELLOW,
 		ANSI_BLUE, ANSI_PURPLE, ANSI_CYAN,
 	};
 
 	public static final int USERNAME_MAX_LENGTH = 10;
 	public static final int PASSWORD_MAX_LENGTH = 10;
+
+	public static String getRandomColor() {
+		return  colors[(new Random()).nextInt(colors.length - 1)];
+	}
 
 	public static String LocalDateTimeToString(LocalDateTime dateTime) {
 		return DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").format(dateTime);
@@ -36,16 +43,29 @@ public class FormatService {
 		return (alignLeft == true ? word : "") + " ".repeat(length - word.length()) + (alignLeft == true ? "" : word);
 	}
 
-	public static String serverLogPrefix(Client client) {
-		String username = FormatService.formatSpace(
-			FormatService.USERNAME_MAX_LENGTH,
-			client != null && client.getUsername() != null
-				? client.getUsername()
-				: "?",
-			true
-		);
+	public static String colorizeString(String color, String value) {
+		String output = value;
+		
+		for (String c : colors) {
+			if (c.contains(color)) {
+				output = color + value + ANSI_RESET;
+			}
+		}
 
-		return "[" + FormatService.LocalDateTimeToString(FormatService.getCurrentTime()) + " " + username + "] ";
+		return output;
+	}
+
+	public static String serverLogPrefix(SocketClient user) {
+		String username;
+		
+		if (user instanceof Player && user != null && ((Player)user).getUsername() != null) {
+			username = ((Player)user).getUsername();
+		} else {
+			username = "?";
+		}
+
+		String formatUsername = FormatService.formatSpace(FormatService.USERNAME_MAX_LENGTH, username, true);
+		return "[" + FormatService.LocalDateTimeToString(FormatService.getCurrentTime()) + " " + formatUsername + "] ";
 	}
 
 	public static String toMessage(Socket socket, String msg) {

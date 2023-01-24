@@ -1,7 +1,7 @@
 package game;
-import socket.Client;
+import socket.Player;
 
 public class Match {
-	protected Client players[];
+	protected Player players[];
 
 }

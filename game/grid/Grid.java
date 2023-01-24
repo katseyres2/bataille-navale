@@ -60,6 +60,8 @@ public class Grid {
 
 			for (int[] vector : VECTORS) {
 				// vertical border
+				// P = [3, 0]
+				// v = [-1, 0]
 				if (x + vector[0] > ROWS -1 || x + vector[0] < 0) {
 					isFreePoint = true;
 				}
@@ -70,16 +72,16 @@ public class Grid {
 				}
 
 				// neighbor not null
-				if (!isFreePoint && grid[x + vector[0]][y + vector[1]] == null) {
+				if (! isFreePoint && grid[x + vector[0]][y + vector[1]] == null) {
 					isFreePoint = true;
 				}
 
-				if (!isFreePoint) {
+				if (! isFreePoint) {
 					break;
 				}
 			}
 
-			if (!isFreePoint) {
+			if (! isFreePoint) {
 				continue;
 			}
 
@@ -121,7 +123,6 @@ public class Grid {
 			// System.out.print("Bottom overflow\n");
 			return false;
 		}
-
 
 		for (int[] vector : VECTORS) {
 			if (x + vector[0] > 9) {
@@ -176,7 +177,7 @@ public class Grid {
 		// PI + 4 * V1 = [A, 1] + 4 * [1, 0] = [A, 1] + [4, 0] = [A+4, 1+0] = [E, 1]
 		// PI + V2 = [A-1, 1-1] = [J, 0]
 
-		while (!canPlace) {
+		while (! canPlace) {
 			point = getRandomPoint();
 			vectors = getVectors();
 			coords = new int[length][2];
@@ -194,7 +195,7 @@ public class Grid {
 
 				// check if all points can be filled
 				for (int i = 0; i < length; i++) {
-					if (!canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
+					if (! canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
 						canPlace = false;
 						break;
 					}
