@@ -173,14 +173,16 @@ public class Server {
 		final ServerSocket serverSocket;
 
 		String data = readFile(CREDENTIALS_PATH);
-		for (String credentials : data.split("\n")) {
-			String username = credentials.split(" ")[0];
-			String password = credentials.split(" ")[1];
-			Player p = new Player(null, null, null);
-			p.setUsername(username);
-			p.setPassword(password);
-			players.add(p);
-			appendFile(LOG_PATH, "Credentials loaded");
+		if (data.length() > 0) {
+			for (String credentials : data.split("\n")) {
+				String username = credentials.split(" ")[0];
+				String password = credentials.split(" ")[1];
+				Player p = new Player(null, null, null);
+				p.setUsername(username);
+				p.setPassword(password);
+				players.add(p);
+				appendFile(LOG_PATH, "Credentials loaded");
+			}
 		}
 
 		try {
