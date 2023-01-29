@@ -151,11 +151,6 @@ public class Grid {
 	/*
 	 * 
 	 */
-	public void placeBoat(int coord[][], String label) {
-		for (int[] c : coord) {
-			this.grid[c[0]][c[1]] = label;
-		}
-	}
 
 	/**
 	 * For one boat, get a random point.
@@ -164,7 +159,7 @@ public class Grid {
 	 * Otherwise, the next point is not free, select another random vector.
 	 * If all vectors are consumed, select another point and repeat the loop until the boat is placed.
 	 */
-	public void saveBoat(int length, String label) {
+	public void placeBoatRandom(int length, String label) {
 		int[] point;
 		int[][] coords;
 		int[][] vectors;
@@ -213,6 +208,92 @@ public class Grid {
 			}
 			
 		}
+	}
+
+	//gestion du positionnement manuelle par les joueurs des bateaux
+
+	public void placeBoat(int length, String label, Integer x, Integer y, String direction) {
+		int[] point;
+		int[][] coords;
+		int[] vector = getDirectionVector(direction);
+		boolean canPlace = false;
+
+		point = getPoint(x, y);
+		coords = new int[length][2];
+
+		canPlace = true;
+
+		for (int i = 0; i < length; i++) {
+			if (!canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
+				canPlace = false;
+				break;
+			}
+
+			coords[i][0] = point[0] + i * vector[0];
+			coords[i][1] = point[1] + i * vector[1];
+		}
+
+		if (canPlace) {
+			for (int i = 0; i < length; i++) {
+				grid[coords[i][0]][coords[i][1]] = label;
+			}
+		}
+	}
+
+
+
+	public int[] getPoint(Integer x, Integer y) {
+		int output[] = new int[2];
+		boolean isFreePoint = false;
+
+		while (!isFreePoint) {
+
+			for (int[] vector : VECTORS) {
+				// vertical border
+				if (x + vector[0] > ROWS -1 || x + vector[0] < 0) {
+					isFreePoint = true;
+				}
+
+				// horizontal border
+				if (y + vector[1] > COLUMNS -1 || y + vector[1] < 0) {
+					isFreePoint = true;
+				}
+
+				// neighbor not null
+				if (!isFreePoint && grid[x + vector[0]][y + vector[1]] == null) {
+					isFreePoint = true;
+				}
+
+				if (!isFreePoint) {
+					break;
+				}
+			}
+
+			if (!isFreePoint) {
+				continue;
+			}
+
+			output[0] = x;
+			output[1] = y;
+		}
+
+		return output;
+	}
+
+
+	public int[] getDirectionVector(String direction_vectors){
+		switch (direction_vectors){
+			case "NORTH":
+				return new int[]{-1, 0};
+			case "SOUTH":
+				return new int[]{1,0};
+			case "WEST":
+				return new int[]{0, -1};
+			case "EAST":
+				return new int[]{0,1};
+		}
+
+		return null;
 	}
 
 	/**
