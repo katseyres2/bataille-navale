@@ -36,7 +36,7 @@ public class Main {
 		Game game = new Game();
 		game.start();
 
-		/*
+
 		int port;
 
 		if (args.length == 0) {
@@ -55,7 +55,7 @@ public class Main {
 		Client client = new Client();
 		client.start(port);
 
-		 */
+
 
 
 	}

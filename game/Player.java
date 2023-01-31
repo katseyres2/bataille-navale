@@ -9,6 +9,9 @@ public class Player extends Client {
 	private int victories;
 	private int defeats;
 
+	private Grid grid;
+
+
 	public Player() {
 		defeats = 0;
 		victories = 0;
@@ -20,6 +23,15 @@ public class Player extends Client {
 	public int getVictories() { return victories; }
 	public int getDefeats() { return defeats; }
 	public int getNumberOfGamesPlayed() { return defeats + victories; }
+
+	public Grid getGrid() {
+		return grid;
+	}
+
+	public void setGrid(Grid grid) {
+		this.grid = grid;
+	}
+
 
 	public void inviteOpponent(Player opponent) {
 

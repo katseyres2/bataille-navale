@@ -1,5 +1,7 @@
 package game.grid;
 
+import game.Player;
+
 import java.util.Random;
 
 /**
@@ -14,18 +16,18 @@ public class Grid {
 	final private Random random;
 	
 	public final static int AIRCRAFT_CARRIER_LENGTH = 5;
-	public final static int BATTLESHIP_LENGTH = 4;
+	public static int BATTLESHIP_LENGTH = 4;
 	public final static int CRUISER_LENGTH = 3;
 	public final static int SUBMARINE_LENGTH = 3;
 	public final static int DESTROYER_LENGTH = 2;
 
 	final private String [][] grid;
 
+
 	public Grid() {
 		grid = new String[ROWS][COLUMNS];
 		random = new Random();
 	}
-
 	/**
 	 * 
 	 */
@@ -210,13 +212,13 @@ public class Grid {
 		}
 	}
 
-	//gestion du positionnement manuelle par les joueurs des bateaux
+	//gestion du positionnement manuelle des bateaux par les joueurs
 
 	public void placeBoat(int length, String label, Integer x, Integer y, String direction) {
 		int[] point;
 		int[][] coords;
 		int[] vector = getDirectionVector(direction);
-		boolean canPlace = false;
+		boolean canPlace;
 
 		point = getPoint(x, y);
 		coords = new int[length][2];
@@ -238,6 +240,7 @@ public class Grid {
 				grid[coords[i][0]][coords[i][1]] = label;
 			}
 		}
+
 	}
 
 

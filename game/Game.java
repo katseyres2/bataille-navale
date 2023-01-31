@@ -24,7 +24,7 @@ public class Game {
 
 		Scanner scanner = new Scanner(System.in);
 		String answer = scanner.nextLine();
-		
+
 		animateMessage("- Hi " + answer + ", nice to meet you !", 0);
 		animateMessage("\n\n- We are going to build a new grid for you...", 1000);
 
@@ -38,27 +38,37 @@ public class Game {
 
 		 */
 
+
 		Grid grid = new Grid();
-		grid.placeBoat(Grid.AIRCRAFT_CARRIER_LENGTH, "A", 7, 4, "SOUTH");
+		grid.placeBoat(Grid.AIRCRAFT_CARRIER_LENGTH, "A", 4, 4, "EAST");
+
+
 
 		animateMessage("\n- Done, there is your grid !", 0);
 
 		animateMessage("\n", 0);
 		grid.show();
 		animateMessage("\n", 0);
-		
+
 		scanner.close();
 	}
 
 	public void animateMessage(String message, int pauseMs) {
 		for (String letter : message.split("")) {
 			System.out.print(letter);
-			
-			try { Thread.sleep(20);	}
-			catch (Exception e) { System.out.println("ERROR");	}
+
+			try {
+				Thread.sleep(20);
+			} catch (Exception e) {
+				System.out.println("ERROR");
+			}
 		}
 
-		try { Thread.sleep(pauseMs);	}
-		catch (Exception e) { System.out.println("ERROR");	}
+		try {
+			Thread.sleep(pauseMs);
+		} catch (Exception e) {
+			System.out.println("ERROR");
+		}
 	}
+
 }
