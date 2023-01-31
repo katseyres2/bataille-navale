@@ -29,8 +29,6 @@ public class Boat {
 
         getBoatType(String label, int length) {
 
-
-
         }
     }
 
