@@ -40,8 +40,9 @@ public class Main {
 		// grid.saveBoat(Grid.SUBMARINE_LENGTH, "S");
 		// grid.show();
 
-		// Game game = new Game();
-		// game.start();
+		Game game = new Game();
+		game.start();
+
 
 		
 		
