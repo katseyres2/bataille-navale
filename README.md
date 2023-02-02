@@ -1,5 +1,6 @@
 # bataille_navale
 
+HELLO WORLD, I'm kidding :p !
 
 
 ## Getting started
