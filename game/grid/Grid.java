@@ -1,7 +1,4 @@
 package game.grid;
-
-import game.Player;
-
 import java.util.Random;
 
 /**

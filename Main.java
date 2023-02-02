@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import game.Game;
 import socket.Player;
 import socket.Server;
 import socket.SocketClient;

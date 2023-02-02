@@ -22,7 +22,7 @@ public class Server {
 		WARNING,
 		ERROR,
 	}
-	
+
 	private ArrayList<Player> players = new ArrayList<Player>();
 	private static Log logLevel = Log.INFO;
 	private static final Path LOG_PATH = Path.of("../data/server.log");

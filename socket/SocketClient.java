@@ -21,7 +21,6 @@ public class SocketClient {
 		bufferedReader = br;
 	}
 
-	
 	public int getPort()					  	{ return socket != null ? socket.getPort() : null; }
 	public Socket getSocket()				  	{ return socket; }
 	public boolean isLogged() 					{ return logged; }
