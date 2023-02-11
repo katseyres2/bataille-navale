@@ -4,3 +4,4 @@ out*
 *.iml
 .vscode
 out
+*.log

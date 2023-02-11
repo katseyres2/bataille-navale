@@ -6,50 +6,48 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import game.Player;
 import services.FormatService;
 import socket.commands.ServerCommandHandler;
 
-public class Server extends SocketUser implements ISocket {
-	private static enum Log {
+public class Server {
+	public static enum Log {
 		INFO,
 		DEBUG,
 		WARNING,
 		ERROR,
 	}
 	
-	private ArrayList<Client> clients = new ArrayList<Client>();
+	private ArrayList<Player> players = new ArrayList<Player>();
 	private static Log logLevel = Log.INFO;
+	private static final Path LOG_PATH = Path.of("../data/server.log");
+	public static final Path CREDENTIALS_PATH = Path.of("../data/credentials.txt");
 
-	public static void logDebug(String value)    { if (logLevel == Log.DEBUG)    System.out.print(value); }
 	public static void logInfo(String value)     { if (logLevel == Log.INFO)     System.out.print(value); }
-	public static void logWarning(String value)  { if (logLevel == Log.WARNING)  System.out.print(value); }
+	public static void setLogLevel(Log value) 	 { logLevel = value; }
+	public static void logDebug(String value)    { if (logLevel == Log.DEBUG)    System.out.print(value); }
 	public static void logError(String value)    { if (logLevel == Log.ERROR)    System.out.print(value); }
+	public static void logWarning(String value)  { if (logLevel == Log.WARNING)  System.out.print(value); }
 
-	@Override
-	public Thread buildSender(SocketUser user) {
-		// create a new thread with a callback function
-		// "Runnable" must implement run()
-		return new Thread(new Runnable() {
-			String msg;
-
+	public Thread buildSender(PrintWriter pw) {
+		return new Thread(new Runnable() {		// Create a new thread with a callback function. "Runnable" must implement run().
 			@Override
 			public void run() {
-				msg = "Welcome ! Use the command /signup to create a new account or /signin you're already registered.;;(?)──┤\n";
-				user.getPrintWriter().print(msg);
-				user.getPrintWriter().flush();
+				String msg = "Welcome ! Use the command /signup to create a new account or /signin you're already registered.;;(?)──┤\n";
+				Scanner scan = new Scanner(System.in);
+
+				pw.print(msg);
+				pw.flush();
 
 				while(true) {
-					// wait for the user input
-					msg = user.getScanner().nextLine();
-					// send the message on the client host:port
-					user.getPrintWriter().println(msg);
-					// clear the memory cell
-					user.getPrintWriter().flush();
+					msg = scan.nextLine();		// Wait for the user input.
+					pw.println(msg);			// Send the message on the client host:port.
+					pw.flush();					// Clear the memory cell.
 				}
 			}
 		});
@@ -60,139 +58,132 @@ public class Server extends SocketUser implements ISocket {
 			@Override
 			public void run() {
 				while (true) {
-					for (Client client : clients) {
+					for (Player client : players) {
 						if (client.isLogged() && !client.getLastConnection().plus(5, ChronoUnit.MINUTES).isAfter(FormatService.getCurrentTime())) {
+							client.clear();
 							client.toggleLog();
-							System.out.println(FormatService.serverLogPrefix(client) + FormatService.ANSI_YELLOW + "timeout connection, kick user." + FormatService.ANSI_RESET);
+							appendFile(LOG_PATH, FormatService.serverLogPrefix(client) + "timeout connection, kick user.");
 						}
 					}
 					
 					try {
 						Thread.sleep(2000);
 					} catch (InterruptedException e) {
-						System.out.println(e.getMessage());
+						appendFile(LOG_PATH, e.getMessage());
 					}
 				}
 			}
 		});
 	}
 
-	@Override
-	public Thread buildReceiver(SocketUser user) {
-		Client client = (Client)user;
-		
-		// create a new thread that receives sockets
-		return new Thread(new Runnable() {
-			String msg;
-			ServerCommandHandler commandHandler = new ServerCommandHandler();
-			
+	public Thread buildReceiver(Socket s, PrintWriter pw, BufferedReader br) {
+		return new Thread(new Runnable() {					// It creates a new thread that receives sockets.
+			String messageReceived;
+
 			@Override
 			public void run() {
-				client.refreshColor();
-
 				try {
-					// catch the message from the remote host
-					msg = client.getBufferedReader().readLine();
+					messageReceived = br.readLine();		// It catches the message from the remote host.
+					Player client;
 
-					// while the buffer is not empty, there is still a message inside
-					while (msg != null) {
-						String[] args = msg.split(" ");
-						String messageToSend = "";
-						String logMessage = "";
-						boolean closeClient = false;
+					while (messageReceived != null) {		// While the buffer is not empty, there is still a message inside.
+						String messageToSend = "";			// The server will send this message to the client.
+						String logMessage = "";				// It will be printed in the server logs.
+						client = null;
 
-						if (msg.length() > 0 && args[0].compareTo("/q!") != 0) {
-							logMessage += args[0];
-						}
-
-						if (args[0].compareTo("/q!") == 0) {
-							if (client.isLogged()) {
-								commandHandler.signOut(client, clients);
-							}
-
-							closeClient = true;
-							logMessage += FormatService.ANSI_RED + "has left the room." + FormatService.ANSI_RESET;
-						}
-						
-						boolean allowedCommand = false;
-
-						if (!client.isLogged()) {
-							for (String cmd : new String[]{"/signin", "/signup", "/help"}) {						
-								if (args[0].compareTo(cmd) == 0) {
-									if (cmd.compareTo("/signin") == 0 || cmd.compareToIgnoreCase("signup") == 0) client.refreshColor();
-									allowedCommand = true;
-									break;
-								}
+						for (Player p : players) {
+							if (p.getSocket() == s) {
+								client = p;
+								break;
 							}
 						}
 
-						Server.logDebug("username = " + client.getUsername());
-							
-						if (client.isLogged() || allowedCommand) {
-							switch (args[0]) {
-								case "/ping"	: messageToSend += commandHandler.pong();								break;
-								case "/signin"	: messageToSend += commandHandler.signIn(args, client, clients);		break;
-								case "/signup"	: messageToSend += commandHandler.signUp(args, client, clients);		break;
-								case "/signout"	: messageToSend += commandHandler.signOut(client, clients);				break;
-								case "/users"	: messageToSend += commandHandler.users(client, clients);				break;
-								case "/help"	: messageToSend += commandHandler.help();								break;
-								case "/invite"	: messageToSend += commandHandler.invite(args, client, clients);		break;
-								case "/confirm"	: messageToSend += commandHandler.confirm(args, client, clients);		break;
-								case "/info"	: messageToSend += commandHandler.info((Player) client);				break;
-								default			: messageToSend += commandHandler.notFound();							break;
-							}
-						} else {
-							messageToSend += "Not connected, please /signin or /signup. 🔒";
-						}
-
-						messageToSend = client.isLogged()
-							? client.getColor() + "▓ " + FormatService.ANSI_RESET + messageToSend.replace(";", ";" + client.getColor() + "▓ " + FormatService.ANSI_RESET)
-							: messageToSend;
-						
-						if (client.isLogged()) {
-							client.refreshLastConnection();
-							messageToSend += ";;" + client.getColor() + "(" + client.getUsername() + ")──┤" + FormatService.ANSI_RESET;
-						} else {
-							messageToSend += ";;(?)──┤";
-						}
-
-						client.getPrintWriter().println(messageToSend);
-						client.getPrintWriter().flush();
-
-						logMessage = FormatService.serverLogPrefix(client.isLogged() ? client : null) + logMessage;
-						
-						Server.logInfo(logMessage + "\n");
-
-						if (closeClient) {
-							try {
+						if (messageReceived.compareTo("/q!") == 0) {
+							if (client != null && client.isLogged()) {
 								client.close();
-								return;
-							} catch (IOException e) {
-								System.out.print(" can't be closed.");
+								client.toggleLog();
 							}
+							
+							logMessage += "has left the room.";
+						} else {
+							logMessage += messageReceived.split(" ")[0]; // Add some logs.
+							messageToSend += ServerCommandHandler.executeCommand(messageReceived, s, pw, br, players);								
 						}
 
-						msg = client.getBufferedReader().readLine();
-					}
+						client = null;
 
-					System.out.println(client.getAddress() + ":" + client.getPort() +  " --> closed");
-				
-					// close the connection between the local host and the remote host
-					client.getPrintWriter().close();
-					client.close();
-				} catch (IOException e) {
-					try {
-						client.close();
-					} catch (IOException er) {
-						System.out.println(er.getMessage());
+						for (Player p : players) {
+							if (p.getSocket() == s) {
+								client = p;
+								break;
+							}
+						}
+						
+						if (client == null) {
+							messageToSend += ";;(?)──┤";
+						} else {
+							client.refreshLastConnection();
+							messageToSend = client.getColor() + "▓ " + FormatService.ANSI_RESET + messageToSend.replace(";", ";" + client.getColor() +  "▓ " + FormatService.ANSI_RESET) +  ";;" + client.getColor() + "(" + client.getUsername() + ")──┤" + FormatService.ANSI_RESET;
+						}
+
+						pw.println(messageToSend);
+						pw.flush();
+						appendFile(LOG_PATH, FormatService.serverLogPrefix(client) + logMessage);
+						messageReceived = br.readLine();
 					}
-				}
+				
+					pw.close(); // Closes the connection between the local host and the remote host.
+				} catch (IOException e) {}
 			}
 		});
+	}
+
+	public static void appendFile(Path path, String text) {
+		if (! Files.exists(path)) {
+			try {
+				Files.createFile(path);			
+			} catch (IOException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+
+		try {
+			String old = Files.readString(path);
+			Files.writeString(path, old + text + "\n");
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	public static String readFile(Path path) {
+		String output = "";
+		
+		if (Files.exists(path)) {
+			try {
+				output = Files.readString(path);
+			} catch (Exception e) {
+				System.out.println("No file.");
+			}
+		}
+
+		return output;
 	}
 
 	public void start(int port) {
 		final ServerSocket serverSocket;
+
+		String data = readFile(CREDENTIALS_PATH);
+		if (data.length() > 0) {
+			for (String credentials : data.split("\n")) {
+				String username = credentials.split(" ")[0];
+				String password = credentials.split(" ")[1];
+				Player p = new Player(null, null, null);
+				p.setUsername(username);
+				p.setPassword(password);
+				players.add(p);
+				appendFile(LOG_PATH, "Credentials loaded");
+			}
+		}
 
 		try {
 			serverSocket = new ServerSocket(port);
@@ -201,7 +192,7 @@ public class Server extends SocketUser implements ISocket {
 			return;
 		}
 
-		System.out.println("Listening on " + serverSocket.getLocalSocketAddress());
+		appendFile(LOG_PATH, "Listening on " + serverSocket.getLocalSocketAddress());
 		checkConnection().start();
 		
 		while (true) {
@@ -210,30 +201,17 @@ public class Server extends SocketUser implements ISocket {
 			final PrintWriter printWriter;
 			
 			try {
-				// if the host does not send a message, it can not create this object
-				// and can not send messages to this host
-				socket = serverSocket.accept();
+				socket = serverSocket.accept();									// If the host does not send a message, it can not create this object and can not send messages to this host.
 				printWriter = new PrintWriter(socket.getOutputStream());
 				bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				// addHost(socket, bufferedReader, printWriter);
 			} catch (IOException e) {
-				System.out.println("Client not accepted.");
+				appendFile(LOG_PATH, "Client not accepted.");
 				break;
 			}
-			
-			
-			Scanner scanner = new Scanner(System.in);
-			Client client = new Player();
-			client.setSocket(socket);
-			client.setPrintWriter(printWriter);
-			client.setBufferedReader(bufferedReader);
-			client.setScanner(scanner);
 
-			System.out.print(FormatService.serverLogPrefix(client) + FormatService.ANSI_GREEN + "has joined the room." + FormatService.ANSI_RESET + "\n");
-
-			// builds and starts threads
-			buildSender(client).start();
-			buildReceiver(client).start();
+			appendFile(LOG_PATH, FormatService.serverLogPrefix(null) + "has joined the room.");
+			buildSender(printWriter).start();									// Builds and starts threads.
+			buildReceiver(socket, printWriter, bufferedReader).start();
 		}
 
 		try {
