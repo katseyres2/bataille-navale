@@ -1,61 +1,36 @@
 package boat;
 
 public class Boat {
-    private final int width;
-    private final int length;
     private boolean sink = false;
 
+    public enum typeBoat {
+        AIRCRAFT_CARRIER('A', 5), CRUISER('C', 4), SUBMARINE('S', 3), DESTROYER('D', 3), WARSHIP('W', 2);
 
-    /*
-    public final static String LABEL = null;
+        private char label;
+        private int length;
 
-    public final static int AIRCRAFT_CARRIER = 0;
-    public final static int CRUISER = 0;
-    public final static int SUBMARINE = 0;
-    public final static int DESTROYER = 0;
-    public final static int WARSHIP = 0;
+        typeBoat(char label, int length) {
+            this.label = label;
+            this.length = length;
+        }
 
+        public int getLength() {
+            return length;
+        }
 
-     */
-
-    public enum getBoatType {
-        AIRCRAFT_CARRIER("A", 5),
-        CRUISER("C", 4),
-        SUBMARINE("S", 3),
-        DESTROYER("D", 3),
-        WARSHIP("W", 2);
-
-
-
-        getBoatType(String label, int length) {
-
+        public char getLabel() {
+            return label;
         }
     }
 
-    public Boat(int width, int length) {
-        this.width = width;
-        this.length = length;
+    private typeBoat type;
+
+    public Boat(typeBoat type) {
+        this.type = type;
         this.sink = false;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getLength() {
-        return length;
     }
 
     public boolean isSink() {
         return sink;
     }
-
-    public void setType(){
-
-    }
-
 }
-
-
-
-

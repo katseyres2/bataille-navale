@@ -1,46 +1,47 @@
 package game.grid;
+
 import java.util.Random;
 
 /**
  * 
  */
 public class Grid {
-	static final char POSITIONS[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
+	static final char POSITIONS[] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J' };
 	final private static int ROWS = 10;
 	final private static int COLUMNS = 10;
 	// final private static int VECTORS_LENGTH = 9;
 	final private static int[][] VECTORS = getFullVectors();
 	final private Random random;
-	
+
 	public final static int AIRCRAFT_CARRIER_LENGTH = 5;
 	public static int BATTLESHIP_LENGTH = 4;
 	public final static int CRUISER_LENGTH = 3;
 	public final static int SUBMARINE_LENGTH = 3;
 	public final static int DESTROYER_LENGTH = 2;
 
-	final private String [][] grid;
-
+	final private String[][] grid;
 
 	public Grid() {
 		grid = new String[ROWS][COLUMNS];
 		random = new Random();
 	}
+
 	/**
 	 * 
 	 */
 	private static int[][] getVectors() {
 		return new int[][] {
-			        {-1, 0},
-			{0, -1},        { 0, 1},
-			        { 1, 0},
+				{ -1, 0 },
+				{ 0, -1 }, { 0, 1 },
+				{ 1, 0 },
 		};
 	}
 
 	private static int[][] getFullVectors() {
 		return new int[][] {
-			{-1, -1}, {-1, 0}, {-1, 1},
-			{ 0, -1},          { 0, 1},
-			{ 1, -1}, { 1, 0}, { 1, 1}
+				{ -1, -1 }, { -1, 0 }, { -1, 1 },
+				{ 0, -1 }, { 0, 1 },
+				{ 1, -1 }, { 1, 0 }, { 1, 1 }
 		};
 	}
 
@@ -50,37 +51,37 @@ public class Grid {
 	public int[] getRandomPoint() {
 		int output[] = new int[2];
 		boolean isFreePoint = false;
-		
+
 		while (!isFreePoint) {
 			int x = random.nextInt(ROWS);
 			int y = random.nextInt(COLUMNS);
-			
+
 			isFreePoint = false;
 
 			for (int[] vector : VECTORS) {
 				// vertical border
 				// P = [3, 0]
 				// v = [-1, 0]
-				if (x + vector[0] > ROWS -1 || x + vector[0] < 0) {
+				if (x + vector[0] > ROWS - 1 || x + vector[0] < 0) {
 					isFreePoint = true;
 				}
 
 				// horizontal border
-				if (y + vector[1] > COLUMNS -1 || y + vector[1] < 0) {
+				if (y + vector[1] > COLUMNS - 1 || y + vector[1] < 0) {
 					isFreePoint = true;
 				}
 
 				// neighbor not null
-				if (! isFreePoint && grid[x + vector[0]][y + vector[1]] == null) {
+				if (!isFreePoint && grid[x + vector[0]][y + vector[1]] == null) {
 					isFreePoint = true;
 				}
 
-				if (! isFreePoint) {
+				if (!isFreePoint) {
 					break;
 				}
 			}
 
-			if (! isFreePoint) {
+			if (!isFreePoint) {
 				continue;
 			}
 
@@ -107,7 +108,7 @@ public class Grid {
 			// System.out.print("Left overflow\n");
 			return false;
 		}
-		
+
 		if (x > 9) {
 			// System.out.print("Right overflow\n");
 			return false;
@@ -117,7 +118,7 @@ public class Grid {
 			// System.out.print("Top overflow\n");
 			return false;
 		}
-		
+
 		if (y > 9) {
 			// System.out.print("Bottom overflow\n");
 			return false;
@@ -127,15 +128,15 @@ public class Grid {
 			if (x + vector[0] > 9) {
 				continue;
 			}
-			
+
 			if (x + vector[0] < 0) {
 				continue;
 			}
-			
+
 			if (y + vector[1] > 9) {
 				continue;
 			}
-			
+
 			if (y + vector[1] < 0) {
 				continue;
 			}
@@ -155,9 +156,11 @@ public class Grid {
 	/**
 	 * For one boat, get a random point.
 	 * Once the point is selected, select a random vector.
-	 * Check the next point with the selected vector, if the next point is free, the next one become the current.
+	 * Check the next point with the selected vector, if the next point is free, the
+	 * next one become the current.
 	 * Otherwise, the next point is not free, select another random vector.
-	 * If all vectors are consumed, select another point and repeat the loop until the boat is placed.
+	 * If all vectors are consumed, select another point and repeat the loop until
+	 * the boat is placed.
 	 */
 	public void placeBoatRandom(int length, String label) {
 		int[] point;
@@ -171,25 +174,25 @@ public class Grid {
 		// PI + 4 * V1 = [A, 1] + 4 * [1, 0] = [A, 1] + [4, 0] = [A+4, 1+0] = [E, 1]
 		// PI + V2 = [A-1, 1-1] = [J, 0]
 
-		while (! canPlace) {
+		while (!canPlace) {
 			point = getRandomPoint();
 			vectors = getVectors();
 			coords = new int[length][2];
 			/**
 			 * [
-			 * 	[A, 1],
-			 * 	[A, 2],
-			 * 	[A, 3]
+			 * [A, 1],
+			 * [A, 2],
+			 * [A, 3]
 			 * ]
 			 */
-			
+
 			// gets a vector
 			for (int[] vector : vectors) {
 				canPlace = true;
 
 				// check if all points can be filled
 				for (int i = 0; i < length; i++) {
-					if (! canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
+					if (!canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
 						canPlace = false;
 						break;
 					}
@@ -206,11 +209,11 @@ public class Grid {
 				}
 
 			}
-			
+
 		}
 	}
 
-	//gestion du positionnement manuelle des bateaux par les joueurs
+	// gestion du positionnement manuelle des bateaux par les joueurs
 
 	public void placeBoat(int length, String label, Integer x, Integer y, String direction) {
 		int[] point;
@@ -241,8 +244,6 @@ public class Grid {
 
 	}
 
-
-
 	public int[] getPoint(Integer x, Integer y) {
 		int output[] = new int[2];
 		boolean isFreePoint = false;
@@ -251,12 +252,12 @@ public class Grid {
 
 			for (int[] vector : VECTORS) {
 				// vertical border
-				if (x + vector[0] > ROWS -1 || x + vector[0] < 0) {
+				if (x + vector[0] > ROWS - 1 || x + vector[0] < 0) {
 					isFreePoint = true;
 				}
 
 				// horizontal border
-				if (y + vector[1] > COLUMNS -1 || y + vector[1] < 0) {
+				if (y + vector[1] > COLUMNS - 1 || y + vector[1] < 0) {
 					isFreePoint = true;
 				}
 
@@ -281,17 +282,16 @@ public class Grid {
 		return output;
 	}
 
-
-	public int[] getDirectionVector(String direction_vectors){
-		switch (direction_vectors){
+	public int[] getDirectionVector(String direction_vectors) {
+		switch (direction_vectors) {
 			case "NORTH":
-				return new int[]{-1, 0};
+				return new int[] { -1, 0 };
 			case "SOUTH":
-				return new int[]{1,0};
+				return new int[] { 1, 0 };
 			case "WEST":
-				return new int[]{0, -1};
+				return new int[] { 0, -1 };
 			case "EAST":
-				return new int[]{0,1};
+				return new int[] { 0, 1 };
 		}
 
 		return null;
@@ -302,29 +302,46 @@ public class Grid {
 	 */
 	public void show() {
 		System.out.print("\n");
-		for (int i = 0; i < 11;i++){
-			for(int j = 0; j < 11; j++){
+		for (int i = 0; i < 11; i++) {
+			for (int j = 0; j < 11; j++) {
 				// Affiche la lettre sur la première colonne
-				if(j==1){
-					if(i>=1){
-						System.out.print(POSITIONS[i-1] + " ");
+				if (j == 1) {
+					if (i >= 1) {
+						System.out.print(POSITIONS[i - 1] + " ");
 					}
 				}
 				// Affiche la position ( chiffre ) sur la première ligne
-				if(i==0){
-					if(j==0){
+				if (i == 0) {
+					if (j == 0) {
 						System.out.print("\\ ");
 					}
-					if(j>=1){
+					if (j >= 1) {
 						System.out.printf(" %d ", j);
 					}
-				}else if (j>=1 && (grid[i-1][j-1] == null)) {
+				} else if (j >= 1 && (grid[i - 1][j - 1] == null)) {
 					System.out.print(" • ");
-				}else if(j>=1 && (grid[i-1][j-1] != null)){
-					System.out.print(" "+ grid[i-1][j-1] +" ");
+				} else if (j >= 1 && (grid[i - 1][j - 1] != null)) {
+					System.out.print(" " + grid[i - 1][j - 1] + " ");
 				}
 			}
 			System.out.print("\n");
 		}
 	}
+
+	/**
+	 * Convert the first coord ( letter A > J ) into a int
+	 * 
+	 * @param letter
+	 * @return the letter convert in integer
+	 */
+	public int convert_coord_letter(char letter) {
+		int coord = 0;
+		for (int i = 0; i < POSITIONS.length; i++) {
+			if (POSITIONS[i] == Character.toUpperCase(letter)) {
+				coord = i + 1;
+			}
+		}
+		return coord;
+	}
+
 }
