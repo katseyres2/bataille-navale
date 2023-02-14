@@ -7,32 +7,34 @@ import java.util.Random;
 public class Logic extends Bots{
 
     //récupération et création de l'objet sur une base default
-    private ArrayList<ArrayList<String>> grid;
-    private Integer[] coordonnees;
+    private final Integer[] coordonnees;
     private List<int[]> alreadyTarget;
 
     //pritate méthode pour générer des nombres aléatoires
     private Random random;
 
-    public Logic(ArrayList<ArrayList<String>> grid) {
+    public Logic(ArrayList<ArrayList<String>> grid, Integer[] coordonnees) {
         super(grid);
-        this.grid = grid;
+        this.coordonnees = coordonnees;
     }
 
-    public Boolean startTurn(){
+    public Boolean startTurn(ArrayList<ArrayList<String>> playerGrid){
 
         /*
         ETAPES D'UN TOUR :
             1 on vérifie s'il n'a pas déjà trouvé un bâteau
+            2 s'il a trouvé un bâteau on voit si la direction est déjà trouvé / si pas on lance la procedure pour trouver un bâteau
+            3
          */
 
         if(coordonnees[0] == null && coordonnees[1] == null){
             //si c'est faux, il n'a pas touché de bâteau donc on ne fait rien
             //si c'est vrai, on indique la position du bateau.
-
             int[] targetPoint = startSearchShip();
 
-
+            if(targetPoint != null){
+                String direction = startSearchDirection();
+            }
 
         }else{
             //maintenant on vérifie si la direction n'est pas trouvé
@@ -61,6 +63,11 @@ public class Logic extends Bots{
         if(alreadyTarget.contains(output)){
             startSearchShip();
         }
+
+        if(getGrid().get(x).get(y).equals(" ")){
+            return null;
+        }
+
         alreadyTarget.add(output);
         return output;
     }
