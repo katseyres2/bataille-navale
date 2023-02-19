@@ -1,14 +1,17 @@
-package game.grid;
+package grid;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
+
 import boat.Boat;
 
 /**
  * 
  */
 public class Grid {
-	static final char POSITIONS[] = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J' };
+	static final String POSITIONS[] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
 	final private static int ROWS = 10;
 	final private static int COLUMNS = 10;
 	// final private static int VECTORS_LENGTH = 9;
@@ -217,37 +220,37 @@ public class Grid {
 
 	// gestion du positionnement manuelle des bateaux par les joueurs
 
-	// public void placeBoat(int length, String label, Integer x, Integer y, String
-	// direction) {
-	// int[] point;
-	// int[][] coords;
-	// int[] vector = getDirectionVector(direction);
-	// boolean canPlace;
+	public void placeBoat2(int length, String label, Integer x, Integer y, String direction) {
+		int[] point;
+		int[][] coords;
+		int[] vector = getDirectionVector(direction);
+		boolean canPlace;
 
-	// point = getPoint(x, y);
-	// coords = new int[length][2];
+		point = getPoint(x, y);
+		coords = new int[length][2];
 
-	// canPlace = true;
+		canPlace = true;
 
-	// for (int i = 0; i < length; i++) {
-	// if (!canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
-	// canPlace = false;
-	// break;
-	// }
+		for (int i = 0; i < length; i++) {
+			if (!canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
+				canPlace = false;
+				break;
+			}
 
-	// coords[i][0] = point[0] + i * vector[0];
-	// coords[i][1] = point[1] + i * vector[1];
-	// }
+			coords[i][0] = point[0] + i * vector[0];
+			coords[i][1] = point[1] + i * vector[1];
+		}
 
-	// if (canPlace) {
-	// for (int i = 0; i < length; i++) {
-	// grid[coords[i][0]][coords[i][1]] = label;
-	// }
+		if (canPlace) {
+			for (int i = 0; i < length; i++) {
+				grid[coords[i][0]][coords[i][1]] = label;
+			}
 
-	// }
+		}
 
-	// }
+	}
 
+	// TO DO trouver le décalage en x
 	public void placeBoat(Boat boat, Integer x, Integer y, String direction) {
 		int[] point;
 		int[][] coords;
@@ -255,7 +258,7 @@ public class Grid {
 		boolean canPlace;
 
 		point = getPoint(x, y);
-		coords = new int[boat.type.getLength()][2];
+		coords = new int[boat.type.length][2];
 
 		canPlace = true;
 
@@ -273,8 +276,9 @@ public class Grid {
 			for (int i = 0; i < boat.type.length; i++) {
 				grid[coords[i][0]][coords[i][1]] = boat.type.label;
 			}
-			myBoats.add(boat);
+
 		}
+
 	}
 
 	public int[] getPoint(Integer x, Integer y) {
@@ -367,17 +371,17 @@ public class Grid {
 	 * @param letter
 	 * @return the letter convert in integer
 	 */
-	public int convertCoordLetter(char letter) {
+	public int convertCoordLetter(String letter) {
 		int coord = 0;
 		for (int i = 0; i < POSITIONS.length; i++) {
-			if (POSITIONS[i] == Character.toUpperCase(letter)) {
+			if (POSITIONS[i].equals(letter.toUpperCase())) {
 				coord = i + 1;
+				break;
 			}
 		}
 		return coord;
 	}
 
-	// TO DO : fonction pour créer les bateaux
 	public void createBoat(ArrayList<Boat> myBoats) {
 		Boat aircraft = new Boat(Boat.typeBoat.AIRCRAFT_CARRIER);
 		myBoats.add(aircraft);
@@ -391,11 +395,28 @@ public class Grid {
 		myBoats.add(warship);
 	}
 
+	// VOIR POURQUOI LE CLOSE DU SCANNER PLANTE
+	public Object[] askPosition(Object[] position) {
+		Scanner input = new Scanner(System.in);
+		System.out.println("Veuillez entrez la première coordonée de votre bateau : ");
+		String[] result = input.nextLine().split("");
+		position[0] = convertCoordLetter(result[0]);
+		position[1] = Integer.parseInt(result[1]);
+		System.out.println("Veuillez donnez la direction dans laquelle placer le bateau : ");
+		position[2] = input.nextLine();
+		return position;
+	}
+
 	// fonction pour placer tout les bateaux
 	public void placeAllBoat() {
+		Object[] position = new Object[3];
 		createBoat(myBoats);
 		for (Boat b : myBoats) {
-			placeBoat(b, null, null, null);
+			System.out.println(
+					"veuillez placer le bateau : " + b.type.name() + ", ce bateau a une taille de " + b.type.length);
+			askPosition(position);
+			placeBoat(b, (int) position[0], (int) position[1], (String) position[2]);
+			show();
 		}
 	}
 
