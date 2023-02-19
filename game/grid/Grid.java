@@ -220,35 +220,36 @@ public class Grid {
 
 	// gestion du positionnement manuelle des bateaux par les joueurs
 
-	public void placeBoat2(int length, String label, Integer x, Integer y, String direction) {
-		int[] point;
-		int[][] coords;
-		int[] vector = getDirectionVector(direction);
-		boolean canPlace;
+	// public void placeBoat(int length, String label, Integer x, Integer y, String
+	// direction) {
+	// int[] point;
+	// int[][] coords;
+	// int[] vector = getDirectionVector(direction);
+	// boolean canPlace;
 
-		point = getPoint(x, y);
-		coords = new int[length][2];
+	// point = getPoint(x, y);
+	// coords = new int[length][2];
 
-		canPlace = true;
+	// canPlace = true;
 
-		for (int i = 0; i < length; i++) {
-			if (!canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
-				canPlace = false;
-				break;
-			}
+	// for (int i = 0; i < length; i++) {
+	// if (!canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
+	// canPlace = false;
+	// break;
+	// }
 
-			coords[i][0] = point[0] + i * vector[0];
-			coords[i][1] = point[1] + i * vector[1];
-		}
+	// coords[i][0] = point[0] + i * vector[0];
+	// coords[i][1] = point[1] + i * vector[1];
+	// }
 
-		if (canPlace) {
-			for (int i = 0; i < length; i++) {
-				grid[coords[i][0]][coords[i][1]] = label;
-			}
+	// if (canPlace) {
+	// for (int i = 0; i < length; i++) {
+	// grid[coords[i][0]][coords[i][1]] = label;
+	// }
 
-		}
+	// }
 
-	}
+	// }
 
 	// TO DO trouver le décalage en x
 	public void placeBoat(Boat boat, Integer x, Integer y, String direction) {
@@ -275,6 +276,7 @@ public class Grid {
 		if (canPlace) {
 			for (int i = 0; i < boat.type.length; i++) {
 				grid[coords[i][0]][coords[i][1]] = boat.type.label;
+				System.out.println(coords[i][0] + " et " + coords[i][1]);
 			}
 
 		}
@@ -375,7 +377,7 @@ public class Grid {
 		int coord = 0;
 		for (int i = 0; i < POSITIONS.length; i++) {
 			if (POSITIONS[i].equals(letter.toUpperCase())) {
-				coord = i + 1;
+				coord = i;
 				break;
 			}
 		}
@@ -401,7 +403,7 @@ public class Grid {
 		System.out.println("Veuillez entrez la première coordonée de votre bateau : ");
 		String[] result = input.nextLine().split("");
 		position[0] = convertCoordLetter(result[0]);
-		position[1] = Integer.parseInt(result[1]);
+		position[1] = Integer.parseInt(result[1]) - 1;
 		System.out.println("Veuillez donnez la direction dans laquelle placer le bateau : ");
 		position[2] = input.nextLine();
 		return position;
