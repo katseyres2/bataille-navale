@@ -1,6 +1,8 @@
 package game.grid;
 
+import java.util.ArrayList;
 import java.util.Random;
+import boat.Boat;
 
 /**
  * 
@@ -12,12 +14,12 @@ public class Grid {
 	// final private static int VECTORS_LENGTH = 9;
 	final private static int[][] VECTORS = getFullVectors();
 	final private Random random;
-
-	public final static int AIRCRAFT_CARRIER_LENGTH = 5;
-	public static int BATTLESHIP_LENGTH = 4;
-	public final static int CRUISER_LENGTH = 3;
-	public final static int SUBMARINE_LENGTH = 3;
-	public final static int DESTROYER_LENGTH = 2;
+	final private static ArrayList<Boat> myBoats = new ArrayList<Boat>(5);
+	// public final static int AIRCRAFT_CARRIER_LENGTH = 5;
+	// public static int BATTLESHIP_LENGTH = 4;
+	// public final static int CRUISER_LENGTH = 3;
+	// public final static int SUBMARINE_LENGTH = 3;
+	// public final static int DESTROYER_LENGTH = 2;
 
 	final private String[][] grid;
 
@@ -215,18 +217,49 @@ public class Grid {
 
 	// gestion du positionnement manuelle des bateaux par les joueurs
 
-	public void placeBoat(int length, String label, Integer x, Integer y, String direction) {
+	// public void placeBoat(int length, String label, Integer x, Integer y, String
+	// direction) {
+	// int[] point;
+	// int[][] coords;
+	// int[] vector = getDirectionVector(direction);
+	// boolean canPlace;
+
+	// point = getPoint(x, y);
+	// coords = new int[length][2];
+
+	// canPlace = true;
+
+	// for (int i = 0; i < length; i++) {
+	// if (!canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
+	// canPlace = false;
+	// break;
+	// }
+
+	// coords[i][0] = point[0] + i * vector[0];
+	// coords[i][1] = point[1] + i * vector[1];
+	// }
+
+	// if (canPlace) {
+	// for (int i = 0; i < length; i++) {
+	// grid[coords[i][0]][coords[i][1]] = label;
+	// }
+
+	// }
+
+	// }
+
+	public void placeBoat(Boat boat, Integer x, Integer y, String direction) {
 		int[] point;
 		int[][] coords;
 		int[] vector = getDirectionVector(direction);
 		boolean canPlace;
 
 		point = getPoint(x, y);
-		coords = new int[length][2];
+		coords = new int[boat.type.getLength()][2];
 
 		canPlace = true;
 
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < boat.type.length; i++) {
 			if (!canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
 				canPlace = false;
 				break;
@@ -237,11 +270,11 @@ public class Grid {
 		}
 
 		if (canPlace) {
-			for (int i = 0; i < length; i++) {
-				grid[coords[i][0]][coords[i][1]] = label;
+			for (int i = 0; i < boat.type.length; i++) {
+				grid[coords[i][0]][coords[i][1]] = boat.type.label;
 			}
+			myBoats.add(boat);
 		}
-
 	}
 
 	public int[] getPoint(Integer x, Integer y) {
@@ -329,12 +362,12 @@ public class Grid {
 	}
 
 	/**
-	 * Convert the first coord ( letter A > J ) into a int
+	 * Convert the first coord ( letter A to J ) into a int
 	 * 
 	 * @param letter
 	 * @return the letter convert in integer
 	 */
-	public int convert_coord_letter(char letter) {
+	public int convertCoordLetter(char letter) {
 		int coord = 0;
 		for (int i = 0; i < POSITIONS.length; i++) {
 			if (POSITIONS[i] == Character.toUpperCase(letter)) {
@@ -342,6 +375,28 @@ public class Grid {
 			}
 		}
 		return coord;
+	}
+
+	// TO DO : fonction pour créer les bateaux
+	public void createBoat(ArrayList<Boat> myBoats) {
+		Boat aircraft = new Boat(Boat.typeBoat.AIRCRAFT_CARRIER);
+		myBoats.add(aircraft);
+		Boat cruiser = new Boat(Boat.typeBoat.CRUISER);
+		myBoats.add(cruiser);
+		Boat submarine = new Boat(Boat.typeBoat.SUBMARINE);
+		myBoats.add(submarine);
+		Boat destroyer = new Boat(Boat.typeBoat.DESTROYER);
+		myBoats.add(destroyer);
+		Boat warship = new Boat(Boat.typeBoat.WARSHIP);
+		myBoats.add(warship);
+	}
+
+	// fonction pour placer tout les bateaux
+	public void placeAllBoat() {
+		createBoat(myBoats);
+		for (Boat b : myBoats) {
+			placeBoat(b, null, null, null);
+		}
 	}
 
 }
