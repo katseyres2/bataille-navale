@@ -38,14 +38,15 @@ public class Logic extends Bots{
             int[] targetPoint = checkSearchShip(x, y);
 
             if(targetPoint != null){
-                String direction = startSearchDirection(random.nextInt(4));
-            }else{
-                sendGrid();
+                coordonnees[0] = targetPoint[0];
+                coordonnees[1] = targetPoint[1];
+                //sendGrid();
                 return false;
             }
         }else{
             //maintenant, on vérifie si la direction n'est pas trouvée
             // un point de façon aléatoire, mais qui doit se trouver à côté du point trouvé
+            String direction = startSearchDirection(random.nextInt(4));
         }
         return true;
     }
