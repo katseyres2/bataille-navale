@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import boat.Boat;
 
@@ -18,11 +19,11 @@ public class Grid {
 	final private static int[][] VECTORS = getFullVectors();
 	final private Random random;
 	final private static ArrayList<Boat> myBoats = new ArrayList<Boat>(5);
-	// public final static int AIRCRAFT_CARRIER_LENGTH = 5;
-	// public static int BATTLESHIP_LENGTH = 4;
-	// public final static int CRUISER_LENGTH = 3;
-	// public final static int SUBMARINE_LENGTH = 3;
-	// public final static int DESTROYER_LENGTH = 2;
+	public final static int AIRCRAFT_CARRIER_LENGTH = 5;
+	public static int BATTLESHIP_LENGTH = 4;
+	public final static int CRUISER_LENGTH = 3;
+	public final static int SUBMARINE_LENGTH = 3;
+	public final static int DESTROYER_LENGTH = 2;
 
 	final private String[][] grid;
 
@@ -251,8 +252,7 @@ public class Grid {
 
 	// }
 
-	// TO DO trouver le décalage en x
-	public void placeBoat(Boat boat, Integer x, Integer y, String direction) {
+	public boolean placeBoat(Boat boat, Integer x, Integer y, String direction) {
 		int[] point;
 		int[][] coords;
 		int[] vector = getDirectionVector(direction);
@@ -268,7 +268,6 @@ public class Grid {
 				canPlace = false;
 				break;
 			}
-
 			coords[i][0] = point[0] + i * vector[0];
 			coords[i][1] = point[1] + i * vector[1];
 		}
@@ -276,9 +275,10 @@ public class Grid {
 		if (canPlace) {
 			for (int i = 0; i < boat.type.length; i++) {
 				grid[coords[i][0]][coords[i][1]] = boat.type.label;
-				System.out.println(coords[i][0] + " et " + coords[i][1]);
 			}
-
+			return true;
+		} else {
+			return false;
 		}
 
 	}
@@ -397,15 +397,25 @@ public class Grid {
 		myBoats.add(warship);
 	}
 
-	// VOIR POURQUOI LE CLOSE DU SCANNER PLANTE
+	// demande la position pour placer un bateau
 	public Object[] askPosition(Object[] position) {
 		Scanner input = new Scanner(System.in);
 		System.out.println("Veuillez entrez la première coordonée de votre bateau : ");
-		String[] result = input.nextLine().split("");
-		position[0] = convertCoordLetter(result[0]);
-		position[1] = Integer.parseInt(result[1]) - 1;
+		String result = input.nextLine();
+		position[0] = convertCoordLetter(result.substring(0, 1));
+		position[1] = Integer.parseInt(result.substring(1)) - 1;
 		System.out.println("Veuillez donnez la direction dans laquelle placer le bateau : ");
 		position[2] = input.nextLine();
+		return position;
+	}
+
+	// demande la position pour tirer
+	public int[] askPosition(int[] position) {
+		Scanner input = new Scanner(System.in);
+		System.out.println("Veuillez entrez la coordonée de tir : ");
+		String result = input.nextLine();
+		position[0] = convertCoordLetter(result.substring(0, 1));
+		position[1] = Integer.parseInt(result.substring(1)) - 1;
 		return position;
 	}
 
@@ -414,12 +424,54 @@ public class Grid {
 		Object[] position = new Object[3];
 		createBoat(myBoats);
 		for (Boat b : myBoats) {
-			System.out.println(
-					"veuillez placer le bateau : " + b.type.name() + ", ce bateau a une taille de " + b.type.length);
-			askPosition(position);
-			placeBoat(b, (int) position[0], (int) position[1], (String) position[2]);
+			do {
+				System.out.println("veuillez placer le bateau : " + b.type.name() + ", ce bateau a une taille de "
+						+ b.type.length);
+				askPosition(position);
+			} while (!placeBoat(b, (int) position[0], (int) position[1], (String) position[2]));
 			show();
 		}
+	}
+
+	// récupére la valeur d'une position de la grille
+	private String getValuePosition(int[] position) {
+		String value = grid[position[0]][position[1]];
+		return value;
+	}
+
+	// met à jour la grille avec une nouvelle valeur
+	private void upgradeGrid(int[] position, String newValue) {
+		grid[position[0]][position[1]] = newValue;
+	}
+
+	private void upgradeGrid(int[] position, String newValue, String valuePosition) {
+		grid[position[0]][position[1]] = newValue;
+		AtomicInteger boatSinks = new AtomicInteger(0);
+		myBoats.forEach(b -> {
+			if (b.type.label.equals(valuePosition)) {
+				b.getHit();
+			}
+			if (b.isSink()) {
+				System.out.println("Le bateau :" + b.type + "est coulé");
+				boatSinks.incrementAndGet();
+			}
+		});
+		if (boatSinks.get() == myBoats.size()) {
+			System.out.println("Tous les bateaux sont coulés Bravo !!");
+		}
+	}
+
+	public void fire() {
+		int[] position = new int[2];
+		askPosition(position);
+		String valuePosition = getValuePosition(position);
+		switch (valuePosition) {
+			case "A", "C", "D", "S", "W" -> upgradeGrid(position, "X", valuePosition);
+			case "X", "Y" -> System.out.println("Vous avez déjà toucher cette position");
+			case null -> upgradeGrid(position, "Y");
+			default -> upgradeGrid(position, "Y");
+		}
+		show();
 	}
 
 }

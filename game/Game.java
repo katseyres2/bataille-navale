@@ -49,18 +49,18 @@ public class Game {
 		animateMessage("- Hi " + answer + ", nice to meet you !", 0);
 		animateMessage("\n\n- We are going to build a new grid for you...", 1000);
 
-		/*
-		 * Grid grid = new Grid();
-		 * grid.placeBoatRandom(Grid.AIRCRAFT_CARRIER_LENGTH, "A");
-		 * grid.placeBoatRandom(Grid.BATTLESHIP_LENGTH, "B");
-		 * grid.placeBoatRandom(Grid.CRUISER_LENGTH, "C");
-		 * grid.placeBoatRandom(Grid.DESTROYER_LENGTH, "D");
-		 * grid.placeBoatRandom(Grid.SUBMARINE_LENGTH, "S");
-		 * 
-		 */
+		// Grid grid = new Grid();
+		// grid.placeBoatRandom(Grid.AIRCRAFT_CARRIER_LENGTH, "A");
+		// grid.placeBoatRandom(Grid.BATTLESHIP_LENGTH, "B");
+		// grid.placeBoatRandom(Grid.CRUISER_LENGTH, "C");
+		// grid.placeBoatRandom(Grid.DESTROYER_LENGTH, "D");
+		// grid.placeBoatRandom(Grid.SUBMARINE_LENGTH, "S");
 
 		Grid grid = new Grid();
 		grid.placeAllBoat();
+
+		for (int i = 0; i <= 20; i++)
+			grid.fire();
 
 		animateMessage("\n- Done, there is your grid !", 0);
 
