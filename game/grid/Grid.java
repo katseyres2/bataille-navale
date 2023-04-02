@@ -258,6 +258,11 @@ public class Grid {
 		int[] vector = getDirectionVector(direction);
 		boolean canPlace;
 
+		if (vector == null) {
+			System.out.println("La direction que vous avez entré n'est pas correct");
+			return false;
+		}
+
 		point = getPoint(x, y);
 		coords = new int[boat.type.length][2];
 
@@ -322,17 +327,16 @@ public class Grid {
 	}
 
 	public int[] getDirectionVector(String direction_vectors) {
-		switch (direction_vectors) {
-			case "NORTH":
+		switch (direction_vectors.toLowerCase()) {
+			case "n", "north", "nord":
 				return new int[] { -1, 0 };
-			case "SOUTH":
+			case "s", "south", "sud":
 				return new int[] { 1, 0 };
-			case "WEST":
+			case "w", "west", "ouest", "o":
 				return new int[] { 0, -1 };
-			case "EAST":
+			case "e", "east", "est":
 				return new int[] { 0, 1 };
 		}
-
 		return null;
 	}
 
