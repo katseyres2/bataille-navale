@@ -55,7 +55,7 @@ public class FormatService {
 		return output;
 	}
 
-	public static String serverLogPrefix(SocketClient user) {
+	public static String serverLogPrefix(Player user) {
 		String username;
 		
 		if (user instanceof Player && user != null && ((Player)user).getUsername() != null) {

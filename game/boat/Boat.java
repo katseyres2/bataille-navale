@@ -1,4 +1,4 @@
-package boat;
+package game.boat;
 
 public class Boat {
     private boolean sink = false;

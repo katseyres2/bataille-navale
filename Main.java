@@ -13,8 +13,8 @@ import socket.SocketClient;
 public class Main {
 	public static void main(String[] args) {
 
-		Game game = new Game();
-		game.start();
+		// Game game = new Game();
+		// game.start();
 
 		if (args.length == 0) {
 			// SERVER CREATION
@@ -49,7 +49,7 @@ public class Main {
 			}
 
 			// Player client = new Player(socket, printWriter, bufferedReader);
-			(new Player(s, pw, br)).start(port);
+			(new Player(s, pw, br, null, null, null)).start(port);
 		}
 	}
 }

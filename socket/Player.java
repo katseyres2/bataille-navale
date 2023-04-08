@@ -14,7 +14,7 @@ import services.expections.NotConnectedException;
 import services.expections.UserAlreadyInvitedYouException;
 import socket.commands.Command.Role;
 
-public class Player extends SocketClient {
+public class Player {
 	private String username;
 	private String password;
 	private String color;
@@ -24,9 +24,13 @@ public class Player extends SocketClient {
 	private ArrayList<Player> usersYouInvited;
 	private ArrayList<Player> usersWhoInvitedYou;
 	private Role role;
+	public final SocketClient sender;
+	public final SocketClient receiver;
 
-	public Player(Socket s, PrintWriter pw, BufferedReader br) {
-		super(s, pw, br);
+	public Player(Socket sSender, PrintWriter pwSender, BufferedReader brSender, Socket sReceiver, PrintWriter pwReceiver, BufferedReader brReceiver) {
+		receiver = new SocketClient(sReceiver, pwReceiver, brReceiver);
+		sender = new SocketClient(sSender, pwSender, brSender);
+
 		lastConnectionAt = LocalDateTime.now();
 		usersYouInvited = new ArrayList<Player>();
 		usersWhoInvitedYou = new ArrayList<Player>();
@@ -34,12 +38,12 @@ public class Player extends SocketClient {
 		victories = 0;
 		color = FormatService.getRandomColor();
 		role = Role.ADMIN;
-	}	
+	}
 	
 	public void refreshConnection(Socket s, PrintWriter pw, BufferedReader br) {
-		this.setSocket(s);
-		this.setPrintWriter(pw);
-		this.setBufferedReader(br);
+		sender.setSocket(s);
+		sender.setPrintWriter(pw);
+		sender.setBufferedReader(br);
 	}
 	
 	public void setColor(String value) {
@@ -124,9 +128,9 @@ public class Player extends SocketClient {
 	}
 
 	public void signOut() throws NotConnectedException {
-		if (!super.isLogged()) throw new NotConnectedException();
-		super.toggleLog();
-		super.clear();
+		if (!sender.isLogged()) throw new NotConnectedException();
+		sender.toggleLog();
+		sender.clear();
 	}
 
 	public String getUsername() { return username; }
@@ -142,17 +146,17 @@ public class Player extends SocketClient {
 				while (true) {
 
 					try {
-						message = getScanner().nextLine();
-						getPrintWriter().println(message);
-						getPrintWriter().flush();
+						message = sender.getScanner().nextLine();
+						sender.getPrintWriter().println(message);
+						sender.getPrintWriter().flush();
 					} catch (Exception e) {
-						getPrintWriter().println("/q!");
-						getPrintWriter().flush();
+						sender.getPrintWriter().println("/q!");
+						sender.getPrintWriter().flush();
 						break;
 					}
 				}
 
-				boolean isClosed = close();
+				boolean isClosed = sender.close();
 				System.out.println(isClosed ? "\n\nGoodbye!\n" : "Unable to close the socket.");
 			}
 		});
@@ -165,16 +169,16 @@ public class Player extends SocketClient {
 			@Override
 			public void run() {
 				try {
-					message = getBufferedReader().readLine();
+					message = sender.getBufferedReader().readLine();
 					
 					while (message != null) {
 						String[] lines = message.split(";");
 						System.out.print("\n" + String.join("\n", lines) + " ");
-						message = getBufferedReader().readLine();
+						message = sender.getBufferedReader().readLine();
 					}
 
 					System.out.println("Server out of service");
-					close();
+					sender.close();
 				} catch (IOException e) {
 					Thread.currentThread().interrupt();
 					System.out.println("\n\nServer out of service ! Please contact the administrator.\n");
@@ -185,7 +189,7 @@ public class Player extends SocketClient {
 	}
 
 	public void start(int port) {
-		System.out.print("\nYour address is " + super.getAddress() + ":" + Integer.toString(this.getPort()));
+		System.out.print("\nYour address is " + sender.getAddress() + ":" + Integer.toString(sender.getPort()));
 		buildSender().start();
 		buildReceiver().start();
 	}

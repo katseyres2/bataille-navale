@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import game.Game;
 import services.FormatService;
 import services.expections.InvitationAlreadySentException;
 import services.expections.NoInvitationReceivedException;
@@ -93,7 +94,7 @@ public class ServerCommandHandler {
 		Role role = Role.UNDEFINED;
 
 		for (Player p : players) {
-			if (p.getSocket() == s) {
+			if (p.sender.getSocket() == s) {
 				player = p;
 				break;
 			}
@@ -139,8 +140,8 @@ public class ServerCommandHandler {
 
 		for (int i = 0; i < clients.size(); i++) {
 			if (clients.get(i).getUsername().compareTo(client.getUsername()) == 0) continue;
-			message += " ├─ " + (clients.get(i).isLogged() ? "🟢 " : "🔴 ") + clients.get(i).getUsername()
-			         + " is " + (clients.get(i).isLogged() ? "online" : "offline") + ", last message sent "
+			message += " ├─ " + (clients.get(i).sender.isLogged() ? "🟢 " : "🔴 ") + clients.get(i).getUsername()
+			         + " is " + (clients.get(i).sender.isLogged() ? "online" : "offline") + ", last message sent "
 					 + FormatService.LocalDateTimeToString(clients.get(i).getLastConnection())
 					 + ", victories: " + clients.get(i).getVictories() + ", defeats:" + clients.get(i).getDefeats()
 					 + ";";
@@ -161,7 +162,7 @@ public class ServerCommandHandler {
 		boolean usernameMatched = false;
 
 		for (Player p : players) {
-			if (p.getSocket() == s) {
+			if (p.sender.getSocket() == s) {
 				message += "You're already connected.";
 				return message;
 			}
@@ -178,10 +179,10 @@ public class ServerCommandHandler {
 					usernameMatched = true;
 
 					if (p.checkCredentials(username, password)) {
-						if (p.isLogged()) {
+						if (p.sender.isLogged()) {
 							message += "You're connected on another device.";
 						} else {
-							p.toggleLog();
+							p.sender.toggleLog();
 							p.refreshConnection(s, pw, br);
 							message += "Welcome back " + p.getUsername() + ".";
 						}
@@ -216,7 +217,7 @@ public class ServerCommandHandler {
 		String password;
 
 		for (Player p : players) {
-			if (p.getSocket() == s) {
+			if (p.sender.getSocket() == s) {
 				player = p;
 				break;
 			}
@@ -244,10 +245,10 @@ public class ServerCommandHandler {
 			}
 			
 			if (! usernameAlreadyExists) {
-				player = new Player(s, pw, br);
+				player = new Player(s, pw, br, null, null, null);
 				player.setUsername(username);
 				player.setPassword(password);
-				player.toggleLog();
+				player.sender.toggleLog();
 				players.add(player);
 				
 				message += "Your have created a new account, welcome " + player.getUsername() + ".;;";
@@ -262,9 +263,9 @@ public class ServerCommandHandler {
 
 	private static String signOut(Player player, ArrayList<Player> players) {
 		for (Player p : players) {
-			if (p.getSocket() == player.getSocket()) {
-				p.clear();													// Assigns null to all socket parameters.
-				if (p.isLogged()) p.toggleLog();							// Sets to isLogged to false.
+			if (p.sender.getSocket() == player.sender.getSocket()) {
+				p.sender.clear();													// Assigns null to all socket parameters.
+				if (p.sender.isLogged()) p.sender.toggleLog();							// Sets to isLogged to false.
 				break;
 			}
 		}
@@ -313,13 +314,13 @@ public class ServerCommandHandler {
 			boolean clientMatch = false;
 
 			for (Player userWhoInvitedYou : clients) {
-				if (userWhoInvitedYou.isLogged() && userWhoInvitedYou.getUsername().compareTo(username) == 0) {
+				if (userWhoInvitedYou.sender.isLogged() && userWhoInvitedYou.getUsername().compareTo(username) == 0) {
 					clientMatch = true;
 
 					try {
 						client.tryConfirm(userWhoInvitedYou);
 
-						userWhoInvitedYou.getPrintWriter().println(";"
+						userWhoInvitedYou.sender.getPrintWriter().println(";"
 							+ FormatService.colorizeString(userWhoInvitedYou.getColor(), "▓")
 							+ " The user "
 							+ FormatService.colorizeString(client.getColor(), client.getUsername())
@@ -327,7 +328,7 @@ public class ServerCommandHandler {
 							+ FormatService.colorizeString(userWhoInvitedYou.getColor(), "(" + userWhoInvitedYou.getUsername() + ")──┤")
 						);
 
-						userWhoInvitedYou.getPrintWriter().flush();
+						userWhoInvitedYou.sender.getPrintWriter().flush();
 						message += "You confirmed the invitation of " + FormatService.colorizeString(userWhoInvitedYou.getColor(), userWhoInvitedYou.getUsername()) + ".";
 						
 						for (Player cli : clients) {
@@ -338,6 +339,12 @@ public class ServerCommandHandler {
 						}
 						
 						userWhoInvitedYou.removeFromUsersYouInvited(client);
+						
+						Game game = new Game();
+						game.addPlayer(client);
+						game.addPlayer(userWhoInvitedYou);
+						Server.pushGame(game);
+						game.run();
 					} catch (NoInvitationReceivedException e) {
 						message += "You can't confirm to " + FormatService.colorizeString(userWhoInvitedYou.getColor(), userWhoInvitedYou.getUsername()) + " because you have not received his invitation.";
 					} catch (InvitationAlreadySentException e) {
@@ -368,20 +375,20 @@ public class ServerCommandHandler {
 			boolean clientMatch = false;
 			
 			for (Player userToInvite : clients) {
-				if (userToInvite.isLogged() && userToInvite.getUsername().compareTo(username) == 0) {
+				if (userToInvite.sender.isLogged() && userToInvite.getUsername().compareTo(username) == 0) {
 					clientMatch = true;
 
 					try {
 						client.tryInvite(userToInvite);
 
-						userToInvite.getPrintWriter().println(
+						userToInvite.sender.getPrintWriter().println(
 							";" + FormatService.colorizeString(userToInvite.getColor(), "▓")
 							+ " The user " + FormatService.colorizeString(client.getColor(), client.getUsername())
 							+ " sent you a invitation, confirm by sending the command \"/confirm " + FormatService.colorizeString(client.getColor(), client.getUsername()) + "\".;;"
 							+ FormatService.colorizeString(userToInvite.getColor(), "(" + userToInvite.getUsername() + ")──┤")
 						);
 						
-						userToInvite.getPrintWriter().flush();
+						userToInvite.sender.getPrintWriter().flush();
 						message += "Invitation sent to " + FormatService.colorizeString(userToInvite.getColor(), userToInvite.getUsername()) + ".";
 
 						for (Player cli : clients) {

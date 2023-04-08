@@ -12,6 +12,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import game.Game;
 import services.FormatService;
 import socket.commands.ServerCommandHandler;
 
@@ -24,6 +25,7 @@ public class Server {
 	}
 
 	private ArrayList<Player> players = new ArrayList<Player>();
+	private static ArrayList<Game> games = new ArrayList<Game>();
 	private static Log logLevel = Log.INFO;
 	private static final Path LOG_PATH = Path.of("../data/server.log");
 	public static final Path CREDENTIALS_PATH = Path.of("../data/credentials.txt");
@@ -33,6 +35,18 @@ public class Server {
 	public static void logDebug(String value)    { if (logLevel == Log.DEBUG)    System.out.print(value); }
 	public static void logError(String value)    { if (logLevel == Log.ERROR)    System.out.print(value); }
 	public static void logWarning(String value)  { if (logLevel == Log.WARNING)  System.out.print(value); }
+
+	public static void pushGame(Game game) {
+		if (games.contains(game) || game == null) return;
+		games.add(game);
+	}
+
+	public static Game getGame(Player player) {
+		for (Game g : games) {
+			if (g.isPlaying() && g.hasPlayer(player)) return g;
+		}
+		return null;
+	}
 
 	public Thread buildSender(PrintWriter pw) {
 		return new Thread(new Runnable() {		// Create a new thread with a callback function. "Runnable" must implement run().
@@ -59,9 +73,9 @@ public class Server {
 			public void run() {
 				while (true) {
 					for (Player client : players) {
-						if (client.isLogged() && !client.getLastConnection().plus(5, ChronoUnit.MINUTES).isAfter(FormatService.getCurrentTime())) {
-							client.clear();
-							client.toggleLog();
+						if (client.sender.isLogged() && !client.getLastConnection().plus(5, ChronoUnit.MINUTES).isAfter(FormatService.getCurrentTime())) {
+							client.sender.clear();
+							client.sender.toggleLog();
 							appendFile(LOG_PATH, FormatService.serverLogPrefix(client) + "timeout connection, kick user.");
 						}
 					}
@@ -92,16 +106,16 @@ public class Server {
 						client = null;
 
 						for (Player p : players) {
-							if (p.getSocket() == s) {
+							if (p.sender.getSocket() == s) {
 								client = p;
 								break;
 							}
 						}
 
 						if (messageReceived.compareTo("/q!") == 0) {
-							if (client != null && client.isLogged()) {
-								client.close();
-								client.toggleLog();
+							if (client != null && client.sender.isLogged()) {
+								client.sender.close();
+								client.sender.toggleLog();
 							}
 							
 							logMessage += "has left the room.";
@@ -113,7 +127,7 @@ public class Server {
 						client = null;
 
 						for (Player p : players) {
-							if (p.getSocket() == s) {
+							if (p.sender.getSocket() == s) {
 								client = p;
 								break;
 							}
@@ -177,7 +191,7 @@ public class Server {
 			for (String credentials : data.split("\n")) {
 				String username = credentials.split(" ")[0];
 				String password = credentials.split(" ")[1];
-				Player p = new Player(null, null, null);
+				Player p = new Player(null, null, null, null, null, null);
 				p.setUsername(username);
 				p.setPassword(password);
 				players.add(p);

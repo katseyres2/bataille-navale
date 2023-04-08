@@ -1,4 +1,6 @@
-package grid;
+package game.grid;
+import game.boat.Boat;
+import socket.Player;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -6,7 +8,6 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import boat.Boat;
 
 /**
  * 
@@ -24,10 +25,14 @@ public class Grid {
 	public final static int CRUISER_LENGTH = 3;
 	public final static int SUBMARINE_LENGTH = 3;
 	public final static int DESTROYER_LENGTH = 2;
+	private final Player player;
+
+	public Player getPlayer() { return player; }
 
 	final private String[][] grid;
 
-	public Grid() {
+	public Grid(Player player) {
+		this.player = player;
 		grid = new String[ROWS][COLUMNS];
 		random = new Random();
 	}
@@ -327,17 +332,36 @@ public class Grid {
 	}
 
 	public int[] getDirectionVector(String direction_vectors) {
+		int[] output;
+
 		switch (direction_vectors.toLowerCase()) {
-			case "n", "north", "nord":
-				return new int[] { -1, 0 };
-			case "s", "south", "sud":
-				return new int[] { 1, 0 };
-			case "w", "west", "ouest", "o":
-				return new int[] { 0, -1 };
-			case "e", "east", "est":
-				return new int[] { 0, 1 };
+			case "n":
+			case "north":
+			case "nord":
+				output = new int[] { -1, 0 };
+				break;
+			case "s":
+			case "south":
+			case "sud":
+				output = new int[] { 1, 0 };
+				break;
+			case "w":
+			case "west":
+			case "ouest":
+			case "o":
+				output = new int[] { 0, -1 };
+				break;
+			case "e":
+			case "east":
+			case "est":
+				output = new int[] { 0, 1 };
+				break;
+			default:
+				output = null;
+				break;
 		}
-		return null;
+
+		return output;
 	}
 
 	/**
@@ -470,11 +494,26 @@ public class Grid {
 		askPosition(position);
 		String valuePosition = getValuePosition(position);
 		switch (valuePosition) {
-			case "A", "C", "D", "S", "W" -> upgradeGrid(position, "X", valuePosition);
-			case "X", "Y" -> System.out.println("Vous avez déjà toucher cette position");
-			case null -> upgradeGrid(position, "Y");
-			default -> upgradeGrid(position, "Y");
-		}
+            case "A":
+            case "C":
+            case "D":
+            case "S":
+            case "W":
+                upgradeGrid(position, "X", valuePosition);
+                break;
+            case "X":
+            case "Y":
+                System.out.println("Vous avez déjà touché cette position");
+                break;
+            default:
+                if (valuePosition == null) {
+                    upgradeGrid(position, "Y");
+                } else {
+                    upgradeGrid(position, "Y");
+                }
+                break;
+        }
+
 		show();
 	}
 
