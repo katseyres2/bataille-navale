@@ -2,16 +2,11 @@ package game.grid;
 import game.boat.Boat;
 import socket.Player;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
-/**
- * 
- */
 public class Grid {
 	static final String POSITIONS[] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
 	final private static int ROWS = 10;
@@ -37,9 +32,6 @@ public class Grid {
 		random = new Random();
 	}
 
-	/**
-	 * 
-	 */
 	private static int[][] getVectors() {
 		return new int[][] {
 				{ -1, 0 },
@@ -56,9 +48,6 @@ public class Grid {
 		};
 	}
 
-	/**
-	 * @return [row, column]
-	 */
 	public int[] getRandomPoint() {
 		int output[] = new int[2];
 		boolean isFreePoint = false;
@@ -103,17 +92,12 @@ public class Grid {
 		return output;
 	}
 
-	/**
-	 * 
-	 */
+
 	public int[] getRandomVector(int[][] vectors) {
 		int i = random.nextInt(vectors.length);
 		return vectors[i];
 	}
 
-	/**
-	 * 
-	 */
 	public boolean canFillPoint(int x, int y) {
 		if (x < 0) {
 			// System.out.print("Left overflow\n");
@@ -159,10 +143,6 @@ public class Grid {
 
 		return true;
 	}
-
-	/*
-	 * 
-	 */
 
 	/**
 	 * For one boat, get a random point.

@@ -17,6 +17,8 @@ import services.FormatService;
 import socket.commands.ServerCommandHandler;
 
 public class Server {
+	public static int PORT = 5000;
+
 	public static enum Log {
 		INFO,
 		DEBUG,

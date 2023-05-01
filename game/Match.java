@@ -2,9 +2,6 @@ package game;
 
 import socket.Player;
 import game.grid.Grid;
-import socket.Player;
-import socket.Server;
-import socket.commands.Command.Role;
 
 public class Match implements Runnable {
 	public Player player1;
@@ -24,19 +21,18 @@ public class Match implements Runnable {
 
 	@Override
 	public void run() {
-		gridP1 = new Grid();
-		gridP2 = new Grid();
+		gridP1 = new Grid(player1);
+		gridP2 = new Grid(player2);
 
 		try{
 
-			// demander aux joueurs de placer les bateaux
-			player1.getPrintWriter().println("test");
-			player1.getPrintWriter().flush();
-			// attendre que les bateaux sois placer pour les 2 joueurs
-
+			// ask to players to place the boast
+			player1.receiver.getPrintWriter().println("test");
+			player1.receiver.getPrintWriter().flush();
+			// wait for the boat placement
 		} catch (Exception e) {
-			player1.getPrintWriter().println(e);
-			player1.getPrintWriter().flush();
+			player1.receiver.getPrintWriter().println(e);
+			player1.receiver.getPrintWriter().flush();
 		}
 	}
 }
