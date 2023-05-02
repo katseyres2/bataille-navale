@@ -44,9 +44,9 @@ public class ActionCommand extends Command {
 		// Fetch the player game.
 		Game currentGame = Server.getActiveGame(player);
 		// Send an action to this game.
-		boolean actionSuccessful =  currentGame.sendAction(player, targetPlayer, column, row);
+		String response =  currentGame.sendAction(player, targetPlayer, column, row);
 		
-		if (!actionSuccessful) return "Action failed.";
+		if (response != null) return response;
 		return "Action successful.";
 	}
 	

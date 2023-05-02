@@ -1,6 +1,7 @@
 package game.grid;
 import game.Player;
 import game.boat.Boat;
+import game.boat.Boat.typeBoat;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -387,6 +388,7 @@ public class Grid {
 						output += POSITIONS[i - 1] + " ";
 					}
 				}
+
 				// Affiche la position ( chiffre ) sur la première ligne
 				if (i == 0) {
 					if (j == 0) {
@@ -401,6 +403,12 @@ public class Grid {
 					output += " " + grid[i - 1][j - 1] + " ";
 				}
 			}
+
+			if (i - 1 > 0 && i - 1 < typeBoat.values().length) {
+				typeBoat tb = typeBoat.values()[i - 1];
+				output += "          [" + tb.label + "] boat : " + tb.name + ", length : " + tb.length;
+			}
+			
 			output += "\n";
 		}
 

@@ -5,13 +5,19 @@ public class Boat {
     public int hp;
 
     public enum typeBoat {
-        AIRCRAFT_CARRIER("A", 5), CRUISER("C", 4), SUBMARINE("S", 3), DESTROYER("D", 3), WARSHIP("W", 2);
+        AIRCRAFT_CARRIER("A", "aircraft carrier", 5),
+        CRUISER("C", "cruiser", 4),
+        SUBMARINE("S", "submarine", 3),
+        DESTROYER("D", "destroyer", 3),
+        WARSHIP("W", "warship", 2);
 
         public String label;
         public int length;
+        public String name;
 
-        typeBoat(String label, int length) {
+        typeBoat(String label, String name, int length) {
             this.label = label;
+            this.name = name;
             this.length = length;
         }
 
@@ -21,6 +27,10 @@ public class Boat {
 
         public String getLabel() {
             return label;
+        }
+
+        public String getName() {
+            return name;
         }
 
     }

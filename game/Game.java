@@ -33,11 +33,11 @@ public class Game {
 	 * @param row The horizontal coordinate.
 	 * @return true if the action is successful, otherwise false.
 	 */
-	public boolean sendAction(Player player, Player target, int column, int row) {
+	public String sendAction(Player player, Player target, int column, int row) {
 		boolean actionSuccessful = true;
 
-		if (player == target) return false;
-		if (playerTurn != player) return false;
+		if (player == target) return "Hey, you target yourself.";
+		if (playerTurn != player) return "That's not your turn.";
 		
 		// Fetch the target grid.
 		Grid targetGrid = findGridByPlayer(target);
@@ -47,13 +47,13 @@ public class Game {
 		 * targetGrid.askPosition(null);
 		 */
 
-		if (!actionSuccessful) return false;
+		if (!actionSuccessful) return "Action failed.";
 
 		if (player == firstPlayer) turnCount++;
 
 		Action action = new Action(player, targetGrid, column, row, turnCount);
 		actions.add(action);
-		return true;
+		return null;
 	}
 
 	public void nextPlayer() {
@@ -142,8 +142,9 @@ public class Game {
 
 		for (Grid grid : grids) {
 			if (grid.getPlayer() == player) continue;
-
-			output += "-------------------------------- " + grid.getPlayer().getUsername().toUpperCase() + "";
+			
+			output += "That's your turn.;";
+			output += "-------------------------------- " + grid.getPlayer().getUsername().toUpperCase();
 			output += grid;
 			output += "--------------------------------;";
 		}
@@ -210,6 +211,16 @@ public class Game {
 	}
 
 	private void sendToClient(Player player, String message) {
+		while (player.getPrintWriter() == null) {
+			System.out.println("waiting for " + player.getUsername() + " reconnection.");
+			
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				System.out.println(e.getMessage());
+			}
+		}
+
 		player.getPrintWriter().println(message);
 		player.getPrintWriter().flush();
 	}
