@@ -1,6 +1,5 @@
 package game;
 
-import socket.Player;
 import game.grid.Grid;
 
 public class Match implements Runnable {
@@ -25,14 +24,13 @@ public class Match implements Runnable {
 		gridP2 = new Grid(player2);
 
 		try{
-
 			// ask to players to place the boast
-			player1.receiver.getPrintWriter().println("test");
-			player1.receiver.getPrintWriter().flush();
+			player1.getPrintWriter().println("test");
+			player1.getPrintWriter().flush();
 			// wait for the boat placement
 		} catch (Exception e) {
-			player1.receiver.getPrintWriter().println(e);
-			player1.receiver.getPrintWriter().flush();
+			player1.getPrintWriter().println(e);
+			player1.getPrintWriter().flush();
 		}
 	}
 }

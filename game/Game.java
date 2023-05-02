@@ -3,7 +3,6 @@ import java.lang.Thread.State;
 import java.util.*;
 
 import game.grid.Grid;
-import socket.Player;
 
 public class Game {
 	private ArrayList<Player> bots = new ArrayList<Player>();
@@ -13,6 +12,7 @@ public class Game {
 	private Player firstPlayer;
 	private Player playerTurn;
 	private int turnCount = 0;
+	private Player winner;
 
 	public boolean hasPlayer(Player player) {
 		for (Grid g : grids) {
@@ -42,9 +42,9 @@ public class Game {
 	}
 
 	public void askActionToPlayer(Player player) {
-		if (!player.receiver.isLogged()) return;
-		player.receiver.getPrintWriter().println("/sendaction");
-		player.receiver.getPrintWriter().flush();
+		if (!player.isLogged()) return;
+		player.getPrintWriter().println("/sendaction");
+		player.getPrintWriter().flush();
 	}
 
 	private void addGrid(Player player) {
@@ -119,13 +119,30 @@ public class Game {
 
 		thread = new Thread() {
 			public void run() {
-				for (Grid grid : grids) {
-					//TODO code more...
+				while (winner == null) {
+					Grid grid = findGridByPlayer(playerTurn);
+					sendToClient(grid.getPlayer(), "It's your turn.");
 				}
 			}
 		};
 
 		thread.start();
+	}
+
+	public ArrayList<Player> getPlayers()
+	{
+		ArrayList<Player> players = new ArrayList<Player>(){};
+
+		for (Grid grid : grids) {
+			players.add(grid.getPlayer());
+		}
+
+		return players;
+	}
+
+	private void sendToClient(Player player, String message) {
+		player.getPrintWriter().println(message);
+		player.getPrintWriter().flush();
 	}
 
 	public void resume() {

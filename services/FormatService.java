@@ -5,8 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
-import socket.Player;
-import socket.SocketClient;
+import game.Player;
 
 public class FormatService {
 	public static final String ANSI_RESET	= "\u001B[0m";

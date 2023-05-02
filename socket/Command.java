@@ -1,17 +1,18 @@
-package socket.commands;
+package socket;
+import interfaces.ICommand;
 
-public class Command {
+public abstract class Command implements ICommand {
 	public static enum Role {
 		UNDEFINED,
 		AUTHENTICATED,
 		ADMIN
 	};
 
-	private String name;
-	private String[] optionalParameters;
-	private String[] mandatoryParameters;
-	private String documentation;
-	private Role role;
+	String name;
+	String[] optionalParameters;
+	String[] mandatoryParameters;
+	String documentation;
+	Role role;
 
 	public Command(String name, String[] optionalParameters, String[] mandatoryParameters,  Role role, String documentation) {
 		this.name = name;
@@ -21,7 +22,7 @@ public class Command {
 		this.role = role;
 	}
 
-	public String help() 		{ return documentation; }
+	public String getHelp() 	{ return documentation; }
 	public String getName() 	{ return name; 			}
 	public Role getRole() 		{ return role;			}
 

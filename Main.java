@@ -1,15 +1,13 @@
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Scanner;
 
-import socket.Player;
-import socket.Server;
-import socket.SocketClient;
+import game.Player;
+import services.LogService.LEVEL;
+import socket.server.Server;
 
 public class Main {
 	public static void main(String[] args) {
@@ -22,7 +20,7 @@ public class Main {
 
 		if (response == 0) {
 			// SERVER CREATION
-			Server.setLogLevel(Server.Log.DEBUG);
+			Server.setLogLevel(LEVEL.DEBUG);
 			Server server = new Server();
 			server.start(Server.PORT);
 		} else if (response == 1) {
@@ -53,7 +51,7 @@ public class Main {
 			}
 
 			// Player client = new Player(socket, printWriter, bufferedReader);
-			(new Player(s, pw, br, null, null, null)).start(Server.PORT);
+			(new Player(s, pw, br)).start(Server.PORT);
 		}
 	}
 }

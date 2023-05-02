@@ -1,6 +1,6 @@
 package game.grid;
+import game.Player;
 import game.boat.Boat;
-import socket.Player;
 
 import java.util.ArrayList;
 import java.util.Random;
