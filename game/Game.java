@@ -3,6 +3,8 @@ import java.lang.Thread.State;
 import java.util.*;
 
 import game.grid.Grid;
+import services.expections.OnlyOneActiveGameByPlayer;
+import socket.server.Server;
 
 public class Game {
 	private ArrayList<Player> bots = new ArrayList<Player>();
@@ -21,13 +23,33 @@ public class Game {
 		return false;
 	}
 
-	public void sendAction(Player player, int column, int row) {
-		if (playerTurn != player) return;
-		Grid grid = findGridByPlayer(player);
-		//TODO FIREEEEEEE
+	/**
+	 * The action is successful if the player played its turned successfully.
+	 * A wrong action example is an overflow position like (22,5) in a grid 10x10.
+	 * @param player the player who sent the coordinates.
+	 * @param target the player to target.
+	 * @param column The vertical coordinate.
+	 * @param row The horizontal coordinate.
+	 * @return true if the action is successful, otherwise false.
+	 */
+	public boolean sendAction(Player player, Player target, int column, int row) {
+		boolean actionSuccessful = false;
+		if (playerTurn != player) return false;
+		
+		// Fetch the target grid.
+		Grid targetGrid = findGridByPlayer(target);
+
+		/**
+		 * TODO try to hit a boat on this grid
+		 * targetGrid.askPosition(null);
+		 */
+
+		if (!actionSuccessful) return false;
+
 		if (player == firstPlayer) turnCount++;
-		actions.add(new Action(player, column, row, turnCount));
+		actions.add(new Action(player, targetGrid, column, row, turnCount));
 		playerTurn = getNextPlayer();
+		return true;
 	}
 
 	public Player getNextPlayer() {
@@ -47,7 +69,9 @@ public class Game {
 		player.getPrintWriter().flush();
 	}
 
-	private void addGrid(Player player) {
+	private void addGrid(Player player) throws OnlyOneActiveGameByPlayer {
+		if (Server.getActiveGame(player) != null) throw new OnlyOneActiveGameByPlayer();
+
 		for (Grid grid : grids) {
 			if (grid.getPlayer() == player) return;
 		}
@@ -87,7 +111,12 @@ public class Game {
 
 	public void addPlayer(Player player) {
 		if (player == null) return;
-		addGrid(player);
+		
+		try {
+			addGrid(player);
+		} catch (OnlyOneActiveGameByPlayer e) {
+			System.out.println(e.getMessage());
+		}
 	}
 
 	public void removePlayer(Player player) {
@@ -103,11 +132,6 @@ public class Game {
 	public void removeBot(Player bot) {
 		if (bot == null) return;
 		bots.remove(bot);
-	}
-
-	private void pushAction(Action action) {
-		if (actions.contains(action) || action == null) return;
-		actions.add(action);
 	}
 
 	public void run() {
@@ -164,78 +188,6 @@ public class Game {
 		if (thread == null) return;
 		thread.interrupt();
 	}
-
-
-
-	public void test() {
-		System.out.println("TEST");
-	}
-
-	// public void start() {
-	// 	System.out.print(
-	// 			"\n###################################################################################################################################################\n");
-	// 	System.out.print("##" + FormatService.ANSI_BLUE
-	// 			+ "		 __    __   ______   __     __   ______   __              _______    ______   ________  ________  __        ________             "
-	// 			+ FormatService.ANSI_RESET + "##\n");
-	// 	System.out.print("##" + FormatService.ANSI_BLUE
-	// 			+ "		/  \\  /  | /      \\ /  |   /  | /      \\ /  |            /       \\  /      \\ /        |/        |/  |      /        |            "
-	// 			+ FormatService.ANSI_RESET + "##\n");
-	// 	System.out.print("##" + FormatService.ANSI_BLUE
-	// 			+ "		$$  \\ $$ |/$$$$$$  |$$ |   $$ |/$$$$$$  |$$ |            $$$$$$$  |/$$$$$$  |$$$$$$$$/ $$$$$$$$/ $$ |      $$$$$$$$/             "
-	// 			+ FormatService.ANSI_RESET + "##\n");
-	// 	System.out.print("##" + FormatService.ANSI_BLUE
-	// 			+ "		$$$  \\$$ |$$ |__$$ |$$ |   $$ |$$ |__$$ |$$ |            $$ |__$$ |$$ |__$$ |   $$ |      $$ |   $$ |      $$ |__                "
-	// 			+ FormatService.ANSI_RESET + "##\n");
-	// 	System.out.print("##" + FormatService.ANSI_BLUE
-	// 			+ "		$$$$  $$ |$$    $$ |$$  \\ /$$/ $$    $$ |$$ |            $$    $$< $$    $$ |   $$ |      $$ |   $$ |      $$    |               "
-	// 			+ FormatService.ANSI_RESET + "##\n");
-	// 	System.out.print("##" + FormatService.ANSI_BLUE
-	// 			+ "		$$ $$ $$ |$$$$$$$$ | $$  /$$/  $$$$$$$$ |$$ |            $$$$$$$  |$$$$$$$$ |   $$ |      $$ |   $$ |      $$$$$/                "
-	// 			+ FormatService.ANSI_RESET + "##\n");
-	// 	System.out.print("##" + FormatService.ANSI_BLUE
-	// 			+ "		$$ |$$$$ |$$ |  $$ |  $$ $$/   $$ |  $$ |$$ |_____       $$ |__$$ |$$ |  $$ |   $$ |      $$ |   $$ |_____ $$ |_____             "
-	// 			+ FormatService.ANSI_RESET + "##\n");
-	// 	System.out.print("##" + FormatService.ANSI_BLUE
-	// 			+ "		$$ | $$$ |$$ |  $$ |   $$$/    $$ |  $$ |$$       |      $$    $$/ $$ |  $$ |   $$ |      $$ |   $$       |$$       |            "
-	// 			+ FormatService.ANSI_RESET + "##\n");
-	// 	System.out.print("##" + FormatService.ANSI_BLUE
-	// 			+ "		$$/   $$/ $$/   $$/     $/     $$/   $$/ $$$$$$$$/       $$$$$$$/  $$/   $$/    $$/       $$/    $$$$$$$$/ $$$$$$$$/             "
-	// 			+ FormatService.ANSI_RESET + "##\n");
-	// 	System.out.print(
-	// 			"##                                                                                                                                               ##");
-	// 	System.out.print(
-	// 			"\n###################################################################################################################################################\n");
-
-	// 	animateMessage("\n- Hi, welcome to our Naval Battle Game.", 0);
-	// 	animateMessage("\n- What's your name : ", 0);
-
-	// 	Scanner scanner = new Scanner(System.in);
-	// 	String answer = scanner.nextLine();
-
-	// 	animateMessage("- Hi " + answer + ", nice to meet you !", 0);
-	// 	animateMessage("\n\n- We are going to build a new grid for you...", 1000);
-
-	// 	// Grid grid = new Grid();
-	// 	// grid.placeBoatRandom(Grid.AIRCRAFT_CARRIER_LENGTH, "A");
-	// 	// grid.placeBoatRandom(Grid.BATTLESHIP_LENGTH, "B");
-	// 	// grid.placeBoatRandom(Grid.CRUISER_LENGTH, "C");
-	// 	// grid.placeBoatRandom(Grid.DESTROYER_LENGTH, "D");
-	// 	// grid.placeBoatRandom(Grid.SUBMARINE_LENGTH, "S");
-
-	// 	Grid grid = new Grid();
-	// 	grid.placeAllBoat();
-
-	// 	for (int i = 0; i <= 20; i++)
-	// 		grid.fire();
-
-	// 	animateMessage("\n- Done, there is your grid !", 0);
-
-	// 	animateMessage("\n", 0);
-	// 	grid.show();
-	// 	animateMessage("\n", 0);
-
-	// 	scanner.close();
-	// }
 
 	public void animateMessage(String message, int pauseMs) {
 		for (String letter : message.split("")) {

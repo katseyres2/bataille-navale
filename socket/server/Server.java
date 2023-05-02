@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 		games.add(game);
 	}
 
-	public static Game getGame(Player player) {
+	public static Game getActiveGame(Player player) {
 		for (Game g : games) {
 			if (g.isPlaying() && g.hasPlayer(player)) return g;
 		}
