@@ -1,62 +1,132 @@
-// package game;
+package game;
 
-// import game.grid.Cell;
-// import game.grid.Grid;
-// import socket.Player;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.ArrayList;
 
-// public class Player extends Player {
-// 	private String username;
-// 	private int victories;
-// 	private int defeats;
+import services.FormatService;
+import services.expections.InvitationAlreadySentException;
+import services.expections.NoInvitationReceivedException;
+import services.expections.NotConnectedException;
+import services.expections.UserAlreadyInvitedYouException;
+import socket.Command.Role;
+import socket.client.SocketClient;
 
-// 	public Player() {
-// 		defeats = 0;
-// 		victories = 0;
-// 	}
+public class Player extends SocketClient {
+	private String username;
+	private String password;
+	private String color;
+	private int victories;
+	private int defeats;
+	private ArrayList<Player> usersYouInvited;
+	private ArrayList<Player> usersWhoInvitedYou;
+	private Role role;
 
-// 	public static Player copyOf(Player player) {
-// 		Player p = new Player();
-// 		p.setBufferedReader(player.getBufferedReader());
-// 		p.setSocket(player.getSocket());
-// 		p.setPrintWriter(player.getPrintWriter());
-// 		p.setUsername(player.getUsername());
-// 		p.setPassword(player.getPassword());
-// 		p.setColor(player.getColor());
+	public Player(Socket sSender, PrintWriter pwSender, BufferedReader brSender) {
+		super(sSender, pwSender, brSender);
 
-// 		return p;
-// 	}
+		
+		usersYouInvited = new ArrayList<Player>();
+		usersWhoInvitedYou = new ArrayList<Player>();
+		defeats = 0;
+		victories = 0;
+		color = FormatService.getRandomColor();
+		role = Role.ADMIN;
+	}
+	
+	public void setColor(String value) {
+		for (String color : FormatService.colors) {
+			if (value.compareTo(color) == 0) {
+				color = value;
+				break;
+			}
+		}
+	}
+	
+	public Role getRole() 								{ return role; }
+	public int getDefeats() 							{ return defeats; }
+	public String getColor()							{ return color; }
+	public int getVictories() 							{ return victories; }
+	private String getPassword()						{ return password; }
+	public ArrayList<Player> getUsersYouInvited()		{ return usersYouInvited; }
+	public ArrayList<Player> getUsersWhoInvitedYou()	{ return usersWhoInvitedYou; }
+	
+	public void addDefeat()  								{ defeats++; }
+	public void addVictory() 								{ victories++; }
+	public void setRole(Role value)							{ role = value; }
+	public void addInUsersYouInvited(Player client) 		{ usersYouInvited.add(client); }
+	public void addInUsersWhoInvitedYou(Player client) 		{ usersWhoInvitedYou.add(client); }
+	public void removeFromUsersYouInvited(Player client) 	{ usersYouInvited.remove(client); }
+	public void removeFromUserWhoInvitedYou(Player client) 	{ usersWhoInvitedYou.remove(client); }
 
-// 	public String getUsername() { return username; }
-// 	public void setUsername(String value) { username = value; }
+	/**
+	 * Checks if "this" can invite the parameter client. 
+	 * @param client
+	 * @throws InvitationAlreadySentException
+	 * @throws UserAlreadyInvitedYouException
+	 */
+	public void tryInvite(Player client) throws InvitationAlreadySentException, UserAlreadyInvitedYouException {
+		for (Player cli : this.getUsersYouInvited()) {
+			if (cli.compareTo(client)) {
+				throw new InvitationAlreadySentException();
+			}
+		}
+		
+		for (Player cli : this.usersWhoInvitedYou) {
+			if (cli.compareTo(client)) {
+				throw new UserAlreadyInvitedYouException();
+			}
+		}
+	}
 
-// 	public int getVictories() { return victories; }
-// 	public int getDefeats() { return defeats; }
-// 	public int getNumberOfGamesPlayed() { return defeats + victories; }
+	/**
+	 * Checks if this can confirm the invitation sent by the client parameter.
+	 * @param client
+	 * @throws InvitationAlreadySentException
+	 * @throws NoInvitationReceivedException
+	 */
+	public void tryConfirm(Player client) throws InvitationAlreadySentException, NoInvitationReceivedException {
+		for (Player cli : this.usersYouInvited) {												// Iterates on each user you invited.
+			if (cli.compareTo(client)) {														// Checks if the client you invited matches with this client.
+				throw new InvitationAlreadySentException();										// You sent an invitation thus you can not confirm.
+			}
+		}
 
-// 	public void inviteOpponent(Player opponent) {
+		boolean invitationReceived = false;
 
-// 	}
+		for (Player cli : this.usersWhoInvitedYou) {											// Iterates on each user who invited you.
+			if (cli.compareTo(client)) {														// Checks if this client invited you.
+				invitationReceived = true;														// You received an invitation from the client parameter.
+				break;
+			}
+		}
 
-// 	/*
-// 	 * 
-// 	 */
-// 	public void inviteAI() {
+		if (! invitationReceived) throw new NoInvitationReceivedException();					// If the client parameter did not send you an invitation, throws an exception.
+	}
 
-// 	}
 
-// 	// /*
-// 	//  * 
-// 	//  */
-// 	// private static Player generateAI() {
-// 	// 	Player ai = new Player();
-// 	// 	ai.setUsername("bot" + (new Random()).nextInt(1000));
-// 	// 	return ai;
-// 	// }
+	public boolean checkCredentials(String username, String password) {
+		return (this.getUsername() != null && this.password != null) && (this.getUsername().compareTo(username) == 0 && this.getPassword().compareTo(password) == 0);
+	}
 
-// 	/*
-// 	 * 
-// 	 */
-// 	public void shoot(Grid grid, Cell cell) {
+	public boolean compareTo(Player client) {
+		return this.getUsername() != null & this.getUsername().compareTo(client.getUsername()) == 0;
+	}
 
-// 	}
-// }
+	public void signOut() throws NotConnectedException {
+		if (!super.isLogged()) throw new NotConnectedException();
+		super.toggleLog();
+		super.clear();
+	}
+
+	public String getUsername() { return username; }
+	public void setUsername(String value) { username = value; }
+	public void setPassword(String value) { password = value; }
+
+	public void start(int port) {
+		System.out.print("\nYour address is " + super.getAddress() + ":" + Integer.toString(getPort()));
+		buildSender(getPrintWriter()).start();
+		buildReceiver(getSocket(), getPrintWriter(), getBufferedReader()).start();
+	}
+}
