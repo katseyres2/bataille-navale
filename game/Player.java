@@ -25,7 +25,6 @@ public class Player extends SocketClient {
 
 	public Player(Socket sSender, PrintWriter pwSender, BufferedReader brSender) {
 		super(sSender, pwSender, brSender);
-
 		
 		usersYouInvited = new ArrayList<Player>();
 		usersWhoInvitedYou = new ArrayList<Player>();

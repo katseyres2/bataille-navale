@@ -12,8 +12,10 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import game.Action;
 import game.Game;
 import game.Player;
+import game.grid.Grid;
 import interfaces.IServer;
 import interfaces.ISocketBuilder;
 import services.FormatService;
@@ -21,8 +23,6 @@ import services.LogService;
 
 public class Server extends LogService implements IServer,ISocketBuilder {
 	public static int PORT = 5000;
-
-
 
 	public Server() {
 		super(LOG_PATH);
@@ -46,8 +46,11 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 	}
 
 	public static Game getActiveGame(Player player) {
+		// System.out.println("Player : " + player.getUsername());
 		for (Game g : games) {
-			if (g.isPlaying() && g.hasPlayer(player)) return g;
+			// System.out.println("Is playing : " + g.isPlaying() + ", hasPlayer : " + g.hasPlayer(player));
+			// if (g.isPlaying() && g.hasPlayer(player)) return g;
+			if (g.hasPlayer(player)) return g;
 		}
 		return null;
 	}

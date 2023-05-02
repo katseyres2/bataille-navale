@@ -23,7 +23,7 @@ public class ActionCommand extends Command {
 
 		if (args.length != 4) return "Wrong number of parameters.";
 		String username = args[1];
-		
+
 		try {
 			row = Integer.parseInt(args[2]);
 			column = Integer.parseInt(args[3]);
@@ -32,9 +32,8 @@ public class ActionCommand extends Command {
 			return "Wrong parameter format.";
 		}
 
-		
 		for (Player p : players) {
-			if (p.getUsername() == username) {
+			if (p.getUsername().compareTo(username) == 0) {
 				targetPlayer = p;
 				break;
 			}

@@ -33,7 +33,9 @@ public class Game {
 	 * @return true if the action is successful, otherwise false.
 	 */
 	public boolean sendAction(Player player, Player target, int column, int row) {
-		boolean actionSuccessful = false;
+		boolean actionSuccessful = true;
+
+		if (player == target) return false;
 		if (playerTurn != player) return false;
 		
 		// Fetch the target grid.
@@ -47,20 +49,20 @@ public class Game {
 		if (!actionSuccessful) return false;
 
 		if (player == firstPlayer) turnCount++;
-		actions.add(new Action(player, targetGrid, column, row, turnCount));
-		playerTurn = getNextPlayer();
+
+		Action action = new Action(player, targetGrid, column, row, turnCount);
+		actions.add(action);
 		return true;
 	}
 
-	public Player getNextPlayer() {
+	public void nextPlayer() {
 		int currentIndex = grids.indexOf(findGridByPlayer(playerTurn));
-		if (currentIndex == grids.size() - 1) currentIndex = 0;
-		Player p =  findPlayerByGrid(grids.get(++currentIndex));
-		return p;
-	}
-
-	public boolean isPlaying() {
-		return thread.getState() == State.RUNNABLE;
+		System.out.println("Current index1 : " + currentIndex);
+		if (currentIndex == grids.size()) currentIndex = 0;
+		System.out.println("Current index2 : " + currentIndex);
+		Player p =  findPlayerByGrid(grids.get(currentIndex++));
+		System.out.println("New player : " + p.getUsername());
+		playerTurn = p;
 	}
 
 	public void askActionToPlayer(Player player) {
@@ -134,6 +136,19 @@ public class Game {
 		bots.remove(bot);
 	}
 
+	public String displayPlayerGrids(Player player) {
+		String output = "";
+
+		for (Grid grid : grids) {
+			if (grid.getPlayer() == player) continue;
+
+			output += "--------------------------------" + grid.getPlayer().getUsername() + "\n";
+			output += grid;
+		}
+
+		return output + "\n\n";
+	}
+
 	public void run() {
 		if (grids.size() < 2) return;
 		int index = (new Random()).nextInt(grids.size());
@@ -142,10 +157,37 @@ public class Game {
 		if (thread != null) return;
 
 		thread = new Thread() {
+			@Override
 			public void run() {
+				sendToClient(playerTurn, displayPlayerGrids(playerTurn));
+
 				while (winner == null) {
-					Grid grid = findGridByPlayer(playerTurn);
-					sendToClient(grid.getPlayer(), "It's your turn.");
+					try {
+						Thread.sleep(5000); // decrease loop time
+					} catch (InterruptedException e) {
+						System.out.println(e.getMessage());
+						break;
+					}
+
+					System.out.println(playerTurn.getUsername() + " turn.");
+
+					Action lastAction = null;
+					if (actions.size() > 0) lastAction = actions.get(actions.size() - 1);
+					if (lastAction == null || lastAction.getPlayer() != playerTurn) continue;
+
+					// Fetch the grid of the player who must play.
+					Grid currentGrid = findGridByPlayer(playerTurn);
+					int currentIndex = grids.indexOf(currentGrid);
+					int nextIndex = currentIndex += 1;
+
+					if (currentIndex == grids.size()) nextIndex = 0;
+
+					// Fetch the next grid to play.
+					Grid nextGrid = grids.get(nextIndex);
+					playerTurn = nextGrid.getPlayer();
+					sendToClient(playerTurn, displayPlayerGrids(playerTurn));
+
+					System.out.println("Sent grid to player " + playerTurn.getUsername());
 				}
 			}
 		};

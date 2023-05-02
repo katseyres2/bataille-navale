@@ -375,6 +375,38 @@ public class Grid {
 		}
 	}
 
+	@Override
+	public String toString() {
+		String output = "\n";
+
+		for (int i = 0; i < 11; i++) {
+			for (int j = 0; j < 11; j++) {
+				// Affiche la lettre sur la première colonne
+				if (j == 1) {
+					if (i >= 1) {
+						output += POSITIONS[i - 1] + " ";
+					}
+				}
+				// Affiche la position ( chiffre ) sur la première ligne
+				if (i == 0) {
+					if (j == 0) {
+						output += "\\ ";
+					}
+					if (j >= 1) {
+						output += " " + j + " ";
+					}
+				} else if (j >= 1 && (grid[i - 1][j - 1] == null)) {
+					output += " • ";
+				} else if (j >= 1 && (grid[i - 1][j - 1] != null)) {
+					output += " " + grid[i - 1][j - 1] + " ";
+				}
+			}
+			output += "\n";
+		}
+
+		return output;
+	}
+
 	/**
 	 * Convert the first coord ( letter A to J ) into a int
 	 * 

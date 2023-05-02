@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import game.Player;
 import socket.Command;
-import socket.Command.Role;
+import socket.commands.ActionCommand;
 import socket.commands.ConfirmCommand;
 import socket.commands.HelpCommand;
 import socket.commands.InfoCommand;
@@ -28,7 +28,8 @@ public class ServerCommandHandler {
 		new InviteCommand(),
 		new ConfirmCommand(),
 		new SignUpCommand(),
-		new InfoCommand()
+		new InfoCommand(),
+		new ActionCommand()
 	));
 
 	/**
@@ -43,7 +44,6 @@ public class ServerCommandHandler {
 		String messageToSend = "";
 		Player player = null;
 		String[] args = line.split(" ");
-		Role role = Role.UNDEFINED;
 
 		for (Player p : players) {
 			if (p.getSocket() == s) {
@@ -52,12 +52,8 @@ public class ServerCommandHandler {
 			}
 		}
 
-		if (player != null) {
-			role = player.getRole();
-		}
-
 		for (Command c : COMMANDS) {
-			if (c.getName().contains(args[0]) && c.hasPermission(role)) {
+			if (c.getName().contains(args[0])) {
 				messageToSend += c.execute(args, player, players, s, pw, br);
 				return messageToSend;
 			}

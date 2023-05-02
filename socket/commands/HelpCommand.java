@@ -17,11 +17,14 @@ public class HelpCommand extends Command {
 	@Override
     public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
 		String message = "List Of Commands;─┬───────────────; │;";
+		Role role = player != null ? player.getRole() : Role.UNDEFINED;
+
 
 		for (Command command : ServerCommandHandler.COMMANDS) {
-			if (command.hasPermission(player.getRole())) {
+			if (command.hasPermission(role)) {
 				int totalLength = 30;
 				int fillWithSpace = totalLength - command.getName().length() - command.getParameters().length();
+				if (fillWithSpace < 0) fillWithSpace = 0;
 				message += " ├─ " + command.getName() + " " + command.getParameters() + " ".repeat(fillWithSpace) + " : " + command.getHelp() + ";";
 			}
 		}
