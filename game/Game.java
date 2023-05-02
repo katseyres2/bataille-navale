@@ -146,14 +146,11 @@ public class Game {
 
 		for (Grid grid : grids) {
 			if (grid.getPlayer() == player) continue;
-			
-			output += "That's your turn.;";
 			output += "-------------------------------- " + grid.getPlayer().getUsername().toUpperCase();
 			output += grid;
 			output += "--------------------------------;";
 		}
-		
-		output += FormatService.colorizeString(player.getColor(), "(" + player.getUsername() + ")--|");
+
 		return output;
 	}
 
@@ -167,7 +164,7 @@ public class Game {
 		thread = new Thread() {
 			@Override
 			public void run() {
-				sendToClient(playerTurn, displayPlayerGrids(playerTurn));
+				sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));
 
 				while (winner == null) {
 					try {
@@ -193,7 +190,7 @@ public class Game {
 					// Fetch the next grid to play.
 					Grid nextGrid = grids.get(nextIndex);
 					playerTurn = nextGrid.getPlayer();
-					sendToClient(playerTurn, displayPlayerGrids(playerTurn));
+					sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));
 
 					System.out.println("Sent grid to player " + playerTurn.getUsername());
 				}

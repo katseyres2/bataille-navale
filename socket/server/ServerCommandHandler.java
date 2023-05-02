@@ -10,6 +10,7 @@ import game.Player;
 import socket.Command;
 import socket.commands.ActionCommand;
 import socket.commands.ConfirmCommand;
+import socket.commands.GameStateCommand;
 import socket.commands.HelpCommand;
 import socket.commands.InfoCommand;
 import socket.commands.InviteCommand;
@@ -31,7 +32,8 @@ public class ServerCommandHandler {
 		new SignUpCommand(),
 		new InfoCommand(),
 		new ActionCommand(),
-		new SurrendCommand()
+		new SurrendCommand(),
+		new GameStateCommand()
 	));
 
 	/**
