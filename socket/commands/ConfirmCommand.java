@@ -40,11 +40,11 @@ public class ConfirmCommand extends Command {
 						player.tryConfirm(userWhoInvitedYou);
 
 						userWhoInvitedYou.getPrintWriter().println(";"
-							+ FormatService.colorizeString(userWhoInvitedYou.getColor(), "▓")
+							+ FormatService.colorizeString(userWhoInvitedYou.getColor(), "#")
 							+ " The user "
 							+ FormatService.colorizeString(player.getColor(), player.getUsername())
-							+ " sent you a /confirm, create a <LINK BETWEEN THEM>;;"
-							+ FormatService.colorizeString(userWhoInvitedYou.getColor(), "(" + userWhoInvitedYou.getUsername() + ")──┤")
+							+ " accepts your invitation, start the game.;;"
+							+ FormatService.colorizeString(userWhoInvitedYou.getColor(), "(" + userWhoInvitedYou.getUsername() + ")--|")
 						);
 
 						userWhoInvitedYou.getPrintWriter().flush();

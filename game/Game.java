@@ -3,6 +3,7 @@ import java.lang.Thread.State;
 import java.util.*;
 
 import game.grid.Grid;
+import services.FormatService;
 import services.expections.OnlyOneActiveGameByPlayer;
 import socket.server.Server;
 
@@ -142,11 +143,13 @@ public class Game {
 		for (Grid grid : grids) {
 			if (grid.getPlayer() == player) continue;
 
-			output += "--------------------------------" + grid.getPlayer().getUsername() + "\n";
+			output += "-------------------------------- " + grid.getPlayer().getUsername().toUpperCase() + "";
 			output += grid;
+			output += "--------------------------------;";
 		}
-
-		return output + "\n\n";
+		
+		output += FormatService.colorizeString(player.getColor(), "(" + player.getUsername() + ")--|");
+		return output;
 	}
 
 	public void run() {

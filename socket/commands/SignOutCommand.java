@@ -27,6 +27,6 @@ public class SignOutCommand extends Command {
 			}
 		}
 
-		return "You're disconnected, see you soon. 🙂";
+		return "You're disconnected, see you soon.";
 	}
 }

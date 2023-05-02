@@ -15,8 +15,8 @@ public class InviteCommand extends Command {
     public InviteCommand() {
         super(
             "/invite",
-            new String[]{"username"},
             null,
+            new String[]{"username"},
             Command.Role.AUTHENTICATED,
             "Invite your friends to play a new game."
         );
@@ -28,7 +28,7 @@ public class InviteCommand extends Command {
 		if (args.length != 2) {
 			message += "You must specify <username>.";
 		} else if (args[1].compareTo(player.getUsername()) == 0) {
-			message += "You can't invite yourself. 🤪";
+			message += "You can't invite yourself.";
 		} else {
 			String username = args[1];
 			boolean playerMatch = false;
@@ -41,10 +41,10 @@ public class InviteCommand extends Command {
 						player.tryInvite(userToInvite);
 
 						userToInvite.getPrintWriter().println(
-							";" + FormatService.colorizeString(userToInvite.getColor(), "▓")
+							";" + FormatService.colorizeString(userToInvite.getColor(), "|")
 							+ " The user " + FormatService.colorizeString(player.getColor(), player.getUsername())
 							+ " sent you a invitation, confirm by sending the command \"/confirm " + FormatService.colorizeString(player.getColor(), player.getUsername()) + "\".;;"
-							+ FormatService.colorizeString(userToInvite.getColor(), "(" + userToInvite.getUsername() + ")──┤")
+							+ FormatService.colorizeString(userToInvite.getColor(), "(" + userToInvite.getUsername() + ")--|")
 						);
 						
 						userToInvite.getPrintWriter().flush();

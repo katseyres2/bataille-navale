@@ -15,16 +15,15 @@ public class UserListCommand extends Command {
 	}
 	
 	public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
-		String message = "List Of Users;".concat("─┬────────────; │;");
+		String message = "List Of Users;".concat("--------------; |;");
 
 		for (int i = 0; i < players.size(); i++) {
-			if (players.get(i).getUsername().compareTo(player.getUsername()) == 0) continue;
-			message += " ├─ " + (players.get(i).isLogged() ? "V " : "X ") + players.get(i).getUsername()
-			+ " is " + (players.get(i).isLogged() ? "online" : "offline") + ", last message sent "
+			if (player == null || players.get(i).getUsername().compareTo(player.getUsername()) == 0) continue;
+			message += " | " + players.get(i).getUsername() + " " + (players.get(i).isLogged() ? "online" : "offline").toUpperCase() + ", "
 						+ FormatService.LocalDateTimeToString(players.get(i).getLastConnection())
-						+ ", victories: " + players.get(i).getVictories() + ", defeats:" + players.get(i).getDefeats()
+						+ ", V = " + players.get(i).getVictories() + ", D = " + players.get(i).getDefeats()
 						+ ";";
 					}
-		return message += " │; └────────────";
+		return message += " |; |------------";
 	}
 }

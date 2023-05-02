@@ -59,7 +59,7 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 		return new Thread(new Runnable() {		// Create a new thread with a callback function. "Runnable" must implement run().
 			@Override
 			public void run() {
-				String msg = "Welcome ! Use the command /signup to create a new account or /signin you're already registered.;;(?)──┤\n";
+				String msg = "Welcome ! Use the command /signup to create a new account or /signin you're already registered.;;(?)--|\n";
 				Scanner scan = new Scanner(System.in);
 
 				pw.print(msg);
@@ -149,10 +149,10 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 						}
 						
 						if (client == null) {
-							messageToSend += ";;(?)──┤";
+							messageToSend += ";;(?)--|";
 						} else {
 							client.refreshLastConnection();
-							messageToSend = client.getColor() + "▓ " + FormatService.ANSI_RESET + messageToSend.replace(";", ";" + client.getColor() +  "▓ " + FormatService.ANSI_RESET) +  ";;" + client.getColor() + "(" + client.getUsername() + ")──┤" + FormatService.ANSI_RESET;
+							messageToSend = client.getColor() + "# " + FormatService.ANSI_RESET + messageToSend.replace(";", ";" + client.getColor() +  "# " + FormatService.ANSI_RESET) +  ";;" + client.getColor() + "(" + client.getUsername() + ")--|" + FormatService.ANSI_RESET;
 						}
 
 						pw.println(messageToSend);
