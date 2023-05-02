@@ -19,7 +19,7 @@ public class UserListCommand extends Command {
 
 		for (int i = 0; i < players.size(); i++) {
 			if (players.get(i).getUsername().compareTo(player.getUsername()) == 0) continue;
-			message += " ├─ " + (players.get(i).isLogged() ? "🟢 " : "🔴 ") + players.get(i).getUsername()
+			message += " ├─ " + (players.get(i).isLogged() ? "V " : "X ") + players.get(i).getUsername()
 			+ " is " + (players.get(i).isLogged() ? "online" : "offline") + ", last message sent "
 						+ FormatService.LocalDateTimeToString(players.get(i).getLastConnection())
 						+ ", victories: " + players.get(i).getVictories() + ", defeats:" + players.get(i).getDefeats()
