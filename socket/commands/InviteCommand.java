@@ -10,6 +10,7 @@ import services.FormatService;
 import services.expections.InvitationAlreadySentException;
 import services.expections.UserAlreadyInvitedYouException;
 import socket.Command;
+import socket.server.Server;
 
 public class InviteCommand extends Command {
     public InviteCommand() {
@@ -29,6 +30,8 @@ public class InviteCommand extends Command {
 			message += "You must specify <username>.";
 		} else if (args[1].compareTo(player.getUsername()) == 0) {
 			message += "You can't invite yourself.";
+		} else if (Server.getActiveGame(player) != null) {
+			message += "You already play a game.";
 		} else {
 			String username = args[1];
 			boolean playerMatch = false;

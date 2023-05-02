@@ -66,6 +66,10 @@ public class Game {
 		playerTurn = p;
 	}
 
+	public boolean isPlayerTurn(Player player) {
+		return playerTurn == player;
+	}
+
 	public void askActionToPlayer(Player player) {
 		if (!player.isLogged()) return;
 		player.getPrintWriter().println("/sendaction");

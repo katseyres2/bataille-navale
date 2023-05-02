@@ -16,6 +16,7 @@ import socket.commands.InviteCommand;
 import socket.commands.SignInCommand;
 import socket.commands.SignOutCommand;
 import socket.commands.SignUpCommand;
+import socket.commands.SurrendCommand;
 import socket.commands.UserListCommand;
 
 public class ServerCommandHandler {
@@ -29,7 +30,8 @@ public class ServerCommandHandler {
 		new ConfirmCommand(),
 		new SignUpCommand(),
 		new InfoCommand(),
-		new ActionCommand()
+		new ActionCommand(),
+		new SurrendCommand()
 	));
 
 	/**

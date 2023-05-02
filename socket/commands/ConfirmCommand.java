@@ -28,6 +28,8 @@ public class ConfirmCommand extends Command {
 
 		if (args.length != 2) {
 			message += "You must specify <username>.";
+		} else if (Server.getActiveGame(player) != null) {
+			message += "You already play a game.";
 		} else {
 			String username = args[1];
 			boolean playerMatch = false;
