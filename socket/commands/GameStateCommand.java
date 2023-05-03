@@ -6,14 +6,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import game.Game;
-import game.Player;
+import socket.server.Player;
 import socket.Command;
 import socket.server.Server;
 
 public class GameStateCommand extends Command {
 
 	public GameStateCommand() {
-		super("/gamestate", null, null, Role.AUTHENTICATED, "Get you state in the game.");
+		super("/gamestate", null, null, Role.AUTHENTIFIED, "Get you state in the game.");
 	}
 
 	@Override

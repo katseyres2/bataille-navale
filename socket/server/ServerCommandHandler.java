@@ -6,19 +6,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import game.Player;
 import socket.Command;
-import socket.commands.ActionCommand;
-import socket.commands.ConfirmCommand;
-import socket.commands.GameStateCommand;
-import socket.commands.HelpCommand;
-import socket.commands.InfoCommand;
-import socket.commands.InviteCommand;
-import socket.commands.SignInCommand;
-import socket.commands.SignOutCommand;
-import socket.commands.SignUpCommand;
-import socket.commands.SurrendCommand;
-import socket.commands.UserListCommand;
+import socket.commands.*;
 
 public class ServerCommandHandler {
 	public static final ArrayList<Command> COMMANDS = new ArrayList<Command>(Arrays.asList(
@@ -33,15 +22,10 @@ public class ServerCommandHandler {
 		new InfoCommand(),
 		new ActionCommand(),
 		new SurrendCommand(),
-		new GameStateCommand()
+		new GameStateCommand(),
+		new HistoryCommand()
 	));
 
-	/**
-	 * @param line
-	 * @param player
-	 * @param players
-	 * @return
-	 */
 	public static String executeCommand(String line, Socket s, PrintWriter pw, BufferedReader br, ArrayList<Player> players) {
 		if (line == null || s == null || pw == null || br == null || players == null) return "";
 

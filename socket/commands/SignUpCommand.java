@@ -5,7 +5,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import game.Player;
+import org.jetbrains.annotations.NotNull;
+import socket.server.Player;
 import services.FormatService;
 import socket.Command;
 
@@ -20,14 +21,10 @@ public class SignUpCommand extends Command {
 		);
     }
 
-        /**
+	/**
      * Create a new Client with new credentials
-     * @param args
-     * @param client
-     * @param clients
-     * @return
      */
-	public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+	public String execute(String[] args, Player player, @NotNull ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
 		String message = "";
 		boolean usernameAlreadyExists = false;
 		String username;
@@ -61,15 +58,12 @@ public class SignUpCommand extends Command {
 			}
 			
 			if (! usernameAlreadyExists) {
-				player = new Player(socket, pw, br);
-				player.setUsername(username);
-				player.setPassword(password);
+				player = new Player(socket, pw, br, username, password);
 				player.toggleLog();
 				players.add(player);
 				
 				message += "Your have created a new account, welcome " + player.getUsername() + ".;;";
 				message +=  (new UserListCommand()).execute(args, player, players, socket, pw, br);
-				// Server.appendFile(Server.CREDENTIALS_PATH, username + " " + password + " ");
 			}
 		}
 

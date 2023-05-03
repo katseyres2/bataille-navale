@@ -2,7 +2,7 @@ package game.boat;
 
 public class Boat {
     private boolean sink = false;
-    public int hp;
+    private int hp;
 
     public enum typeBoat {
         AIRCRAFT_CARRIER("A", "aircraft carrier", 5),

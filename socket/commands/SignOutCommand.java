@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import game.Player;
+import socket.server.Player;
 import socket.Command;
 
 public class SignOutCommand extends Command {
@@ -13,7 +13,7 @@ public class SignOutCommand extends Command {
         super("/signout",
         null,
         null,
-        Command.Role.AUTHENTICATED,
+        Command.Role.AUTHENTIFIED,
         "Disconnect from your account."
         );
     }

@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import game.Player;
+import socket.server.Player;
 import socket.Command;
 
 public class InfoCommand extends Command {
@@ -13,7 +13,7 @@ public class InfoCommand extends Command {
         super("/info",
 		 	null,
 		 	null,
-		 	Command.Role.AUTHENTICATED,
+		 	Command.Role.AUTHENTIFIED,
 		 	"Get all information about the player."
         );
     }

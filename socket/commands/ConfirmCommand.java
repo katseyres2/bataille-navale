@@ -6,10 +6,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import game.Game;
-import game.Player;
+import socket.server.Player;
 import services.FormatService;
-import services.expections.InvitationAlreadySentException;
-import services.expections.NoInvitationReceivedException;
+import services.exceptions.InvitationAlreadySentException;
+import services.exceptions.NoInvitationReceivedException;
 import socket.Command;
 import socket.server.Server;
 
@@ -18,7 +18,7 @@ public class ConfirmCommand extends Command {
         super("/confirm",
             null,
             new String[]{"username"},
-            Command.Role.AUTHENTICATED,
+            Command.Role.AUTHENTIFIED,
             "Confirm the invitation."
         );
     }

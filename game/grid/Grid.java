@@ -1,5 +1,5 @@
 package game.grid;
-import game.Player;
+import socket.server.Player;
 import game.boat.Boat;
 import game.boat.Boat.typeBoat;
 

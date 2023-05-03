@@ -4,7 +4,8 @@ import java.util.*;
 
 import game.grid.Grid;
 import services.FormatService;
-import services.expections.OnlyOneActiveGameByPlayer;
+import services.exceptions.OnlyOneActiveGameByPlayer;
+import socket.server.Player;
 import socket.server.Server;
 
 public class Game {

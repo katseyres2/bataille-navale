@@ -1,6 +1,7 @@
 package game;
 
 import game.grid.Grid;
+import socket.server.Player;
 
 public class Match implements Runnable {
 	public Player player1;

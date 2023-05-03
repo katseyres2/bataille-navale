@@ -5,8 +5,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-import game.Player;
 import services.LogService.LEVEL;
+import socket.client.SocketClient;
 import socket.server.Server;
 
 public class Main {
@@ -51,7 +51,7 @@ public class Main {
 			}
 
 			// Player client = new Player(socket, printWriter, bufferedReader);
-			(new Player(s, pw, br)).start(Server.PORT);
+			(new SocketClient(s, pw, br)).start(Server.PORT);
 		}
 	}
 }

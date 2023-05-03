@@ -5,10 +5,17 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import interfaces.ISocketBuilder;
+import org.jetbrains.annotations.NotNull;
+import socket.Message;
 
+/**
+ * The socket client instance is only used for the client side application.<br>
+ * The server can use the client method by the Player inheritance.
+ */
 public class SocketClient implements ISocketBuilder {
 	private Socket socket;
 	private BufferedReader bufferedReader;
@@ -24,6 +31,12 @@ public class SocketClient implements ISocketBuilder {
 		printWriter = pw;
 		bufferedReader = br;
 		lastConnectionAt = LocalDateTime.now();
+	}
+
+	public void start(int port) {
+		System.out.print("\nYour address is " + getAddress() + ":" + Integer.toString(getPort()));
+		buildSender(getPrintWriter()).start();
+		buildReceiver(getSocket(), getPrintWriter(), getBufferedReader()).start();
 	}
 
 	public void refreshLastConnection() { lastConnectionAt = LocalDateTime.now(); }
@@ -68,13 +81,10 @@ public class SocketClient implements ISocketBuilder {
 			@Override
 			public void run() {
 				try {
-					message = bufferedReader.readLine();
-					
-					while (message != null) {
-						String[] lines = message.split(";");
-						System.out.print("\n" + String.join("\n", lines) + " ");
+					do {
 						message = bufferedReader.readLine();
-					}
+						receiveMessage(message);
+					} while (message != null);
 
 					System.out.println("Server out of service");
 					close();
@@ -87,6 +97,12 @@ public class SocketClient implements ISocketBuilder {
 		});
 	}
 
+	public void receiveMessage(@NotNull String message) {
+		String[] lines = message.split(";");
+		String formattedMessage = String.join("\n", lines);
+		System.out.print("\n" + formattedMessage + " ");
+	}
+
 	public Thread buildSender(PrintWriter pw) {
 		return new Thread(new Runnable() {
 			String message;
@@ -94,14 +110,11 @@ public class SocketClient implements ISocketBuilder {
 			@Override
 			public void run() {
 				while (true) {
-
 					try {
 						message = scanner.nextLine();
-						printWriter.println(message);
-						printWriter.flush();
+						sendMessage(message);
 					} catch (Exception e) {
-						printWriter.println("/q!");
-						printWriter.flush();
+						leaveChat();
 						break;
 					}
 				}
@@ -110,6 +123,15 @@ public class SocketClient implements ISocketBuilder {
 				System.out.println(isClosed ? "\n\nGoodbye!\n" : "Unable to close the socket.");
 			}
 		});
+	}
+
+	public void sendMessage(String message) {
+		printWriter.println(message);
+		printWriter.flush();
+	}
+
+	public void leaveChat() {
+		sendMessage("/q!");
 	}
 
 	public void refreshConnection(Socket s, PrintWriter pw, BufferedReader br) {

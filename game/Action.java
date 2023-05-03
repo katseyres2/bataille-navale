@@ -1,6 +1,7 @@
 package game;
 
 import game.grid.Grid;
+import socket.server.Player;
 
 public class Action {
 	private Player player;

@@ -5,10 +5,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import game.Player;
+import socket.server.Player;
 import services.FormatService;
-import services.expections.InvitationAlreadySentException;
-import services.expections.UserAlreadyInvitedYouException;
+import services.exceptions.InvitationAlreadySentException;
+import services.exceptions.UserAlreadyInvitedYouException;
 import socket.Command;
 import socket.server.Server;
 
@@ -18,7 +18,7 @@ public class InviteCommand extends Command {
             "/invite",
             null,
             new String[]{"username"},
-            Command.Role.AUTHENTICATED,
+            Command.Role.AUTHENTIFIED,
             "Invite your friends to play a new game."
         );
     }

@@ -6,14 +6,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import game.Game;
-import game.Player;
+import socket.server.Player;
 import socket.Command;
 import socket.server.Server;
 
 public class SurrendCommand extends Command {
 
 	public SurrendCommand() {
-		super("/surrend", null, null, Role.AUTHENTICATED, "Surrend the game.");
+		super("/surrend", null, null, Role.AUTHENTIFIED, "Surrend the game.");
 	}
 
 	@Override

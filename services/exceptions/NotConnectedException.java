@@ -1,4 +1,4 @@
-package services.expections;
+package services.exceptions;
 
 public class NotConnectedException extends Throwable {
 	public NotConnectedException() {
