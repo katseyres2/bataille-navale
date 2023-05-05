@@ -191,6 +191,7 @@ public class Game {
 					// Fetch the next grid to play.
 					Grid nextGrid = grids.get(nextIndex);
 					playerTurn = nextGrid.getPlayer();
+
 					sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));
 
 					System.out.println("Sent grid to player " + playerTurn.getUsername());

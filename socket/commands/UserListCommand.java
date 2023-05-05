@@ -11,7 +11,7 @@ import socket.Command;
 
 public class UserListCommand extends Command {
 	public UserListCommand() {
-		super("/userlist", null, null, Role.AUTHENTIFIED, "List all connected users.");
+		super("/userlist", null, null, Role.AUTHENTICATED, "List all connected users.");
 	}
 	
 	public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {

@@ -13,7 +13,7 @@ public class InfoCommand extends Command {
         super("/info",
 		 	null,
 		 	null,
-		 	Command.Role.AUTHENTIFIED,
+		 	Command.Role.AUTHENTICATED,
 		 	"Get all information about the player."
         );
     }

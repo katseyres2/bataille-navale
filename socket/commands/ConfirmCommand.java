@@ -18,7 +18,7 @@ public class ConfirmCommand extends Command {
         super("/confirm",
             null,
             new String[]{"username"},
-            Command.Role.AUTHENTIFIED,
+            Command.Role.AUTHENTICATED,
             "Confirm the invitation."
         );
     }

@@ -13,7 +13,7 @@ import socket.server.Server;
 public class ActionCommand extends Command {
 
 	public ActionCommand() {
-		super("/action", new String[] {}, new String[] {"player", "row", "column"}, Role.AUTHENTIFIED, "Send an action to your grid for the current game.");
+		super("/action", new String[] {}, new String[] {"player", "row", "column"}, Role.AUTHENTICATED, "Send an action to your grid for the current game.");
 	}
 
 	@Override

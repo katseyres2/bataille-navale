@@ -2,8 +2,6 @@ package socket;
 
 import org.jetbrains.annotations.NotNull;
 import socket.server.Player;
-
-import java.net.Socket;
 import java.time.LocalDateTime;
 
 public class Message {

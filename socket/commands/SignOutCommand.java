@@ -13,7 +13,7 @@ public class SignOutCommand extends Command {
         super("/signout",
         null,
         null,
-        Command.Role.AUTHENTIFIED,
+        Command.Role.AUTHENTICATED,
         "Disconnect from your account."
         );
     }

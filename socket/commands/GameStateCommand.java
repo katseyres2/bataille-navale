@@ -13,7 +13,7 @@ import socket.server.Server;
 public class GameStateCommand extends Command {
 
 	public GameStateCommand() {
-		super("/gamestate", null, null, Role.AUTHENTIFIED, "Get you state in the game.");
+		super("/gamestate", null, null, Role.AUTHENTICATED, "Get you state in the game.");
 	}
 
 	@Override
