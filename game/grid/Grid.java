@@ -398,7 +398,7 @@ public class Grid {
 						output += " " + j + " ";
 					}
 				} else if (j >= 1 && (grid[i - 1][j - 1] == null)) {
-					output += " • ";
+					output += " . ";
 				} else if (j >= 1 && (grid[i - 1][j - 1] != null)) {
 					output += " " + grid[i - 1][j - 1] + " ";
 				}

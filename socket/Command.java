@@ -2,11 +2,11 @@ package socket;
 import interfaces.ICommand;
 
 public abstract class Command implements ICommand {
-	public static enum Role {
+	public enum Role {
 		UNDEFINED,
-		AUTHENTIFIED,
+		AUTHENTICATED,
 		ADMIN
-	};
+	}
 
 	String name;
 	String[] optionalParameters;
@@ -28,7 +28,7 @@ public abstract class Command implements ICommand {
 
 	public boolean hasPermission(Role value) {
 		if (value == Role.ADMIN) return true;
-		if (value == Role.AUTHENTIFIED && role == Role.AUTHENTIFIED || role == Role.UNDEFINED) return true;
+		if (value == Role.AUTHENTICATED && role == Role.AUTHENTICATED || role == Role.UNDEFINED) return true;
 		if (value == Role.UNDEFINED && role == Role.UNDEFINED) return true;
 		return false;
 	}

@@ -1,7 +1,7 @@
 package game.boat;
 
 public class Boat {
-    private boolean sink = false;
+    private boolean sink;
     private int hp;
 
     public enum typeBoat {
@@ -11,9 +11,9 @@ public class Boat {
         DESTROYER("D", "destroyer", 3),
         WARSHIP("W", "warship", 2);
 
-        public String label;
-        public int length;
-        public String name;
+        public final String label;
+        public final int length;
+        public final String name;
 
         typeBoat(String label, String name, int length) {
             this.label = label;

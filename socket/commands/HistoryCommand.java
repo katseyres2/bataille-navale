@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class HistoryCommand extends Command {
 
     public HistoryCommand() {
-        super("/history", null, null, Role.AUTHENTIFIED, "The user command history.");
+        super("/history", null, null, Role.AUTHENTICATED, "The user command history.");
     }
 
     @Override

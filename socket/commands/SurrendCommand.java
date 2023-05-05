@@ -13,7 +13,7 @@ import socket.server.Server;
 public class SurrendCommand extends Command {
 
 	public SurrendCommand() {
-		super("/surrend", null, null, Role.AUTHENTIFIED, "Surrend the game.");
+		super("/surrend", null, null, Role.AUTHENTICATED, "Surrend the game.");
 	}
 
 	@Override

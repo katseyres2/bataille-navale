@@ -18,7 +18,7 @@ public class InviteCommand extends Command {
             "/invite",
             null,
             new String[]{"username"},
-            Command.Role.AUTHENTIFIED,
+            Command.Role.AUTHENTICATED,
             "Invite your friends to play a new game."
         );
     }
