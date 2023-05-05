@@ -1,61 +1,67 @@
-package boat;
+package game.boat;
 
 public class Boat {
-    private final int width;
-    private final int length;
     private boolean sink = false;
+    public int hp;
 
+    public enum typeBoat {
+        AIRCRAFT_CARRIER("A", "aircraft carrier", 5),
+        CRUISER("C", "cruiser", 4),
+        SUBMARINE("S", "submarine", 3),
+        DESTROYER("D", "destroyer", 3),
+        WARSHIP("W", "warship", 2);
 
-    /*
-    public final static String LABEL = null;
+        public String label;
+        public int length;
+        public String name;
 
-    public final static int AIRCRAFT_CARRIER = 0;
-    public final static int CRUISER = 0;
-    public final static int SUBMARINE = 0;
-    public final static int DESTROYER = 0;
-    public final static int WARSHIP = 0;
-
-
-     */
-
-    public enum getBoatType {
-        AIRCRAFT_CARRIER("A", 5),
-        CRUISER("C", 4),
-        SUBMARINE("S", 3),
-        DESTROYER("D", 3),
-        WARSHIP("W", 2);
-
-
-
-        getBoatType(String label, int length) {
-
+        typeBoat(String label, String name, int length) {
+            this.label = label;
+            this.name = name;
+            this.length = length;
         }
+
+        public int getLength() {
+            return length;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String getName() {
+            return name;
+        }
+
     }
 
-    public Boat(int width, int length) {
-        this.width = width;
-        this.length = length;
+    public typeBoat type;
+
+    public Boat(typeBoat type) {
+        this.type = type;
         this.sink = false;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getLength() {
-        return length;
+        this.hp = type.length;
     }
 
     public boolean isSink() {
         return sink;
     }
 
-    public void setType(){
+    public int getHp() {
+        return hp;
+    }
 
+    public void getHit() {
+        if (hp != 0) {
+            setHP();
+        }
+        if (hp == 0) {
+            sink = true;
+        }
+    }
+
+    public void setHP() {
+        hp--;
     }
 
 }
-
-
-
-
