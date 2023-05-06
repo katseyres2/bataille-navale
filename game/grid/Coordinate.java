@@ -17,6 +17,11 @@ public class Coordinate {
         this.isSink = isSink;
     }
 
+    public Coordinate(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
     /**
      * Getter for x-coordinate.
      * @return x-coordinate of the coordinate
