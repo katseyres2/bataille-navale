@@ -1,10 +1,13 @@
 package game.boat;
 
+import game.grid.Coordinate;
+
+import java.util.List;
+
 public class Boat {
-    private boolean sink = false;
-    public int hp;
 
     public enum typeBoat {
+
         AIRCRAFT_CARRIER("A", "aircraft carrier", 5),
         CRUISER("C", "cruiser", 4),
         SUBMARINE("S", "submarine", 3),
@@ -36,32 +39,16 @@ public class Boat {
     }
 
     public typeBoat type;
+    public List<Coordinate> coordinates;
 
-    public Boat(typeBoat type) {
+    public Boat(typeBoat type, List<Coordinate> coordinates) {
         this.type = type;
-        this.sink = false;
-        this.hp = type.length;
+        this.coordinates = coordinates;
     }
 
     public boolean isSink() {
-        return sink;
+        return coordinates.stream().noneMatch(Coordinate::isSink);
     }
 
-    public int getHp() {
-        return hp;
-    }
-
-    public void getHit() {
-        if (hp != 0) {
-            setHP();
-        }
-        if (hp == 0) {
-            sink = true;
-        }
-    }
-
-    public void setHP() {
-        hp--;
-    }
 
 }

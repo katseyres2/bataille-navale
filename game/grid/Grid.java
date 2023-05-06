@@ -9,21 +9,16 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Grid {
-	static final String POSITIONS[] = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+
+
+	static final String[] POSITIONS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
 	final private static int ROWS = 10;
 	final private static int COLUMNS = 10;
 	// final private static int VECTORS_LENGTH = 9;
 	final private static int[][] VECTORS = getFullVectors();
 	final private Random random;
 	final private static ArrayList<Boat> myBoats = new ArrayList<Boat>(5);
-	public final static int AIRCRAFT_CARRIER_LENGTH = 5;
-	public static int BATTLESHIP_LENGTH = 4;
-	public final static int CRUISER_LENGTH = 3;
-	public final static int SUBMARINE_LENGTH = 3;
-	public final static int DESTROYER_LENGTH = 2;
 	private final Player player;
-
-	public Player getPlayer() { return player; }
 
 	final private String[][] grid;
 
@@ -32,6 +27,11 @@ public class Grid {
 		grid = new String[ROWS][COLUMNS];
 		random = new Random();
 	}
+
+	public Player getPlayer() { return player; }
+
+
+	public String[][] getGrid() { return grid; }
 
 	private static int[][] getVectors() {
 		return new int[][] {
@@ -50,14 +50,12 @@ public class Grid {
 	}
 
 	public int[] getRandomPoint() {
-		int output[] = new int[2];
+		int[] output = new int[2];
 		boolean isFreePoint = false;
 
 		while (!isFreePoint) {
 			int x = random.nextInt(ROWS);
 			int y = random.nextInt(COLUMNS);
-
-			isFreePoint = false;
 
 			for (int[] vector : VECTORS) {
 				// vertical border
@@ -275,7 +273,7 @@ public class Grid {
 	}
 
 	public int[] getPoint(Integer x, Integer y) {
-		int output[] = new int[2];
+		int[] output = new int[2];
 		boolean isFreePoint = false;
 
 		while (!isFreePoint) {
