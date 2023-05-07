@@ -3,8 +3,8 @@ package game.grid;
 import game.boat.Boat;
 
 public class Cell {
-	private int row; // the row index of the cell
-	private int column; // the column index of the cell
+	private int rowIndex; // the row index of the cell
+	private int columnIndex; // the column index of the cell
 	private boolean discovered; // whether the cell has been discovered or not
 	private Boat.typeBoat boat;
 
@@ -12,13 +12,13 @@ public class Cell {
 	/**
 	 * Constructs a new Cell object with the specified row, column and boat status.
 	 *
-	 * @param row     the row index of the cell in the grid
-	 * @param column  the column index of the cell in the grid
+	 * @param rowIndex     the row index of the cell in the grid
+	 * @param columnIndex  the column index of the cell in the grid
 	 * @param boat
 	 */
-	public Cell(int row, int column, Boat.typeBoat boat) {
-		this.row = row;
-		this.column = column;
+	public Cell(int rowIndex, int columnIndex, Boat.typeBoat boat) {
+		this.rowIndex = rowIndex;
+		this.columnIndex = columnIndex;
 		this.boat = boat;
 		discovered = false;
 	}
@@ -29,7 +29,7 @@ public class Cell {
 	 * @return a string representation of the cell
 	 */
 	public String toString() {
-		return "(" + row + "," + column + ")";
+		return "(" + rowIndex + "," + columnIndex + ")";
 	}
 
 	/**
@@ -37,8 +37,8 @@ public class Cell {
 	 *
 	 * @return the row index of the cell
 	 */
-	public int getRow() {
-		return row;
+	public int getRowIndex() {
+		return rowIndex;
 	}
 
 	/**
@@ -46,8 +46,8 @@ public class Cell {
 	 *
 	 * @return the column index of the cell
 	 */
-	public int getColumn() {
-		return column;
+	public int getColumnIndex() {
+		return columnIndex;
 	}
 
 	/**
@@ -55,8 +55,8 @@ public class Cell {
 	 *
 	 * @param value the new row index value
 	 */
-	public void setRow(int value) {
-		row = value;
+	public void setRowIndex(int value) {
+		rowIndex = value;
 	}
 
 	/**
@@ -64,8 +64,8 @@ public class Cell {
 	 *
 	 * @param value the new column index value
 	 */
-	public void setColumn(int value) {
-		column = value;
+	public void setColumnIndex(int value) {
+		columnIndex = value;
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class Cell {
 	}
 
 	/**
-	 * Returns whether or not the cell has already been discovered.
+	 * Returns whether the cell has already been discovered.
 	 *
 	 * @return true if the cell has been discovered, false otherwise
 	 */

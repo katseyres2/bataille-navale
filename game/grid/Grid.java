@@ -3,7 +3,9 @@ import game.Player;
 import game.boat.Boat;
 import game.boat.Boat.typeBoat;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -431,15 +433,18 @@ public class Grid {
 	}
 
 	public void createBoat(ArrayList<Boat> myBoats) {
-		Boat aircraft = new Boat(Boat.typeBoat.AIRCRAFT_CARRIER);
+
+		List<Coordinate> coordinates = new ArrayList<>();
+
+		Boat aircraft = new Boat(Boat.typeBoat.AIRCRAFT_CARRIER, coordinates);
 		myBoats.add(aircraft);
-		Boat cruiser = new Boat(Boat.typeBoat.CRUISER);
+		Boat cruiser = new Boat(Boat.typeBoat.CRUISER, coordinates);
 		myBoats.add(cruiser);
-		Boat submarine = new Boat(Boat.typeBoat.SUBMARINE);
+		Boat submarine = new Boat(Boat.typeBoat.SUBMARINE, coordinates);
 		myBoats.add(submarine);
-		Boat destroyer = new Boat(Boat.typeBoat.DESTROYER);
+		Boat destroyer = new Boat(Boat.typeBoat.DESTROYER, coordinates);
 		myBoats.add(destroyer);
-		Boat warship = new Boat(Boat.typeBoat.WARSHIP);
+		Boat warship = new Boat(Boat.typeBoat.WARSHIP, coordinates);
 		myBoats.add(warship);
 	}
 

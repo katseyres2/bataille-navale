@@ -46,6 +46,26 @@ public class Boat {
         this.coordinates = coordinates;
     }
 
+    public typeBoat getType() {
+        return type;
+    }
+
+    public void setType(typeBoat type) {
+        this.type = type;
+    }
+
+    public List<Coordinate> getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(List<Coordinate> coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public void addCoordinate(Coordinate coordinate) {
+        getCoordinates().add(coordinate);
+    }
+
     public boolean isSink() {
         return coordinates.stream().noneMatch(Coordinate::isSink);
     }
