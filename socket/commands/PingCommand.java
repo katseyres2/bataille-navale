@@ -20,7 +20,7 @@ public class PingCommand extends Command {
 		);
     }
 
-    public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+    public String execute(String[] args, Player player, ArrayList<Player> players) {
 		  return "pong!";
 	  }
 }

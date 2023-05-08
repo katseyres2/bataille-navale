@@ -23,7 +23,7 @@ public class InviteCommand extends Command {
         );
     }
 
-    public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+    public String execute(String[] args, Player player, ArrayList<Player> players) {
 		String message = "";
 		
 		if (args.length != 2) {

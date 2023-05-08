@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import services.DiscoveryService;
 import services.FormatService;
 import services.LogService;
+import socket.Command;
 import socket.Message;
 
 public class Server extends LogService implements IServer,ISocketBuilder {
@@ -203,6 +204,7 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 	}
 
 	public void start(int port) {
+		ServerCommandHandler.populateCommands();
 		final ServerSocket serverSocket;
 
 		String data = readFile(LEVEL.DEBUG);

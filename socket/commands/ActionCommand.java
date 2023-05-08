@@ -17,7 +17,7 @@ public class ActionCommand extends Command {
 	}
 
 	@Override
-	public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+	public String execute(String[] args, Player player, ArrayList<Player> players) {
 		int row, column;
 		Player targetPlayer = null;
 

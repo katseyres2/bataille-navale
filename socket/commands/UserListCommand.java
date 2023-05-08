@@ -14,7 +14,7 @@ public class UserListCommand extends Command {
 		super("/userlist", null, null, Role.AUTHENTICATED, "List all connected users.");
 	}
 	
-	public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+	public String execute(String[] args, Player player, ArrayList<Player> players) {
 		String message = "List Of Users;".concat("--------------; |;");
 
 		for (int i = 0; i < players.size(); i++) {

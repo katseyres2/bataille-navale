@@ -18,7 +18,7 @@ public class SignOutCommand extends Command {
         );
     }
 
-    public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+    public String execute(String[] args, Player player, ArrayList<Player> players) {
 		for (Player p : players) {
 			if (p.getSocket() == player.getSocket()) {
 				p.clear();													// Assigns null to all socket parameters.

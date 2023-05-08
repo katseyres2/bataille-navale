@@ -18,7 +18,7 @@ public class HistoryCommand extends Command {
     }
 
     @Override
-    public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+    public String execute(String[] args, Player player, ArrayList<Player> players) {
         String output = "";
         if (player == null) return output;
 

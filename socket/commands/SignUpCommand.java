@@ -24,14 +24,14 @@ public class SignUpCommand extends Command {
 	/**
      * Create a new Client with new credentials
      */
-	public String execute(String[] args, Player player, @NotNull ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+	public String execute(String[] args, Player player, @NotNull ArrayList<Player> players) {
 		String message = "";
 		boolean usernameAlreadyExists = false;
 		String username;
 		String password;
 
 		for (Player p : players) {
-			if (p.getSocket() == socket) {
+			if (p.getSocket() == player.getSocket()) {
 				player = p;
 				break;
 			}
@@ -58,12 +58,12 @@ public class SignUpCommand extends Command {
 			}
 			
 			if (! usernameAlreadyExists) {
-				player = new Player(socket, pw, br, username, password);
+				player = new Player(player.getSocket(), player.getPrintWriter(), player.getBufferedReader(), username, password);
 				player.toggleLog();
 				players.add(player);
 				
 				message += "Your have created a new account, welcome " + player.getUsername() + ".;;";
-				message +=  (new UserListCommand()).execute(args, player, players, socket, pw, br);
+				message +=  (new UserListCommand()).execute(args, player, players);
 			}
 		}
 

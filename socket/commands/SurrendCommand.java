@@ -17,7 +17,7 @@ public class SurrendCommand extends Command {
 	}
 
 	@Override
-	public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+	public String execute(String[] args, Player player, ArrayList<Player> players) {
 		Game activeGame = Server.getActiveGame(player);
 		
 		if (activeGame == null) return "You are not playing a game.";
