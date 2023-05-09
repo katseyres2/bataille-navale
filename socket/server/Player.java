@@ -1,15 +1,16 @@
-package game;
+package socket.server;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import org.jetbrains.annotations.NotNull;
 import services.FormatService;
-import services.expections.InvitationAlreadySentException;
-import services.expections.NoInvitationReceivedException;
-import services.expections.NotConnectedException;
-import services.expections.UserAlreadyInvitedYouException;
+import services.exceptions.InvitationAlreadySentException;
+import services.exceptions.NoInvitationReceivedException;
+import services.exceptions.NotConnectedException;
+import services.exceptions.UserAlreadyInvitedYouException;
 import socket.Command.Role;
 import socket.client.SocketClient;
 
@@ -23,9 +24,26 @@ public class Player extends SocketClient {
 	private ArrayList<Player> usersWhoInvitedYou;
 	private Role role;
 
-	public Player(Socket sSender, PrintWriter pwSender, BufferedReader brSender) {
+	public Player(Socket sSender, PrintWriter pwSender, BufferedReader brSender, String username, String password) {
 		super(sSender, pwSender, brSender);
+
+		this.username = username;
+		this.password = password;
 		
+		usersYouInvited = new ArrayList<Player>();
+		usersWhoInvitedYou = new ArrayList<Player>();
+		defeats = 0;
+		victories = 0;
+		color = FormatService.getRandomColor();
+		role = Role.ADMIN;
+	}
+
+	public Player(@NotNull SocketClient sc, String username, String password) {
+		super(sc.getSocket(), sc.getPrintWriter(), sc.getBufferedReader());
+
+		this.username = username;
+		this.password = password;
+
 		usersYouInvited = new ArrayList<Player>();
 		usersWhoInvitedYou = new ArrayList<Player>();
 		defeats = 0;
@@ -122,10 +140,4 @@ public class Player extends SocketClient {
 	public String getUsername() { return username; }
 	public void setUsername(String value) { username = value; }
 	public void setPassword(String value) { password = value; }
-
-	public void start(int port) {
-		System.out.print("\nYour address is " + super.getAddress() + ":" + Integer.toString(getPort()));
-		buildSender(getPrintWriter()).start();
-		buildReceiver(getSocket(), getPrintWriter(), getBufferedReader()).start();
-	}
 }

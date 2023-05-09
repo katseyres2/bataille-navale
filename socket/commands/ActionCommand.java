@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import game.Game;
-import game.Player;
+import socket.server.Player;
 import socket.Command;
 import socket.server.Server;
 
@@ -17,7 +17,7 @@ public class ActionCommand extends Command {
 	}
 
 	@Override
-	public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+	public String execute(String[] args, Player player, ArrayList<Player> players) {
 		int row, column;
 		Player targetPlayer = null;
 

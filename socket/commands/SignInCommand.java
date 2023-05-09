@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import game.Player;
+import socket.server.Player;
 import socket.Command;
 
 public class SignInCommand extends Command {
@@ -19,14 +19,14 @@ public class SignInCommand extends Command {
 		);
     }
 
-    public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+    public String execute(String[] args, Player player, ArrayList<Player> players) {
 		String message = "";
 		String username;
 		String password;
 		boolean usernameMatched = false;
 
 		for (Player p : players) {
-			if (p.getSocket() == socket) {
+			if (p.getSocket() == player.getSocket()) {
 				message += "You're already connected.";
 				return message;
 			}
@@ -47,7 +47,7 @@ public class SignInCommand extends Command {
 							message += "You're connected on another device.";
 						} else {
 							p.toggleLog();
-							p.refreshConnection(socket, pw, br);
+							p.refreshConnection(player.getSocket(), player.getPrintWriter(), player.getBufferedReader());
 							message += "Welcome back " + p.getUsername() + ".";
 						}
 					} else {

@@ -1,11 +1,8 @@
 package socket.commands;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 
-import game.Player;
+import socket.server.Player;
 import socket.Command;
 import socket.server.ServerCommandHandler;
 
@@ -15,11 +12,11 @@ public class HelpCommand extends Command {
     }
 
 	@Override
-    public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+    public String execute(String[] args, Player player, ArrayList<Player> players) {
 		String message = "List Of Commands;-----------------; |;";
 		Role role = player != null ? player.getRole() : Role.UNDEFINED;
 
-		for (Command command : ServerCommandHandler.COMMANDS) {
+		for (Command command : ServerCommandHandler.commands) {
 			if (command.hasPermission(role)) {
 				int totalLength = 40;
 				int fillWithSpace = totalLength - command.getName().length() - command.getParameters().length();

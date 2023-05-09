@@ -1,4 +1,4 @@
-package services.expections;
+package services.exceptions;
 
 public class UserAlreadyInvitedYouException extends Throwable {
 	

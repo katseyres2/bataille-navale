@@ -2,11 +2,11 @@ package socket;
 import interfaces.ICommand;
 
 public abstract class Command implements ICommand {
-	public static enum Role {
+	public enum Role {
 		UNDEFINED,
 		AUTHENTICATED,
 		ADMIN
-	};
+	}
 
 	String name;
 	String[] optionalParameters;
@@ -28,21 +28,19 @@ public abstract class Command implements ICommand {
 
 	public boolean hasPermission(Role value) {
 		if (value == Role.ADMIN) return true;
-		if (value == Role.AUTHENTICATED && role == Role.AUTHENTICATED || role == Role.UNDEFINED) return true;
-		if (value == Role.UNDEFINED && role == Role.UNDEFINED) return true;
-		return false;
+		return value == Role.AUTHENTICATED && role == Role.AUTHENTICATED || role == Role.UNDEFINED;
 	}
 
 	public String getParameters() {
-		String output = "";
+		StringBuilder output = new StringBuilder();
 
 		for (String parameter : optionalParameters) {
-			output += "["+ parameter +"] ";
+			output.append("[").append(parameter).append("] ");
 		}
 		for (String parameter : mandatoryParameters) {
-			output += "<"+ parameter +"> ";
+			output.append("<").append(parameter).append("> ");
 		}
 		
-		return output;
+		return output.toString();
 	}
 }

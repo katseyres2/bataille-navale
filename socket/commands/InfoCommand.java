@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import game.Player;
+import socket.server.Player;
 import socket.Command;
 
 public class InfoCommand extends Command {
@@ -18,7 +18,7 @@ public class InfoCommand extends Command {
         );
     }
 
-    public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+    public String execute(String[] args, Player player, ArrayList<Player> players) {
 		String message = "";
 
 		message += "Username    : " + player.getUsername();

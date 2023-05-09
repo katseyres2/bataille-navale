@@ -6,10 +6,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import game.Game;
-import game.Player;
+import socket.server.Player;
 import services.FormatService;
-import services.expections.InvitationAlreadySentException;
-import services.expections.NoInvitationReceivedException;
+import services.exceptions.InvitationAlreadySentException;
+import services.exceptions.NoInvitationReceivedException;
 import socket.Command;
 import socket.server.Server;
 
@@ -23,7 +23,7 @@ public class ConfirmCommand extends Command {
         );
     }
 
-    public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+	public String execute(String[] args, Player player, ArrayList<Player> players) {
 		String message = "";
 
 		if (args.length != 2) {
