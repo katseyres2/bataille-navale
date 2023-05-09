@@ -1,6 +1,7 @@
 package game;
 
 import game.grid.Grid_old;
+import socket.server.Player;
 
 public class Action {
 	private Player player; // the player who made the action
