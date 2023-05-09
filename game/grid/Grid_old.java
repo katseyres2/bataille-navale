@@ -1,7 +1,7 @@
 package game.grid;
-import game.Player;
 import game.boat.Boat;
 import game.boat.Boat.typeBoat;
+import socket.server.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -499,7 +499,7 @@ public class Grid_old {
 		AtomicInteger boatSinks = new AtomicInteger(0);
 		myBoats.forEach(b -> {
 			if (b.type.label.equals(valuePosition)) {
-				b.getHit();
+//				b.getHit();
 			}
 			if (b.isSink()) {
 				System.out.println("Le bateau :" + b.type + "est coulé");
