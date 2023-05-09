@@ -12,10 +12,8 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-import game.Action;
 import game.Game;
 import game.Player;
-import game.grid.Grid;
 import interfaces.IServer;
 import interfaces.ISocketBuilder;
 import services.FormatService;

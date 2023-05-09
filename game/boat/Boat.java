@@ -62,6 +62,10 @@ public class Boat {
         this.coordinates = coordinates;
     }
 
+    public boolean isPlaced() {
+        return getCoordinates() != null && getCoordinates().size() == getType().getLength();
+    }
+
     public void addCoordinate(Coordinate coordinate) {
         getCoordinates().add(coordinate);
     }

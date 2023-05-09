@@ -4,21 +4,19 @@
 package Bots;
 
 import game.Action;
-import game.grid.Grid;
-
-import java.util.ArrayList;
+import game.grid.Grid_old;
 
 public class BotsTurn {
 
-    private Grid grid;
+    private Grid_old gridOld;
     private Action action;
 
     /**
      * Constructeur de la classe Bots
-     * @param grid la grille du jeu
+     * @param gridOld la grille du jeu
      */
-    public BotsTurn(Grid grid) {
-        this.grid = grid;
+    public BotsTurn(Grid_old gridOld) {
+        this.gridOld = gridOld;
     }
 
 
@@ -26,8 +24,8 @@ public class BotsTurn {
      * Accesseur pour la grille du jeu
      * @return la grille du jeu
      */
-    public Grid getGrid(){
-        return grid;
+    public Grid_old getGrid(){
+        return gridOld;
     }
 
     public Action getAction(){
