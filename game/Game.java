@@ -2,9 +2,11 @@ package game;
 import java.lang.Thread.State;
 import java.util.*;
 
+import game.grid.Grid;
 import game.grid.Grid_old;
 import services.FormatService;
 import services.expections.OnlyOneActiveGameByPlayer;
+import socket.server.Player;
 import socket.server.Server;
 
 public class Game {
@@ -53,6 +55,21 @@ public class Game {
 
 		Action action = new Action(player, targetGridOld, column, row, turnCount);
 		actions.add(action);
+		return null;
+	}
+
+	public String placePlayerBoat(Player player, int length , int column, int row, String vector) {
+		boolean placedBoat = false;
+
+		// Fetch the player grid.
+		Grid playerGrid = findGridByPlayer(player);
+		// get the boat with length
+
+		placedBoat = placeBoat( ,column,row,vector);
+
+		if (!placedBoat)
+			return "Action failed.";
+
 		return null;
 	}
 
