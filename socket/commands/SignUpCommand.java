@@ -58,7 +58,7 @@ public class SignUpCommand extends Command {
 			}
 			
 			if (! usernameAlreadyExists) {
-				player = new Player(player.getSocket(), player.getPrintWriter(), player.getBufferedReader(), username, password);
+				player = new Player(player.getSocket(), player.getPrintWriter(), player.getBufferedReader(), username, password, false);
 				player.toggleLog();
 				players.add(player);
 				

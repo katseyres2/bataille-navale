@@ -1,7 +1,9 @@
 package game;
 import java.lang.Thread.State;
+import java.lang.reflect.Array;
 import java.util.*;
 
+import game.grid.Grid;
 import game.grid.Grid_old;
 import services.FormatService;
 import services.exceptions.OnlyOneActiveGameByPlayer;
@@ -17,6 +19,11 @@ public class Game {
 	private Player playerTurn;
 	private int turnCount = 0;
 	private Player winner;
+
+	public void addBot(Player bot) {
+		if (bot == null || bots.contains(bot)) return;
+		bots.add(bot);
+	}
 
 	public boolean hasPlayer(Player player) {
 		for (Grid_old g : gridOlds) {
@@ -77,6 +84,8 @@ public class Game {
 		player.getPrintWriter().flush();
 	}
 
+
+
 	private void addGrid(Player player) throws OnlyOneActiveGameByPlayer {
 		if (Server.getActiveGame(player) != null) throw new OnlyOneActiveGameByPlayer();
 
@@ -88,7 +97,7 @@ public class Game {
 		gridOlds.add(gridOld);
 	}
 
-	private Grid_old findGridByPlayer(Player player) {
+	public Grid_old findGridByPlayer(Player player) {
 		for (Grid_old g : gridOlds) {
 			if (g.getPlayer() == player) {
 				return g;
@@ -130,11 +139,6 @@ public class Game {
 	public void removePlayer(Player player) {
 		if (player == null) return;
 		removeGrid(player);
-	}
-
-	public void addBot(Player bot) {
-		if (bot == null || bots.contains(bot)) return;
-		bots.add(bot);
 	}
 
 	public void removeBot(Player bot) {

@@ -12,8 +12,8 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import Bots.Bot;
 import game.Game;
-import game.Player;
 import interfaces.IServer;
 import interfaces.ISocketBuilder;
 import services.FormatService;
@@ -50,6 +50,9 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 			// if (g.isPlaying() && g.hasPlayer(player)) return g;
 			if (g.hasPlayer(player)) return g;
 		}
+
+		Player player1 = new Bot("test", Bot.Difficulty.Easy);
+
 		return null;
 	}
 
