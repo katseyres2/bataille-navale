@@ -1,8 +1,8 @@
 package Bots;
 
-public class Brain extends BotsTurn {
+public class Brain extends Bot {
 
     public Brain() {
-
+        super("john", Difficulty.Easy);
     }
 }
