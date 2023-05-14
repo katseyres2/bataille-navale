@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import game.Game;
 import socket.server.Player;
 import services.FormatService;
 import services.exceptions.InvitationAlreadySentException;
@@ -40,6 +41,12 @@ public class InviteCommand extends Command {
 				if (userToInvite.isLogged() && userToInvite.getUsername().compareTo(username) == 0) {
 					playerMatch = true;
 
+					Game game = Server.getActiveGame(player);
+
+					if (game == null) {
+
+					}
+
 					try {
 						player.tryInvite(userToInvite);
 
@@ -59,7 +66,12 @@ public class InviteCommand extends Command {
 							}
 						}
 
+
+
 						userToInvite.addInUsersWhoInvitedYou(player);
+						Game game = new Game();
+						game.addPlayer(player);
+						Server.pushGame(game);
 					} catch (UserAlreadyInvitedYouException e) {
 						message += "You can't invite " + FormatService.colorizeString(userToInvite.getColor() ,userToInvite.getUsername()) + " because you already received an invitation. Please send \"/confirm " + FormatService.colorizeString(userToInvite.getColor() ,userToInvite.getUsername()) + "\" to play with.";
 					} catch (InvitationAlreadySentException e) {

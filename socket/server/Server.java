@@ -16,6 +16,7 @@ import Bots.Bot;
 import game.Game;
 import interfaces.IServer;
 import interfaces.ISocketBuilder;
+import org.jetbrains.annotations.Nullable;
 import services.FormatService;
 import services.LogService;
 
@@ -43,7 +44,7 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 		games.add(game);
 	}
 
-	public static Game getActiveGame(Player player) {
+	public static @Nullable Game getActiveGame(Player player) {
 		// System.out.println("Player : " + player.getUsername());
 		for (Game g : games) {
 			// System.out.println("Is playing : " + g.isPlaying() + ", hasPlayer : " + g.hasPlayer(player));

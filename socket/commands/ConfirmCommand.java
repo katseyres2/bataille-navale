@@ -60,11 +60,12 @@ public class ConfirmCommand extends Command {
 						}
 						
 						userWhoInvitedYou.removeFromUsersYouInvited(player);
-						
-						Game game = new Game();
+
+						// find the game the userWhoInvitedYou want play with you
+						Game game = Server.getActiveGame(userWhoInvitedYou);
+						// add your player in the game
 						game.addPlayer(player);
-						game.addPlayer(userWhoInvitedYou);
-						Server.pushGame(game);
+						// start the game
 						game.run();
 					} catch (NoInvitationReceivedException e) {
 						message += "You can't confirm to " + FormatService.colorizeString(userWhoInvitedYou.getColor(), userWhoInvitedYou.getUsername()) + " because you have not received his invitation.";

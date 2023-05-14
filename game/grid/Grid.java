@@ -15,6 +15,7 @@ public class Grid {
     private int rows;
     private int columns;
     private Cell[][] grid;
+    private Player owner;
 
     //
     final private static int[][] VECTORS = getFullVectors();
@@ -25,14 +26,19 @@ public class Grid {
     /**
      * Constructs a Grid_Alex object with the specified player, cells, rows, and columns.
      *
-     * @param player   The player associated with the grid.
+     * @param owner    The player owner.
      * @param rows     The number of rows in the grid.
      * @param columns  The number of columns in the grid.
      */
-    public Grid(Player player, int rows, int columns) {
+    public Grid(Player owner, int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
         this.grid = new Cell[][]{};
+        this.owner = owner;
+    }
+
+    public boolean isPlayerOwner(Player player) {
+        return player == owner;
     }
 
     //----------------------------------------------------------------
