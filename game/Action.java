@@ -1,10 +1,12 @@
 package game;
 
+import game.grid.Grid;
 import game.grid.Grid_old;
+import socket.server.Player;
 
 public class Action {
 	private Player player; // the player who made the action
-	private Grid_old target; // the target grid of the action
+	private Grid target; // the target grid of the action
 	private int column; // the column index of the target cell
 	private int row; // the row index of the target cell
 	private int turnCount; // the turn count at which the action was made
@@ -17,7 +19,7 @@ public class Action {
 	 * @param row the row index of the target cell
 	 * @param turnCount the turn count at which the action was made
 	 */
-	public Action(Player player, Grid_old target, int column, int row, int turnCount) {
+	public Action(Player player, Grid target, int column, int row, int turnCount) {
 		this.player = player;
 		this.target = target;
 		this.column = column;
@@ -37,7 +39,7 @@ public class Action {
 	 * Get the target grid of the action
 	 * @return the target grid of the action
 	 */
-	public Grid_old getTarget() {
+	public Grid getTarget() {
 		return target;
 	}
 
