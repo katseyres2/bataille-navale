@@ -1,44 +1,46 @@
 package game.grid;
 
+
+import socket.server.Player;
 import game.boat.Boat;
 import socket.server.Player;
 
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Represents the grid used in the game for a specific player.
  */
 public class Grid {
+
     public static final int DEFAULT_ROW_COUNT = 10;
     public static final int DEFAULT_COLUMN_COUNT = 10;
-
     private int rows;
     private int columns;
     private Cell[][] grid;
-    private Player owner;
-
-    //
+    final private static ArrayList<Boat> myBoats = new ArrayList<Boat>(5);
     final private static int[][] VECTORS = getFullVectors();
-    static final String[] POSITIONS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
-
+    static public final String[] POSITIONS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+    private final Player player;
     private Random random;
+
 
     /**
      * Constructs a Grid_Alex object with the specified player, cells, rows, and columns.
      *
-     * @param owner    The player owner.
+     * @param player   The player associated with the grid.
      * @param rows     The number of rows in the grid.
      * @param columns  The number of columns in the grid.
      */
-    public Grid(Player owner, int rows, int columns) {
+    public Grid(Player player, int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
+        this.grid = grid;
+        this.player = player;
+        this.isReady = false;
         this.grid = new Cell[][]{};
-        this.owner = owner;
-    }
 
-    public boolean isPlayerOwner(Player player) {
-        return player == owner;
     }
 
     //----------------------------------------------------------------
@@ -87,6 +89,8 @@ public class Grid {
     public Cell[][] getGrid() {
         return grid;
     }
+
+    public Player getPlayer() { return player; }
 
     /**
      * Sets the 2D array of cells representing the grid.
@@ -331,7 +335,7 @@ public class Grid {
     }
 
 
-    public void placeBoat(Boat boat, Integer x, Integer y, String direction) {
+    public boolean placeBoat(Boat boat, Integer x, Integer y, String direction) {
         Cell cell;
         int[] vector = getDirectionVector(direction); // Get the available vectors
 
@@ -345,6 +349,7 @@ public class Grid {
             if (!canSetupCell(x, y)) {
                 canPlace = false;
                 break;
+                return canPlace;
             }
         }
 
@@ -355,7 +360,9 @@ public class Grid {
                 y = cell.getRowIndex() + i * vector[1];
                 cell.setBoat(boat.getType());
                 boat.addCoordinate(new Coordinate(x, y, false));
+                boat.getType().isPlaced = true;
             }
+            return true;
         }
 
     }
@@ -403,19 +410,31 @@ public class Grid {
     //----------------------------------------------------------------
 
     /**
-     * Convert the first coord ( letter A to J ) into a int
      *
-     * @param letter
-     * @return the letter convert in integer
+     * @param length
+     * @return return a boat from the list by his length
      */
-    public int convertCoordLetter(String letter) {
-        int coord = 0;
-        for (int i = 0; i < POSITIONS.length; i++) {
-            if (POSITIONS[i].equals(letter.toUpperCase())) {
-                coord = i;
-                break;
+    public Boat getBoatWithLength(int length){
+        for (Boat boat : myBoats) {
+            if (boat.getType().getLength() == length) {
+                return boat;
             }
         }
-        return coord;
+        return null;
+    }
+
+    /**
+     *
+     * @return state of the grid
+     */
+
+    public boolean isConfigured(){
+        int counter = 0;
+        for (Boat boat : myBoats) {
+            if (boat.getType().isPlaced) {
+                counter++;
+            }
+        }
+        return counter == myBoats.size();
     }
 }
