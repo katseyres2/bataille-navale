@@ -463,4 +463,8 @@ public class Grid {
         }
        return "You are out of the grid";
     }
+
+    public boolean allBoatAreSink(){
+        return myBoats.stream().allMatch(Boat::isSink);
+    }
 }

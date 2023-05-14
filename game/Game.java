@@ -218,8 +218,6 @@ public class Game {
 						break;
 					}
 
-
-
 					System.out.println(playerTurn.getUsername() + " turn.");
 
 					Action lastAction = null;
@@ -239,6 +237,14 @@ public class Game {
 					sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));
 
 					System.out.println("Sent grid to player " + playerTurn.getUsername());
+					if(currentGrid.allBoatAreSink()){
+						winner = playerTurn;
+						sendToClient(playerTurn, "You WON !!!!");
+						playerTurn.addVictory();
+						nextPlayer();
+						playerTurn.addDefeat();
+						sendToClient(playerTurn, "You LOOSE");
+					}
 				}
 			}
 		};
