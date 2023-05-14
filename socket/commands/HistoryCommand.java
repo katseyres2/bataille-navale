@@ -22,10 +22,10 @@ public class HistoryCommand extends Command {
         String output = "";
         if (player == null) return output;
 
-        ArrayList<Message> messages = Server.findMessagesFrom(player.getUsername());
-        for (Message m : messages) {
-            output += "[" + FormatService.LocalDateTimeToString(m.getTime()) + "] FROM : " + m.getFrom().getUsername() + ", MESSAGE : " + m.getText() + ";";
-        }
+//        ArrayList<Message> messages = Server.findMessagesFrom(player.getUsername());
+//        for (Message m : messages) {
+//            output += "[" + FormatService.LocalDateTimeToString(m.getTime()) + "] FROM : " + m.getFrom().getUsername() + ", MESSAGE : " + m.getText() + ";";
+//        }
 
         return output;
     }

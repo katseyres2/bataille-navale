@@ -1,5 +1,6 @@
 package game;
 import java.lang.Thread.State;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import game.grid.Grid;
@@ -18,6 +19,11 @@ public class Game {
 	private Player playerTurn;
 	private int turnCount = 0;
 	private Player winner;
+
+	public void addBot(Player bot) {
+		if (bot == null || bots.contains(bot)) return;
+		bots.add(bot);
+	}
 
 	public boolean hasPlayer(Player player) {
 		for (Grid g : grids) {
@@ -92,6 +98,8 @@ public class Game {
 		player.getPrintWriter().flush();
 	}
 
+
+
 	private void addGrid(Player player) throws OnlyOneActiveGameByPlayer {
 		if (Server.getActiveGame(player) != null) throw new OnlyOneActiveGameByPlayer();
 
@@ -145,11 +153,6 @@ public class Game {
 	public void removePlayer(Player player) {
 		if (player == null) return;
 		removeGrid(player);
-	}
-
-	public void addBot(Player bot) {
-		if (bot == null || bots.contains(bot)) return;
-		bots.add(bot);
 	}
 
 	public void removeBot(Player bot) {

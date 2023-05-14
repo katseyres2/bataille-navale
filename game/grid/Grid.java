@@ -1,7 +1,9 @@
 package game.grid;
 
+
 import socket.server.Player;
 import game.boat.Boat;
+import socket.server.Player;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -11,6 +13,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Represents the grid used in the game for a specific player.
  */
 public class Grid {
+
+    public static final int DEFAULT_ROW_COUNT = 10;
+    public static final int DEFAULT_COLUMN_COUNT = 10;
     private int rows;
     private int columns;
     private Cell[][] grid;
@@ -25,16 +30,17 @@ public class Grid {
      * Constructs a Grid_Alex object with the specified player, cells, rows, and columns.
      *
      * @param player   The player associated with the grid.
-     * @param grid    The 2D array of cells representing the grid.
      * @param rows     The number of rows in the grid.
      * @param columns  The number of columns in the grid.
      */
-    public Grid(Player player, Cell[][] grid, int rows, int columns) {
+    public Grid(Player player, int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
         this.grid = grid;
         this.player = player;
         this.isReady = false;
+        this.grid = new Cell[][]{};
+
     }
 
     //----------------------------------------------------------------
