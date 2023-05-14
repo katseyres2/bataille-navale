@@ -17,11 +17,13 @@ public class Boat {
         public String label;
         public int length;
         public String name;
+        public boolean isPlaced;
 
-        typeBoat(String label, String name, int length) {
+        typeBoat(String label, String name, int length, boolean isPlaced) {
             this.label = label;
             this.name = name;
             this.length = length;
+            this.isPlaced = false;
         }
 
         public int getLength() {

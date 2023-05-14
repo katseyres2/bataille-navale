@@ -13,7 +13,7 @@ import socket.server.Server;
 public class Game {
 	private ArrayList<Player> bots = new ArrayList<Player>();
 	private ArrayList<Action> actions = new ArrayList<Action>();
-	private ArrayList<Grid_old> gridOlds = new ArrayList<Grid_old>();
+	private ArrayList<Grid> grids = new ArrayList<Grid>();
 	private Thread thread = null;
 	private Player firstPlayer;
 	private Player playerTurn;
@@ -26,7 +26,7 @@ public class Game {
 	}
 
 	public boolean hasPlayer(Player player) {
-		for (Grid_old g : gridOlds) {
+		for (Grid g : grids) {
 			if (g.getPlayer() == player) return true;
 		}
 		return false;
@@ -48,7 +48,7 @@ public class Game {
 		if (playerTurn != player) return "That's not your turn.";
 		
 		// Fetch the target grid.
-		Grid_old targetGridOld = findGridByPlayer(target);
+		Grid targetGrid = findGridByPlayer(target);
 
 		/**
 		 * TODO try to hit a boat on this grid
@@ -59,17 +59,31 @@ public class Game {
 
 		if (player == firstPlayer) turnCount++;
 
-		Action action = new Action(player, targetGridOld, column, row, turnCount);
+		Action action = new Action(player, targetGrid, column, row, turnCount);
 		actions.add(action);
 		return null;
 	}
 
+	public String placePlayerBoat(Player player, int length , int column, int row, String vector) {
+		boolean placedBoat = false;
+
+		// Fetch the player grid.
+		Grid playerGrid = findGridByPlayer(player);
+		// get the boat with length
+		placedBoat = playerGrid.placeBoat(playerGrid.getBoatWithLength(length), column, row, vector);
+
+		if (!placedBoat)
+			return "Action failed.";
+
+		return null;
+	}
+
 	public void nextPlayer() {
-		int currentIndex = gridOlds.indexOf(findGridByPlayer(playerTurn));
+		int currentIndex = grids.indexOf(findGridByPlayer(playerTurn));
 		System.out.println("Current index1 : " + currentIndex);
-		if (currentIndex == gridOlds.size()) currentIndex = 0;
+		if (currentIndex == grids.size()) currentIndex = 0;
 		System.out.println("Current index2 : " + currentIndex);
-		Player p =  findPlayerByGrid(gridOlds.get(currentIndex++));
+		Player p =  findPlayerByGrid(grids.get(currentIndex++));
 		System.out.println("New player : " + p.getUsername());
 		playerTurn = p;
 	}
@@ -89,16 +103,16 @@ public class Game {
 	private void addGrid(Player player) throws OnlyOneActiveGameByPlayer {
 		if (Server.getActiveGame(player) != null) throw new OnlyOneActiveGameByPlayer();
 
-		for (Grid_old gridOld : gridOlds) {
-			if (gridOld.getPlayer() == player) return;
+		for (Grid grid : grids) {
+			if (grid.getPlayer() == player) return;
 		}
 
-		Grid_old gridOld = new Grid_old(player);
-		gridOlds.add(gridOld);
+		Grid grid = new Grid(player,null,0,0);
+		grids.add(grid);
 	}
 
-	public Grid_old findGridByPlayer(Player player) {
-		for (Grid_old g : gridOlds) {
+	private Grid findGridByPlayer(Player player) {
+		for (Grid g : grids) {
 			if (g.getPlayer() == player) {
 				return g;
 			}
@@ -106,8 +120,8 @@ public class Game {
 		return null;
 	}
 
-	private Player findPlayerByGrid(Grid_old gridOld) {
-		for (Grid_old g : gridOlds) {
+	private Player findPlayerByGrid(Grid gridOld) {
+		for (Grid g : grids) {
 			if (g == gridOld) {
 				return g.getPlayer();
 			}
@@ -116,14 +130,14 @@ public class Game {
 	}
 
 	private void removeGrid(Player player) {
-		Grid_old gridOld = findGridByPlayer(player);
+		Grid gridOld = findGridByPlayer(player);
 		if (gridOld == null) return;
-		gridOlds.remove(gridOld);
+		grids.remove(gridOld);
 	}
 
 	public void removeGrid(Grid_old gridOld) {
 		if (gridOld == null) return;
-		gridOlds.remove(gridOld);
+		grids.remove(gridOld);
 	}
 
 	public void addPlayer(Player player) {
@@ -149,10 +163,10 @@ public class Game {
 	public String displayPlayerGrids(Player player) {
 		String output = "";
 
-		for (Grid_old gridOld : gridOlds) {
-			if (gridOld.getPlayer() == player) continue;
-			output += "-------------------------------- " + gridOld.getPlayer().getUsername().toUpperCase();
-			output += gridOld;
+		for (Grid grid : grids) {
+			if (grid.getPlayer() == player) continue;
+			output += "-------------------------------- " + grid.getPlayer().getUsername().toUpperCase();
+			output += grid;
 			output += "--------------------------------;";
 		}
 
@@ -160,9 +174,9 @@ public class Game {
 	}
 
 	public void run() {
-		if (gridOlds.size() < 2) return;
-		int index = (new Random()).nextInt(gridOlds.size());
-		firstPlayer = playerTurn = findPlayerByGrid(gridOlds.get(index));
+		if (grids.size() < 2) return;
+		int index = (new Random()).nextInt(grids.size());
+		firstPlayer = playerTurn = findPlayerByGrid(grids.get(index));
 
 		if (thread != null) return;
 
@@ -186,15 +200,15 @@ public class Game {
 					if (lastAction == null || lastAction.getPlayer() != playerTurn) continue;
 
 					// Fetch the grid of the player who must play.
-					Grid_old currentGridOld = findGridByPlayer(playerTurn);
-					int currentIndex = gridOlds.indexOf(currentGridOld);
+					Grid currentGrid = findGridByPlayer(playerTurn);
+					int currentIndex = grids.indexOf(currentGrid);
 					int nextIndex = currentIndex += 1;
 
-					if (currentIndex == gridOlds.size()) nextIndex = 0;
+					if (currentIndex == grids.size()) nextIndex = 0;
 
 					// Fetch the next grid to play.
-					Grid_old nextGridOld = gridOlds.get(nextIndex);
-					playerTurn = nextGridOld.getPlayer();
+					Grid nextGrid = grids.get(nextIndex);
+					playerTurn = nextGrid.getPlayer();
 					sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));
 
 					System.out.println("Sent grid to player " + playerTurn.getUsername());
@@ -209,8 +223,8 @@ public class Game {
 	{
 		ArrayList<Player> players = new ArrayList<Player>(){};
 
-		for (Grid_old gridOld : gridOlds) {
-			players.add(gridOld.getPlayer());
+		for (Grid grid : grids) {
+			players.add(grid.getPlayer());
 		}
 
 		return players;

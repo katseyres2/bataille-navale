@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
+import game.grid.Grid;
 import socket.server.Player;
 
 public class FormatService {
@@ -86,5 +87,22 @@ public class FormatService {
 		}
 
 		return output;
+	}
+
+	/**
+	 * Convert the first coord ( letter A to J ) into a int
+	 *
+	 * @param letter
+	 * @return the letter convert in integer
+	 */
+	public static int convertCoordLetter(String letter) {
+		int coord = 0;
+		for (int i = 0; i < Grid.POSITIONS.length; i++) {
+			if (Grid.POSITIONS[i].equals(letter.toUpperCase())) {
+				coord = i;
+				break;
+			}
+		}
+		return coord;
 	}
 }
