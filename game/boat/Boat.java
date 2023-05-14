@@ -15,15 +15,15 @@ public class Boat {
         WARSHIP("W", "warship", 2);
 
         public String label;
+
         public int length;
         public String name;
-        public boolean isPlaced;
 
-        typeBoat(String label, String name, int length, boolean isPlaced) {
+
+        typeBoat(String label, String name, int length) {
             this.label = label;
             this.name = name;
             this.length = length;
-            this.isPlaced = false;
         }
 
         public int getLength() {
@@ -43,9 +43,13 @@ public class Boat {
     public typeBoat type;
     public List<Coordinate> coordinates;
 
+    public boolean isPlaced;
+
     public Boat(typeBoat type, List<Coordinate> coordinates) {
         this.type = type;
         this.coordinates = coordinates;
+        this.isPlaced = false;
+
     }
 
     public typeBoat getType() {

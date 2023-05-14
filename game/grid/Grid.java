@@ -25,6 +25,8 @@ public class Grid {
     private final Player player;
     private Random random;
 
+    private boolean isReady;
+
 
     /**
      * Constructs a Grid_Alex object with the specified player, cells, rows, and columns.
@@ -347,9 +349,7 @@ public class Grid {
             x = cell.getColumnIndex() + i * vector[0];
             y = cell.getRowIndex() + i * vector[1];
             if (!canSetupCell(x, y)) {
-                canPlace = false;
-                break;
-                return canPlace;
+                return false;
             }
         }
 
@@ -360,11 +360,11 @@ public class Grid {
                 y = cell.getRowIndex() + i * vector[1];
                 cell.setBoat(boat.getType());
                 boat.addCoordinate(new Coordinate(x, y, false));
-                boat.getType().isPlaced = true;
+                boat.isPlaced = true;
             }
             return true;
         }
-
+        return false;
     }
 
     //----------------------------------------------------------------
@@ -416,7 +416,7 @@ public class Grid {
      */
     public Boat getBoatWithLength(int length){
         for (Boat boat : myBoats) {
-            if (boat.getType().getLength() == length) {
+            if (boat.getType().getLength() == length && !boat.isPlaced) {
                 return boat;
             }
         }
@@ -431,7 +431,7 @@ public class Grid {
     public boolean isConfigured(){
         int counter = 0;
         for (Boat boat : myBoats) {
-            if (boat.getType().isPlaced) {
+            if (boat.isPlaced) {
                 counter++;
             }
         }
