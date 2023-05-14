@@ -49,11 +49,11 @@ public class Game {
 		
 		// Fetch the target grid.
 		Grid targetGrid = findGridByPlayer(target);
-
-		/**
-		 * TODO try to hit a boat on this grid
-		 * targetGrid.askPosition(null);
-		 */
+		// get the message from the fire position : you hit, you miss, ...
+		String message = targetGrid.fire(column, row);
+		if (message == null){
+			actionSuccessful = false;
+		}
 
 		if (!actionSuccessful) return "Action failed.";
 
@@ -61,7 +61,7 @@ public class Game {
 
 		Action action = new Action(player, targetGrid, column, row, turnCount);
 		actions.add(action);
-		return null;
+		return message;
 	}
 
 	public String placePlayerBoat(Player player, int length , int column, int row, String vector) {
@@ -111,7 +111,7 @@ public class Game {
 		grids.add(grid);
 	}
 
-	private Grid findGridByPlayer(Player player) {
+	public Grid findGridByPlayer(Player player) {
 		for (Grid g : grids) {
 			if (g.getPlayer() == player) {
 				return g;
@@ -130,9 +130,9 @@ public class Game {
 	}
 
 	private void removeGrid(Player player) {
-		Grid gridOld = findGridByPlayer(player);
-		if (gridOld == null) return;
-		grids.remove(gridOld);
+		Grid grid = findGridByPlayer(player);
+		if (grid == null) return;
+		grids.remove(grid);
 	}
 
 	public void removeGrid(Grid grid) {

@@ -69,7 +69,7 @@ public class InviteCommand extends Command {
 
 
 						userToInvite.addInUsersWhoInvitedYou(player);
-						Game game = new Game();
+//						Game game = new Game();
 						game.addPlayer(player);
 						Server.pushGame(game);
 					} catch (UserAlreadyInvitedYouException e) {

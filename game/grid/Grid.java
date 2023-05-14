@@ -3,11 +3,9 @@ package game.grid;
 
 import socket.server.Player;
 import game.boat.Boat;
-import socket.server.Player;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Represents the grid used in the game for a specific player.
@@ -38,7 +36,6 @@ public class Grid {
     public Grid(Player player, int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
-        this.grid = grid;
         this.player = player;
         this.isReady = false;
         this.grid = new Cell[][]{};
@@ -325,7 +322,7 @@ public class Grid {
                         int x = cell.getColumnIndex() + i * vector[0];
                         int y = cell.getRowIndex() + i * vector[1];
                         Cell currentCell = grid[y][x];
-                        currentCell.setBoat(boat.getType());
+                        currentCell.setBoat(boat);
                         boat.addCoordinate(new Coordinate(x, y, false));
                     }
                     return;
@@ -358,7 +355,7 @@ public class Grid {
             for (int i = 0; i < boat.getType().length; i++) {
                 x = cell.getColumnIndex() + i * vector[0];
                 y = cell.getRowIndex() + i * vector[1];
-                cell.setBoat(boat.getType());
+                cell.setBoat(boat);
                 boat.addCoordinate(new Coordinate(x, y, false));
                 boat.isPlaced = true;
             }
@@ -436,5 +433,29 @@ public class Grid {
             }
         }
         return counter == myBoats.size();
+    }
+
+    public Cell getCellWithPosition(int x, int y){
+        return grid[x][y];
+    }
+
+    public String fire(int x, int y) {
+        Cell valuePosition = getCellWithPosition(x,y);
+        if(valuePosition != null){
+            if(valuePosition.isDiscovered()){
+                return "you already hit this position";
+            }
+            if(valuePosition.hasBoat()){
+                valuePosition.setDiscovered();
+                valuePosition.getBoat().getCoordinates().stream()
+                        .filter(coord -> coord.getX() == x && coord.getY() == y)
+                        .forEach(coord -> coord.setSink(true));
+                return "You hit " + valuePosition.getBoat().getType().getName();
+            }else{
+                valuePosition.setDiscovered();
+                return "Sadly, it's only water...";
+            }
+        }
+       return "You are out of the grid";
     }
 }

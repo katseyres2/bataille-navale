@@ -6,7 +6,7 @@ public class Cell {
 	private int rowIndex; // the row index of the cell
 	private int columnIndex; // the column index of the cell
 	private boolean discovered; // whether the cell has been discovered or not
-	private Boat.typeBoat boat;
+	private Boat boat;
 
 
 	/**
@@ -16,7 +16,7 @@ public class Cell {
 	 * @param columnIndex  the column index of the cell in the grid
 	 * @param boat
 	 */
-	public Cell(int rowIndex, int columnIndex, Boat.typeBoat boat) {
+	public Cell(int rowIndex, int columnIndex, Boat boat) {
 		this.rowIndex = rowIndex;
 		this.columnIndex = columnIndex;
 		this.boat = boat;
@@ -73,7 +73,7 @@ public class Cell {
 	 *
 	 * @return true if the cell has a boat, false otherwise
 	 */
-	public Boat.typeBoat isHasBoat(int row, int column) {
+	public Boat isHasBoat(int row, int column) {
 		if (!discovered) {
 			discovered = true;
 			return boat;
@@ -81,20 +81,28 @@ public class Cell {
 		return null;
 	}
 
+	public boolean hasBoat(){
+		return this.boat == null;
+	}
+
 	/**
 	 * Returns whether the cell has already been discovered.
 	 *
 	 * @return true if the cell has been discovered, false otherwise
 	 */
-	public boolean alreadyDiscovered() {
+	public boolean isDiscovered() {
 		return discovered;
 	}
 
-	public Boat.typeBoat getBoat() {
+	public Boat getBoat() {
 		return boat;
 	}
 
-	public void setBoat(Boat.typeBoat boat) {
+	public void setBoat(Boat boat) {
 		this.boat = boat;
+	}
+
+	public void setDiscovered() {
+		this.discovered = true;
 	}
 }

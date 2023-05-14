@@ -171,7 +171,7 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 
 	public void start(int port) {
 		final ServerSocket serverSocket;
-
+		ServerCommandHandler.populateCommands();
 		String data = readFile(LEVEL.DEBUG);
 		if (data.length() > 0) {
 			for (String credentials : data.split("\n")) {
