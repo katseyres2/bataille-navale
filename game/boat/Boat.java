@@ -77,7 +77,7 @@ public class Boat {
     }
 
     public boolean isSink() {
-        return coordinates.stream().noneMatch(Coordinate::isSink);
+        return coordinates.stream().allMatch(Coordinate::isSink);
     }
 
 

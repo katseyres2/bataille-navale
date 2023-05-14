@@ -218,6 +218,8 @@ public class Game {
 						break;
 					}
 
+
+
 					System.out.println(playerTurn.getUsername() + " turn.");
 
 					Action lastAction = null;

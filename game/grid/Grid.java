@@ -450,7 +450,12 @@ public class Grid {
                 valuePosition.getBoat().getCoordinates().stream()
                         .filter(coord -> coord.getX() == x && coord.getY() == y)
                         .forEach(coord -> coord.setSink(true));
-                return "You hit " + valuePosition.getBoat().getType().getName();
+                if(valuePosition.getBoat().isSink()){
+                    return "You just sink the boat " + valuePosition.getBoat().getType().getName();
+                }else{
+                    return "You hit the boat" + valuePosition.getBoat().getType().getName();
+                }
+
             }else{
                 valuePosition.setDiscovered();
                 return "Sadly, it's only water...";
