@@ -16,7 +16,7 @@ public class DiscoveryService {
         return output;
     }
 
-    public static Object findOneBy(Player needle, ArrayList<Player> haystack) {
+    public static Player findOneBy(Player needle, ArrayList<Player> haystack) {
         var elements = findBy(needle, haystack);
         if (elements.size() == 0) return null;
         return elements.get(0);

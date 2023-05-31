@@ -45,7 +45,7 @@ public class ServerCommandHandler {
 		String[] args = line.split(" ");
 
 		for (Command c : commands) {
-			if (c.getName().contains(args[0])) {
+			if (c.getName().compareTo(args[0]) == 0) {
 				String response = c.execute(args, client, players);
 				System.out.println("To   client : " + response);
 				return messageToSend + response;
