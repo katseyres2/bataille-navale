@@ -23,21 +23,17 @@ public class PlaceBoatCommand extends Command {
         );
     }
 
-    /**
-     * get the active game and place the boat of the player
-     * @param args all space-separated elements from the user input.
-     * @param player the player who sent the command.
-     * @param players the players the server holds.
-     * @return
-     */
-    public String execute(String[] args, Player player, ArrayList<Player> players) {
+
+    public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+        Player player = DiscoveryService.findOneBy(client, players);
+        if (player == null) return ServerResponse.notConnected;
 
         if (args.length != 3) return ServerResponse.wrongNumberOfParameters;
         int row, column, length;
         String vector;
 
         try {
-            // il faudra peut être inverser la row et la column
+            // peut être inverser axe x et y
             row = FormatService.convertCoordLetter(args[1].substring(0, 1));
             column = Integer.parseInt(args[1].substring(1)) - 1;
             length = Integer.parseInt(args[2]);

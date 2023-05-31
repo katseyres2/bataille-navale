@@ -165,6 +165,10 @@ public class Game {
 		grids.remove(grid);
 	}
 
+	/**
+	 *
+	 * @param player
+	 */
 	public void addPlayer(Player player) {
 		if (player == null) return;
 		
