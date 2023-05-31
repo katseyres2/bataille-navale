@@ -46,7 +46,7 @@ public class Game {
 
 		if (player == target) return "Hey, you target yourself.";
 		if (playerTurn != player) return "That's not your turn.";
-		
+
 		// Fetch the target grid.
 		Grid targetGrid = findGridByPlayer(target);
 
@@ -99,16 +99,17 @@ public class Game {
 	}
 
 
-
 	private void addGrid(Player player) throws OnlyOneActiveGameByPlayer {
+		System.out.println("ADDGRID START");
 		if (Server.getActiveGame(player) != null) throw new OnlyOneActiveGameByPlayer();
 
 		for (Grid grid : grids) {
 			if (grid.getPlayer() == player) return;
 		}
 
-//		Grid grid = new Grid(player,null,0,0);
-//		grids.add(grid);
+		Grid grid = new Grid(player,10,10);
+		grids.add(grid);
+		System.out.println("ADDGRID END");
 	}
 
 	public Grid findGridByPlayer(Player player) {
@@ -141,13 +142,16 @@ public class Game {
 	}
 
 	public void addPlayer(Player player) {
+		System.out.println("ADDPLAYER START");
 		if (player == null) return;
-		
+
 		try {
 			addGrid(player);
 		} catch (OnlyOneActiveGameByPlayer e) {
 			System.out.println(e.getMessage());
 		}
+
+		System.out.println("ADDPLAYER END");
 	}
 
 	public void removePlayer(Player player) {
@@ -219,8 +223,7 @@ public class Game {
 		thread.start();
 	}
 
-	public ArrayList<Player> getPlayers()
-	{
+	public ArrayList<Player> getPlayers() {
 		ArrayList<Player> players = new ArrayList<Player>(){};
 
 		for (Grid grid : grids) {
@@ -233,7 +236,7 @@ public class Game {
 	private void sendToClient(Player player, String message) {
 		while (player.getPrintWriter() == null) {
 			System.out.println("waiting for " + player.getUsername() + " reconnection.");
-			
+
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -252,7 +255,7 @@ public class Game {
 
 	public void stop() {
 		if (thread == null || !thread.isAlive()) return;
-		
+
 		try {
 			thread.wait();
 		} catch (InterruptedException e) {
