@@ -12,6 +12,7 @@ import socket.server.Server;
 import java.util.ArrayList;
 
 
+
 public class PlaceBoatCommand extends Command {
 
     public PlaceBoatCommand() {
@@ -23,7 +24,13 @@ public class PlaceBoatCommand extends Command {
         );
     }
 
-
+    /**
+     * get the active game and place the boat of the player
+     * @param args all space-separated elements from the user input.
+     * @param SocketClient
+     * @param players the players the server holds.
+     * @return
+    -     */
     public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
         Player player = DiscoveryService.findOneBy(client, players);
         if (player == null) return ServerResponse.notConnected;
