@@ -1,17 +1,14 @@
 package socket.server;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Set;
 
+import services.DiscoveryService;
 import services.LoaderService;
 import socket.Command;
-import socket.commands.*;
+import socket.client.SocketClient;
 
 public class ServerCommandHandler {
 	public static final ArrayList<Command> commands = new ArrayList<>();
@@ -39,24 +36,19 @@ public class ServerCommandHandler {
 		}
 	}
 
-	public static String executeCommand(String line, Socket s, PrintWriter pw, BufferedReader br, ArrayList<Player> players) {
-		if (line == null || s == null || pw == null || br == null || players == null) return "";
+	public static String executeCommand(String line, SocketClient client, ArrayList<Player> players) {
+		if (line == null) return "";
+
+		System.out.println("From client : " + line);
 
 		String messageToSend = "";
-		Player player = null;
 		String[] args = line.split(" ");
-
-		for (Player p : players) {
-			if (p.getSocket() == s) {
-				player = p;
-				break;
-			}
-		}
 
 		for (Command c : commands) {
 			if (c.getName().contains(args[0])) {
-				messageToSend += c.execute(args, player, players);
-				return messageToSend;
+				String response = c.execute(args, client, players);
+				System.out.println("To   client : " + response);
+				return messageToSend + response;
 			}
 		}
 

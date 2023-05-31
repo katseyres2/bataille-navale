@@ -107,11 +107,11 @@ public class Game {
 			if (grid.getPlayer() == player) return;
 		}
 
-		Grid grid = new Grid(player,null,0,0);
-		grids.add(grid);
+//		Grid grid = new Grid(player,null,0,0);
+//		grids.add(grid);
 	}
 
-	private Grid findGridByPlayer(Player player) {
+	public Grid findGridByPlayer(Player player) {
 		for (Grid g : grids) {
 			if (g.getPlayer() == player) {
 				return g;

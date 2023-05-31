@@ -38,7 +38,7 @@ public class Grid {
         this.columns = columns;
         this.grid = grid;
         this.player = player;
-        this.isReady = false;
+//        this.isReady = false;
         this.grid = new Cell[][]{};
 
     }
@@ -348,7 +348,6 @@ public class Grid {
             y = cell.getRowIndex() + i * vector[1];
             if (!canSetupCell(x, y)) {
                 canPlace = false;
-                break;
                 return canPlace;
             }
         }
@@ -365,6 +364,7 @@ public class Grid {
             return true;
         }
 
+        return false;
     }
 
     //----------------------------------------------------------------

@@ -21,11 +21,9 @@ public class SocketClient implements ISocketBuilder {
 	private BufferedReader bufferedReader;
 	private Scanner scanner;
 	private PrintWriter printWriter;
-	private boolean logged;
 	private LocalDateTime lastConnectionAt;
 
 	public SocketClient(Socket s, PrintWriter pw, BufferedReader br) {
-		logged = false;
 		scanner = new Scanner(System.in);
 		socket = s;
 		printWriter = pw;
@@ -43,14 +41,16 @@ public class SocketClient implements ISocketBuilder {
 
 	public int getPort()					  	{ return socket != null ? socket.getPort() : null; }
 	public Socket getSocket()				  	{ return socket; }
-	public boolean isLogged() 					{ return logged; }
+
+	public boolean isLogged() {
+		return socket != null && printWriter != null && bufferedReader != null;
+	}
+
 	public String getAddress()		 		  	{ return socket != null ? socket.getLocalAddress().getHostAddress() : ""; }
 	public Scanner getScanner() 			  	{ return scanner; }
 	public PrintWriter getPrintWriter()		  	{ return printWriter; }
 	public BufferedReader getBufferedReader() 	{ return bufferedReader; }
-	
 	public void clear() 								{ socket = null; bufferedReader = null; scanner = null; printWriter = null; }
-	public void toggleLog()   							{ logged = !logged; }
 	public void setSocket(Socket s) 					{ socket = s; }
 	public void setScanner(Scanner s) 					{ scanner = s; }
 	public void setPrintWriter(PrintWriter pw) 		 	{ printWriter = pw; }
