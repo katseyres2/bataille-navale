@@ -63,12 +63,12 @@ public class Bot extends Player {
     public void run() {
         Game game = Server.getActiveGame(this);
         ArrayList<Player> players = game.getPlayers();
-        Grid_old randomGrid = game.findGridByPlayer(players.get((new Random()).nextInt(players.size() - 1)));
+        Grid randomGrid = game.findGridByPlayer(players.get((new Random()).nextInt(players.size() - 1)));
 
         switch (getDifficulty()) {
             case Easy:
                 //TODO: implémenter la difficulté 1
-                Facile.startTurn(randomGrid);
+//                Facile.startTurn(randomGrid);
                 break;
             case Medium:
                 //TODO: implémenter la difficulté 2
