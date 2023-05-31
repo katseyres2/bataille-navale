@@ -6,7 +6,6 @@ package Bots;
 import game.Action;
 import game.Game;
 import game.grid.Grid;
-import game.grid.Grid_old;
 import org.jetbrains.annotations.NotNull;
 import socket.server.Player;
 import socket.server.Server;

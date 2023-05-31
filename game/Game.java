@@ -65,6 +65,15 @@ public class Game {
 		return message;
 	}
 
+	/**
+	 * place boat of the current player in his grid
+	 * @param player
+	 * @param length
+	 * @param column
+	 * @param row
+	 * @param vector
+	 * @return
+	 */
 	public String placePlayerBoat(Player player, int length , int column, int row, String vector) {
 		boolean placedBoat = false;
 		// Fetch the player grid.
@@ -89,6 +98,11 @@ public class Game {
 		playerTurn = p;
 	}
 
+	/**
+	 * return true if is turn of the current player
+	 * @param player
+	 * @return
+	 */
 	public boolean isPlayerTurn(Player player) {
 		return playerTurn == player;
 	}
@@ -112,6 +126,11 @@ public class Game {
 		grids.add(grid);
 	}
 
+	/**
+	 * return the grid of a player with the player as parameter
+	 * @param player
+	 * @return
+	 */
 	public Grid findGridByPlayer(Player player) {
 		for (Grid g : grids) {
 			if (g.getPlayer() == player) {
@@ -121,9 +140,14 @@ public class Game {
 		return null;
 	}
 
-	private Player findPlayerByGrid(Grid gridOld) {
+	/**
+	 * Return the player with his grid as parameter
+	 * @param grid
+	 * @return
+	 */
+	private Player findPlayerByGrid(Grid grid) {
 		for (Grid g : grids) {
-			if (g == gridOld) {
+			if (g == grid) {
 				return g.getPlayer();
 			}
 		}
@@ -174,6 +198,10 @@ public class Game {
 		return output;
 	}
 
+	/**
+	 * get a list of grids where the boats are not all placed yet
+	 * @return
+	 */
 	public List<Grid> getGridsNotConfigured(){
 		List<Grid> notReady  = new ArrayList<>();
 		for ( Grid notConfiguredGrid : grids   ) {

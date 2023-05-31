@@ -111,6 +111,10 @@ public class Grid {
 
     //----------------------------------------------------------------
 
+    /**
+     * return an array with all vectors
+     * @return
+     */
     private static int[][] getFullVectors() {
         return new int[][] {
                 { -1, -1 }, { -1, 0 }, { -1, 1 },
@@ -119,6 +123,10 @@ public class Grid {
         };
     }
 
+    /**
+     * return array with vector north / south / east / west
+     * @return
+     */
     private static int[][] getVectors() {
         return new int[][] {
                 { -1, 0 },
@@ -132,6 +140,11 @@ public class Grid {
         return vectors[i];
     }
 
+    /**
+     * get the vector of the direction wanted
+     * @param direction_vectors
+     * @return
+     */
     public int[] getDirectionVector(String direction_vectors) {
         int[] output;
 
@@ -161,7 +174,6 @@ public class Grid {
                 output = null;
                 break;
         }
-
         return output;
     }
 
@@ -332,7 +344,17 @@ public class Grid {
         }
     }
 
-
+    /**
+     * place a boat in the grid
+     * you have to choose a direction ( north, south, east, west ) and point in the grid
+     * at the point in the grid, the function will check if every position with the lenght of the boat are free
+     * if all position are free, it will place the boat
+     * @param boat
+     * @param x
+     * @param y
+     * @param direction
+     * @return
+     */
     public boolean placeBoat(Boat boat, Integer x, Integer y, String direction) {
         Cell cell;
         int[] vector = getDirectionVector(direction); // Get the available vectors
@@ -400,7 +422,6 @@ public class Grid {
             }
             sb.append("\n");
         }
-
         System.out.print(sb);
     }
     //----------------------------------------------------------------
@@ -420,10 +441,9 @@ public class Grid {
     }
 
     /**
-     *
+     * return true if all boats are placed in the grid
      * @return state of the grid
      */
-
     public boolean isConfigured(){
         int counter = 0;
         for (Boat boat : myBoats) {
@@ -434,10 +454,25 @@ public class Grid {
         return counter == myBoats.size();
     }
 
+    /**
+     * return a cell from a position in the grid
+     * @param x
+     * @param y
+     * @return
+     */
     public Cell getCellWithPosition(int x, int y){
         return grid[x][y];
     }
 
+    /***
+     * fire on a position of the grid, update the grid where a fire is land and return a message for the user if
+     * he touch a boat
+     * he already hit the position
+     * he sink a boat
+     * @param x
+     * @param y
+     * @return
+     */
     public String fire(int x, int y) {
         Cell valuePosition = getCellWithPosition(x,y);
         if(valuePosition != null){
@@ -463,6 +498,10 @@ public class Grid {
        return "You are out of the grid";
     }
 
+    /**
+     * Return true if all of the boat in the myboats List are Sink
+     * @return
+     */
     public boolean allBoatAreSink(){
         return myBoats.stream().allMatch(Boat::isSink);
     }

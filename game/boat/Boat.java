@@ -8,11 +8,11 @@ public class Boat {
 
     public enum typeBoat {
 
-        AIRCRAFT_CARRIER("A", "aircraft carrier", 5, false),
-        CRUISER("C", "cruiser", 4, false),
-        SUBMARINE("S", "submarine", 3, false),
-        DESTROYER("D", "destroyer", 3, false),
-        WARSHIP("W", "warship", 2, false);
+        AIRCRAFT_CARRIER("A", "aircraft carrier", 5),
+        CRUISER("C", "cruiser", 4),
+        SUBMARINE("S", "submarine", 3),
+        DESTROYER("D", "destroyer", 3),
+        WARSHIP("W", "warship", 2);
 
         public String label;
 

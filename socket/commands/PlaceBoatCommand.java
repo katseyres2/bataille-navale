@@ -26,7 +26,13 @@ public class PlaceBoatCommand extends Command {
         );
     }
 
-
+    /**
+     * get the active game and place the boat of the player
+     * @param args all space-separated elements from the user input.
+     * @param player the player who sent the command.
+     * @param players the players the server holds.
+     * @return
+     */
     public String execute(String[] args, Player player, ArrayList<Player> players) {
 
         if (args.length != 3) return "Wrong number of parameters.";

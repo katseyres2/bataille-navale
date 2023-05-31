@@ -8,7 +8,6 @@ public class Cell {
 	private boolean discovered; // whether the cell has been discovered or not
 	private Boat boat;
 
-
 	/**
 	 * Constructs a new Cell object with the specified row, column and boat status.
 	 *
