@@ -1,10 +1,10 @@
 package socket.commands;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 
+import services.DiscoveryService;
+import services.ServerResponse;
+import socket.client.SocketClient;
 import socket.server.Player;
 import socket.Command;
 
@@ -18,7 +18,9 @@ public class InfoCommand extends Command {
         );
     }
 
-    public String execute(String[] args, Player player, ArrayList<Player> players) {
+    public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+		Player player = DiscoveryService.findOneBy(client, players);
+		if (player == null) return ServerResponse.notConnected;
 		String message = "";
 
 		message += "Username    : " + player.getUsername();

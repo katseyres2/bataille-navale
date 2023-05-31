@@ -1,10 +1,10 @@
 package socket.commands;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 
+import services.DiscoveryService;
+import services.ServerResponse;
+import socket.client.SocketClient;
 import socket.server.Player;
 import socket.Command;
 
@@ -19,21 +19,20 @@ public class SignInCommand extends Command {
 		);
     }
 
-    public String execute(String[] args, Player player, ArrayList<Player> players) {
+    public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+		Player player = DiscoveryService.findOneBy(client, players);
+
 		String message = "";
 		String username;
 		String password;
 		boolean usernameMatched = false;
 
-		for (Player p : players) {
-			if (p.getSocket() == player.getSocket()) {
-				message += "You're already connected.";
-				return message;
-			}
+		if (DiscoveryService.findOneBy(player, players) != null) {
+			return message + ServerResponse.alreadyConnected;
 		}
 
 		if (args.length != 3) {
-			message += "You must specify <username> <password>.";
+			message += ServerResponse.wrongNumberOfParameters;
 		} else {
 			username = args[1];
 			password = args[2];
@@ -44,14 +43,13 @@ public class SignInCommand extends Command {
 
 					if (p.checkCredentials(username, password)) {
 						if (p.isLogged()) {
-							message += "You're connected on another device.";
+							message += ServerResponse.connectedOnAnotherDevice;
 						} else {
-							p.toggleLog();
-							p.refreshConnection(player.getSocket(), player.getPrintWriter(), player.getBufferedReader());
-							message += "Welcome back " + p.getUsername() + ".";
+							p.refreshConnection(client.getSocket(), client.getPrintWriter(), client.getBufferedReader());
+							message += ServerResponse.welcome(p) ;
 						}
 					} else {
-						message += "Invalid credentials.";
+						message += ServerResponse.invalidCredentials;
 					}
 
 					break;
@@ -59,7 +57,7 @@ public class SignInCommand extends Command {
 			}
 
 			if (! usernameMatched) {
-				message += "The user " + username + " does not exist.";
+				message += ServerResponse.playerNotFound;
 			}
 		}
 

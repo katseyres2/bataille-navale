@@ -139,7 +139,6 @@ public class Player extends SocketClient {
 
 	public void signOut() throws NotConnectedException {
 		if (!super.isLogged()) throw new NotConnectedException();
-		super.toggleLog();
 		super.clear();
 	}
 

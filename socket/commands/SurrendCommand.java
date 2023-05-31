@@ -1,11 +1,11 @@
 package socket.commands;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 
 import game.Game;
+import services.DiscoveryService;
+import services.ServerResponse;
+import socket.client.SocketClient;
 import socket.server.Player;
 import socket.Command;
 import socket.server.Server;
@@ -17,13 +17,16 @@ public class SurrendCommand extends Command {
 	}
 
 	@Override
-	public String execute(String[] args, Player player, ArrayList<Player> players) {
+	public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+		Player player = DiscoveryService.findOneBy(client, players);
+		if (player == null) return ServerResponse.notConnected;
+
 		Game activeGame = Server.getActiveGame(player);
 		
-		if (activeGame == null) return "You are not playing a game.";
-		if (!activeGame.isPlayerTurn(player)) return "It's not your turn.";
+		if (activeGame == null) return ServerResponse.notPlayingGame;
+		if (!activeGame.isPlayerTurn(player)) return ServerResponse.notYouTurn ;
 
-		return "You can't surrend yet.";
+		return ServerResponse.youCantSurrend;
 	}
 	
 }

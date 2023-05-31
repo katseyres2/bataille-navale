@@ -1,18 +1,15 @@
 package socket.commands;
 
 import game.Game;
+import services.DiscoveryService;
 import services.FormatService;
+import services.ServerResponse;
 import socket.Command;
+import socket.client.SocketClient;
 import socket.server.Player;
 import socket.server.Server;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
-import game.grid.Grid;
-
-
 
 
 public class PlaceBoatCommand extends Command {
@@ -35,7 +32,7 @@ public class PlaceBoatCommand extends Command {
      */
     public String execute(String[] args, Player player, ArrayList<Player> players) {
 
-        if (args.length != 3) return "Wrong number of parameters.";
+        if (args.length != 3) return ServerResponse.wrongNumberOfParameters;
         int row, column, length;
         String vector;
 
@@ -47,7 +44,7 @@ public class PlaceBoatCommand extends Command {
             vector = args[3];
         } catch (NumberFormatException e) {
             System.out.println(e.getMessage());
-            return "Wrong parameter format.";
+            return ServerResponse.wrongParameterFormat;
         }
 
         if(vector == null) return "";
@@ -58,7 +55,6 @@ public class PlaceBoatCommand extends Command {
         String response =  currentGame.placePlayerBoat(player, length,column, row, vector);
 
         if (response != null) return response;
-        return "Action successful.";
-
+        return ServerResponse.actionSuccessful;
     }
 }

@@ -1,6 +1,7 @@
 package socket.commands;
 
 import socket.Command;
+import socket.client.SocketClient;
 import socket.server.Player;
 
 import java.util.ArrayList;
@@ -12,7 +13,7 @@ public class InviteBotCommand extends Command {
     }
 
     @Override
-    public String execute(String[] args, Player player, ArrayList<Player> players) {
+    public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
 
         return "";
     }

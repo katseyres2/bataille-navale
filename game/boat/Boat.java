@@ -20,10 +20,12 @@ public class Boat {
         public String name;
 
 
+
         typeBoat(String label, String name, int length) {
             this.label = label;
             this.name = name;
             this.length = length;
+
         }
 
         public int getLength() {
