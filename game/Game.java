@@ -5,6 +5,7 @@ import java.util.*;
 
 import game.boat.Boat;
 import game.grid.Grid;
+import game.grid.Grid_old;
 import services.FormatService;
 import services.exceptions.OnlyOneActiveGameByPlayer;
 import socket.server.Player;

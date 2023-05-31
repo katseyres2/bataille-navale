@@ -11,6 +11,7 @@ import java.util.Set;
 
 import services.LoaderService;
 import socket.Command;
+import socket.client.SocketClient;
 import socket.commands.*;
 
 public class ServerCommandHandler {
@@ -51,6 +52,10 @@ public class ServerCommandHandler {
 				player = p;
 				break;
 			}
+		}
+
+		if (player == null) {
+			player = new Player(s,pw,br,null,null,false);
 		}
 
 		for (Command c : commands) {

@@ -23,8 +23,6 @@ public class Grid {
     private final Player player;
     private Random random;
 
-    private boolean isReady;
-
 
     /**
      * Constructs a Grid_Alex object with the specified player, cells, rows, and columns.
@@ -36,8 +34,9 @@ public class Grid {
     public Grid(Player player, int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
+        this.grid = grid;
         this.player = player;
-        this.isReady = false;
+//        this.isReady = false;
         this.grid = new Cell[][]{};
 
     }
