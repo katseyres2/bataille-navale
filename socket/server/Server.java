@@ -17,8 +17,10 @@ import game.Game;
 import interfaces.IServer;
 import interfaces.ISocketBuilder;
 import org.jetbrains.annotations.Nullable;
+import services.DiscoveryService;
 import services.FormatService;
 import services.LogService;
+import socket.client.SocketClient;
 
 public class Server extends LogService implements IServer,ISocketBuilder {
 	public static int PORT = 5000;
@@ -70,7 +72,7 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 				while(true) {
 					try {
 						msg = scan.nextLine();		// Wait for the user input.
-						pw.println(msg);			// Send the message on the client host:port.
+						pw.println(msg);			// Send the message on the player host:port.
 						pw.flush();					// Clear the memory cell.
 					} catch (NoSuchElementException e) {
 						System.out.println(e.getMessage());
@@ -89,11 +91,10 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 			@Override
 			public void run() {
 				while (true) {
-					for (Player client : players) {
-						if (client.isLogged() && !client.getLastConnection().plus(5, ChronoUnit.MINUTES).isAfter(FormatService.getCurrentTime())) {
-							client.clear();
-							client.toggleLog();
-							appendFile(LEVEL.INFO, FormatService.serverLogPrefix(client) + "timeout connection, kick user.");
+					for (Player player : players) {
+						if (player.isLogged() && !player.getLastConnection().plus(5, ChronoUnit.MINUTES).isAfter(FormatService.getCurrentTime())) {
+							player.clear();
+							appendFile(LEVEL.INFO, FormatService.serverLogPrefix(player) + "timeout connection, kick user.");
 						}
 					}
 					
@@ -113,53 +114,43 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 
 			@Override
 			public void run() {
+				final SocketClient client = new SocketClient(s, pw, br);
+
 				try {
 					messageReceived = br.readLine();		// It catches the message from the remote host.
-					Player client;
+					Player player;
 
 					while (messageReceived != null) {		// While the buffer is not empty, there is still a message inside.
-						String messageToSend = "";			// The server will send this message to the client.
+						String messageToSend = "";			// The server will send this message to the player.
 						String logMessage = "";				// It will be printed in the server logs.
-						client = null;
-
-						for (Player p : players) {
-							if (p.getSocket() == s) {
-								client = p;
-								break;
-							}
-						}
+						player = DiscoveryService.findOneBy(s, players);
 
 						if (messageReceived.compareTo("/q!") == 0) {
-							if (client != null && client.isLogged()) {
-								client.close();
-								client.toggleLog();
+							if (player != null && player.isLogged()) {
+								player.close();
 							}
-							
-							logMessage += "has left the room.";
 						} else {
-							logMessage += messageReceived.split(" ")[0]; // Add some logs.
-							messageToSend += ServerCommandHandler.executeCommand(messageReceived, s, pw, br, players);								
+							messageToSend += ServerCommandHandler.executeCommand(messageReceived, client, players);
 						}
 
-						client = null;
+						player = null;
 
 						for (Player p : players) {
 							if (p.getSocket() == s) {
-								client = p;
+								player = p;
 								break;
 							}
 						}
 						
-						if (client == null) {
+						if (player == null) {
 							messageToSend += ";;(?)--|";
 						} else {
-							client.refreshLastConnection();
-							messageToSend = client.getColor() + "# " + FormatService.ANSI_RESET + messageToSend.replace(";", ";" + client.getColor() +  "# " + FormatService.ANSI_RESET) +  ";;" + client.getColor() + "(" + client.getUsername() + ")--|" + FormatService.ANSI_RESET;
+							player.refreshLastConnection();
+							messageToSend = player.getColor() + "# " + FormatService.ANSI_RESET + messageToSend.replace(";", ";" + player.getColor() +  "# " + FormatService.ANSI_RESET) +  ";;" + player.getColor() + "(" + player.getUsername() + ")--|" + FormatService.ANSI_RESET;
 						}
 
 						pw.println(messageToSend);
 						pw.flush();
-						appendFile(LEVEL.INFO, FormatService.serverLogPrefix(client) + logMessage);
 						messageReceived = br.readLine();
 					}
 				
@@ -206,7 +197,7 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 				printWriter = new PrintWriter(socket.getOutputStream());
 				bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			} catch (IOException e) {
-				appendFile(LEVEL.INFO, "Client not accepted.");
+				appendFile(LEVEL.INFO, "player not accepted.");
 				break;
 			}
 

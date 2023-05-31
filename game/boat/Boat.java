@@ -9,10 +9,10 @@ public class Boat {
     public enum typeBoat {
 
         AIRCRAFT_CARRIER("A", "aircraft carrier", 5, false),
-        CRUISER("C", "cruiser", 4, false),
-        SUBMARINE("S", "submarine", 3, false),
-        DESTROYER("D", "destroyer", 3, false),
-        WARSHIP("W", "warship", 2, false);
+        CRUISER("C", "cruiser", 4,false),
+        SUBMARINE("S", "submarine", 3,false),
+        DESTROYER("D", "destroyer", 3,false),
+        WARSHIP("W", "warship", 2,false);
 
         public String label;
         public int length;

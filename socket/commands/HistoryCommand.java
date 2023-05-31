@@ -1,14 +1,11 @@
 package socket.commands;
 
-import services.FormatService;
+import services.DiscoveryService;
+import services.ServerResponse;
 import socket.Command;
-import socket.Message;
+import socket.client.SocketClient;
 import socket.server.Player;
-import socket.server.Server;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 
 public class HistoryCommand extends Command {
@@ -18,15 +15,15 @@ public class HistoryCommand extends Command {
     }
 
     @Override
-    public String execute(String[] args, Player player, ArrayList<Player> players) {
-        String output = "";
-        if (player == null) return output;
+    public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+        Player player = DiscoveryService.findOneBy(client, players);
+        if (player == null) return ServerResponse.notConnected;
 
 //        ArrayList<Message> messages = Server.findMessagesFrom(player.getUsername());
 //        for (Message m : messages) {
 //            output += "[" + FormatService.LocalDateTimeToString(m.getTime()) + "] FROM : " + m.getFrom().getUsername() + ", MESSAGE : " + m.getText() + ";";
 //        }
 
-        return output;
+        return "yo";
     }
 }

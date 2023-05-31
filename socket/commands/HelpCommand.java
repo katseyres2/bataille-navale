@@ -2,6 +2,8 @@ package socket.commands;
 
 import java.util.ArrayList;
 
+import services.DiscoveryService;
+import socket.client.SocketClient;
 import socket.server.Player;
 import socket.Command;
 import socket.server.ServerCommandHandler;
@@ -12,7 +14,9 @@ public class HelpCommand extends Command {
     }
 
 	@Override
-    public String execute(String[] args, Player player, ArrayList<Player> players) {
+    public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+		Player player = DiscoveryService.findOneBy(client, players);
+
 		String message = "List Of Commands;-----------------; |;";
 		Role role = player != null ? player.getRole() : Role.UNDEFINED;
 

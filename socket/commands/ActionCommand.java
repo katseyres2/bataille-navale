@@ -1,11 +1,11 @@
 package socket.commands;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 
 import game.Game;
+import services.DiscoveryService;
+import services.ServerResponse;
+import socket.client.SocketClient;
 import socket.server.Player;
 import socket.Command;
 import socket.server.Server;
@@ -17,11 +17,14 @@ public class ActionCommand extends Command {
 	}
 
 	@Override
-	public String execute(String[] args, Player player, ArrayList<Player> players) {
+	public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+		Player player = DiscoveryService.findOneBy(client, players);
+		if (player == null) return ServerResponse.notConnected;
+
 		int row, column;
 		Player targetPlayer = null;
 
-		if (args.length != 4) return "Wrong number of parameters.";
+		if (args.length != 4) return ServerResponse.wrongNumberOfParameters;
 		String username = args[1];
 
 		try {
@@ -29,7 +32,7 @@ public class ActionCommand extends Command {
 			column = Integer.parseInt(args[3]);
 		} catch (NumberFormatException e) {
 			System.out.println(e.getMessage());
-			return "Wrong parameter format.";
+			return ServerResponse.wrongParameterFormat;
 		}
 
 		for (Player p : players) {
@@ -39,7 +42,7 @@ public class ActionCommand extends Command {
 			}
 		}
 
-		if (targetPlayer == null) return "Player with this username not found.";
+		if (targetPlayer == null) return ServerResponse.playerNotFound;
 
 		// Fetch the player game.
 		Game currentGame = Server.getActiveGame(player);
@@ -47,7 +50,7 @@ public class ActionCommand extends Command {
 		String response =  currentGame.sendAction(player, targetPlayer, column, row);
 		
 		if (response != null) return response;
-		return "Action successful.";
+		return ServerResponse.actionSuccessful;
 	}
 	
 }
