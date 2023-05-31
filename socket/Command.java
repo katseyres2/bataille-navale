@@ -1,17 +1,18 @@
-package socket.commands;
+package socket;
+import interfaces.ICommand;
 
-public class Command {
-	public static enum Role {
+public abstract class Command implements ICommand {
+	public enum Role {
 		UNDEFINED,
 		AUTHENTICATED,
 		ADMIN
-	};
+	}
 
-	private String name;
-	private String[] optionalParameters;
-	private String[] mandatoryParameters;
-	private String documentation;
-	private Role role;
+	String name;
+	String[] optionalParameters;
+	String[] mandatoryParameters;
+	String documentation;
+	Role role;
 
 	public Command(String name, String[] optionalParameters, String[] mandatoryParameters,  Role role, String documentation) {
 		this.name = name;
@@ -21,27 +22,25 @@ public class Command {
 		this.role = role;
 	}
 
-	public String help() 		{ return documentation; }
+	public String getHelp() 	{ return documentation; }
 	public String getName() 	{ return name; 			}
 	public Role getRole() 		{ return role;			}
 
 	public boolean hasPermission(Role value) {
 		if (value == Role.ADMIN) return true;
-		if (value == Role.AUTHENTICATED && role == Role.AUTHENTICATED || role == Role.UNDEFINED) return true;
-		if (value == Role.UNDEFINED && role == Role.UNDEFINED) return true;
-		return false;
+		return value == Role.AUTHENTICATED && role == Role.AUTHENTICATED || role == Role.UNDEFINED;
 	}
 
 	public String getParameters() {
-		String output = "";
+		StringBuilder output = new StringBuilder();
 
 		for (String parameter : optionalParameters) {
-			output += "["+ parameter +"] ";
+			output.append("[").append(parameter).append("] ");
 		}
 		for (String parameter : mandatoryParameters) {
-			output += "<"+ parameter +"> ";
+			output.append("<").append(parameter).append("> ");
 		}
 		
-		return output;
+		return output.toString();
 	}
 }

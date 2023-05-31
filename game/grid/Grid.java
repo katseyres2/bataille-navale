@@ -1,249 +1,440 @@
 package game.grid;
 
+
+import socket.server.Player;
+import game.boat.Boat;
+import socket.server.Player;
+
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 
+ * Represents the grid used in the game for a specific player.
  */
 public class Grid {
-	static final char POSITIONS[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'};
-	final private static int ROWS = 10;
-	final private static int COLUMNS = 10;
-	// final private static int VECTORS_LENGTH = 9;
-	final private static int[][] VECTORS = getFullVectors();
-	final private Random random;
-	
-	public final static int AIRCRAFT_CARRIER_LENGTH = 5;
-	public final static int BATTLESHIP_LENGTH = 4;
-	public final static int CRUISER_LENGTH = 3;
-	public final static int SUBMARINE_LENGTH = 3;
-	public final static int DESTROYER_LENGTH = 2;
 
-	final private String [][] grid;
+    public static final int DEFAULT_ROW_COUNT = 10;
+    public static final int DEFAULT_COLUMN_COUNT = 10;
+    private int rows;
+    private int columns;
+    private Cell[][] grid;
+    final private static ArrayList<Boat> myBoats = new ArrayList<Boat>(5);
+    final private static int[][] VECTORS = getFullVectors();
+    static public final String[] POSITIONS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
+    private final Player player;
+    private Random random;
 
-	public Grid() {
-		grid = new String[ROWS][COLUMNS];
-		random = new Random();
-	}
 
-	/**
-	 * 
-	 */
-	private static int[][] getVectors() {
-		return new int[][] {
-			        {-1, 0},
-			{0, -1},        { 0, 1},
-			        { 1, 0},
-		};
-	}
+    /**
+     * Constructs a Grid_Alex object with the specified player, cells, rows, and columns.
+     *
+     * @param player   The player associated with the grid.
+     * @param rows     The number of rows in the grid.
+     * @param columns  The number of columns in the grid.
+     */
+    public Grid(Player player, int rows, int columns) {
+        this.rows = rows;
+        this.columns = columns;
+        this.grid = grid;
+        this.player = player;
+//        this.isReady = false;
+        this.grid = new Cell[][]{};
 
-	private static int[][] getFullVectors() {
-		return new int[][] {
-			{-1, -1}, {-1, 0}, {-1, 1},
-			{ 0, -1},          { 0, 1},
-			{ 1, -1}, { 1, 0}, { 1, 1}
-		};
-	}
+    }
 
-	/**
-	 * @return [row, column]
-	 */
-	public int[] getRandomPoint() {
-		int output[] = new int[2];
-		boolean isFreePoint = false;
-		
-		while (!isFreePoint) {
-			int x = random.nextInt(ROWS);
-			int y = random.nextInt(COLUMNS);
-			
-			isFreePoint = false;
+    //----------------------------------------------------------------
 
-			for (int[] vector : VECTORS) {
-				// vertical border
-				// P = [3, 0]
-				// v = [-1, 0]
-				if (x + vector[0] > ROWS -1 || x + vector[0] < 0) {
-					isFreePoint = true;
-				}
+    /**
+     * Returns the number of rows in the grid.
+     *
+     * @return The number of rows.
+     */
+    public int getRows() {
+        return rows;
+    }
 
-				// horizontal border
-				if (y + vector[1] > COLUMNS -1 || y + vector[1] < 0) {
-					isFreePoint = true;
-				}
+    /**
+     * Sets the number of rows in the grid.
+     *
+     * @param rows The number of rows to set.
+     */
+    public void setRows(int rows) {
+        this.rows = rows;
+    }
 
-				// neighbor not null
-				if (! isFreePoint && grid[x + vector[0]][y + vector[1]] == null) {
-					isFreePoint = true;
-				}
+    /**
+     * Returns the number of columns in the grid.
+     *
+     * @return The number of columns.
+     */
+    public int getColumns() {
+        return columns;
+    }
 
-				if (! isFreePoint) {
-					break;
-				}
-			}
+    /**
+     * Sets the number of columns in the grid.
+     *
+     * @param columns The number of columns to set.
+     */
+    public void setColumns(int columns) {
+        this.columns = columns;
+    }
 
-			if (! isFreePoint) {
-				continue;
-			}
+    /**
+     * Returns the 2D array of cells representing the grid.
+     *
+     * @return The 2D array of cells.
+     */
+    public Cell[][] getGrid() {
+        return grid;
+    }
 
-			output[0] = x;
-			output[1] = y;
-		}
+    public Player getPlayer() { return player; }
 
-		return output;
-	}
+    /**
+     * Sets the 2D array of cells representing the grid.
+     *
+     * @param grid The 2D array of cells to set.
+     */
+    public void setGrid(Cell[][] grid) {
+        this.grid = grid;
+    }
 
-	/**
-	 * 
-	 */
-	public int[] getRandomVector(int[][] vectors) {
-		int i = random.nextInt(vectors.length);
-		return vectors[i];
-	}
+    /**
+     * Sets up the specified cell at the given coordinate in the grid.
+     *
+     * @param coordinate The coordinate of the cell.
+     * @param cell       The cell object to set.
+     */
+    public void setupCell(Coordinate coordinate, Cell cell) {
+        getGrid()[coordinate.getX()][coordinate.getY()] = cell;
+    }
 
-	/**
-	 * 
-	 */
-	public boolean canFillPoint(int x, int y) {
-		if (x < 0) {
-			// System.out.print("Left overflow\n");
-			return false;
-		}
-		
-		if (x > 9) {
-			// System.out.print("Right overflow\n");
-			return false;
-		}
+    //----------------------------------------------------------------
 
-		if (y < 0) {
-			// System.out.print("Top overflow\n");
-			return false;
-		}
-		
-		if (y > 9) {
-			// System.out.print("Bottom overflow\n");
-			return false;
-		}
+    private static int[][] getFullVectors() {
+        return new int[][] {
+                { -1, -1 }, { -1, 0 }, { -1, 1 },
+                { 0, -1 }, { 0, 1 },
+                { 1, -1 }, { 1, 0 }, { 1, 1 }
+        };
+    }
 
-		for (int[] vector : VECTORS) {
-			if (x + vector[0] > 9) {
-				continue;
-			}
-			
-			if (x + vector[0] < 0) {
-				continue;
-			}
-			
-			if (y + vector[1] > 9) {
-				continue;
-			}
-			
-			if (y + vector[1] < 0) {
-				continue;
-			}
+    private static int[][] getVectors() {
+        return new int[][] {
+                { -1, 0 },
+                { 0, -1 }, { 0, 1 },
+                { 1, 0 },
+        };
+    }
 
-			if (grid[x + vector[0]][y + vector[1]] != null) {
-				return false;
-			}
-		}
+    public int[] getRandomVector(int[][] vectors) {
+        int i = random.nextInt(vectors.length);
+        return vectors[i];
+    }
 
-		return true;
-	}
+    public int[] getDirectionVector(String direction_vectors) {
+        int[] output;
 
-	/*
-	 * 
-	 */
-	public void placeBoat(int coord[][], String label) {
-		for (int[] c : coord) {
-			this.grid[c[0]][c[1]] = label;
-		}
-	}
+        switch (direction_vectors.toLowerCase()) {
+            case "n":
+            case "north":
+            case "nord":
+                output = new int[] { -1, 0 };
+                break;
+            case "s":
+            case "south":
+            case "sud":
+                output = new int[] { 1, 0 };
+                break;
+            case "w":
+            case "west":
+            case "ouest":
+            case "o":
+                output = new int[] { 0, -1 };
+                break;
+            case "e":
+            case "east":
+            case "est":
+                output = new int[] { 0, 1 };
+                break;
+            default:
+                output = null;
+                break;
+        }
 
-	/**
-	 * For one boat, get a random point.
-	 * Once the point is selected, select a random vector.
-	 * Check the next point with the selected vector, if the next point is free, the next one become the current.
-	 * Otherwise, the next point is not free, select another random vector.
-	 * If all vectors are consumed, select another point and repeat the loop until the boat is placed.
-	 */
-	public void saveBoat(int length, String label) {
-		int[] point;
-		int[][] coords;
-		int[][] vectors;
-		boolean canPlace = false;
+        return output;
+    }
 
-		// PI = [A, 1]
-		// V1 = [1, 0]
-		// V2 = [-1, -1]
-		// PI + 4 * V1 = [A, 1] + 4 * [1, 0] = [A, 1] + [4, 0] = [A+4, 1+0] = [E, 1]
-		// PI + V2 = [A-1, 1-1] = [J, 0]
+    //----------------------------------------------------------------
 
-		while (! canPlace) {
-			point = getRandomPoint();
-			vectors = getVectors();
-			coords = new int[length][2];
-			/**
-			 * [
-			 * 	[A, 1],
-			 * 	[A, 2],
-			 * 	[A, 3]
-			 * ]
-			 */
-			
-			// gets a vector
-			for (int[] vector : vectors) {
-				canPlace = true;
+    /**
+     * Sets up a void grid by initializing cells with null values.
+     */
+    public void setupVoidGrid() {
+        // Iterate over each column
+        for (int x = 0; x < getColumns(); x++){
+            // Iterate over each row
+            for (int y = 0; y < getRows(); y++){
+                // Set up a cell with coordinates (x, y) and a null value
+                setupCell(new Coordinate(x, y), new Cell(x, y, null));
+            }
+        }
+    }
 
-				// check if all points can be filled
-				for (int i = 0; i < length; i++) {
-					if (! canFillPoint(point[0] + i * vector[0], point[1] + i * vector[1])) {
-						canPlace = false;
-						break;
-					}
+    //----------------------------------------------------------------
 
-					coords[i][0] = point[0] + i * vector[0];
-					coords[i][1] = point[1] + i * vector[1];
-				}
+    /**
+     * Récupère une cellule aléatoire qui satisfait certaines conditions.
+     *
+     * @return Une cellule aléatoire qui respecte les conditions.
+     */
+    public Cell getRandomCell() {
+        Cell randomCell = null; // Cellule aléatoire à retourner
+        int maxRows = getColumns() - 1; // Indice maximum de ligne
+        int maxColumns = getRows() - 1; // Indice maximum de colonne
 
-				if (canPlace) {
-					for (int i = 0; i < length; i++) {
-						grid[coords[i][0]][coords[i][1]] = label;
-					}
-					break;
-				}
+        while (randomCell == null) {
+            int x = random.nextInt(getColumns()); // Génère un indice de ligne aléatoire
+            int y = random.nextInt(getRows()); // Génère un indice de colonne aléatoire
 
-			}
-			
-		}
-	}
+            // Vérifie si les coordonnées de la cellule générée se trouvent à l'intérieur des limites de la grille
+            if (x > 0 && x < maxRows && y > 0 && y < maxColumns) {
+                Cell currentCell = grid[x][y]; // Obtient la cellule actuelle aux coordonnées générées
+                boolean hasNullNeighbor = false; // Indique si la cellule actuelle a une cellule voisine avec un bateau null
 
-	/**
-	 * 
-	 */
-	public void show() {
-		System.out.print("\n");
-		for (int i = 0; i < 11;i++){
-			for(int j = 0; j < 11; j++){
-				// Affiche la lettre sur la première colonne
-				if(j==1){
-					if(i>=1){
-						System.out.print(POSITIONS[i-1] + " ");
-					}
-				}
-				// Affiche la position ( chiffre ) sur la première ligne
-				if(i==0){
-					if(j==0){
-						System.out.print("\\ ");
-					}
-					if(j>=1){
-						System.out.printf(" %d ", j);
-					}
-				}else if (j>=1 && (grid[i-1][j-1] == null)) {
-					System.out.print(" • ");
-				}else if(j>=1 && (grid[i-1][j-1] != null)){
-					System.out.print(" "+ grid[i-1][j-1] +" ");
-				}
-			}
-			System.out.print("\n");
-		}
-	}
+                // Vérifie chaque cellule voisine
+                for (int[] vector : VECTORS) {
+                    int neighborX = x + vector[0]; // Calcule la coordonnée X de la cellule voisine
+                    int neighborY = y + vector[1]; // Calcule la coordonnée Y de la cellule voisine
+
+                    // Si la cellule voisine a un bateau null, définit le drapeau et sort de la boucle
+                    if (grid[neighborX][neighborY].getBoat() == null) {
+                        hasNullNeighbor = true;
+                        break;
+                    }
+                }
+
+                // Si la cellule actuelle a un bateau non null et aucune cellule voisine null, l'assigne à randomCell
+                if (currentCell.getBoat() != null && !hasNullNeighbor) {
+                    randomCell = currentCell;
+                }
+            }
+        }
+
+        return randomCell;
+    }
+
+    public Cell getCell(int x, int y) {
+        Cell randomCell = null; // Cellule aléatoire à retourner
+        int maxRows = getColumns() - 1; // Indice maximum de ligne
+        int maxColumns = getRows() - 1; // Indice maximum de colonne
+
+        while (randomCell == null) {
+
+
+            // Vérifie si les coordonnées de la cellule générée se trouvent à l'intérieur des limites de la grille
+            if (x > 0 && x < maxRows && y > 0 && y < maxColumns) {
+                Cell currentCell = grid[x][y]; // Obtient la cellule actuelle aux coordonnées générées
+                boolean hasNullNeighbor = false; // Indique si la cellule actuelle a une cellule voisine avec un bateau null
+
+                // Vérifie chaque cellule voisine
+                for (int[] vector : VECTORS) {
+                    int neighborX = x + vector[0]; // Calcule la coordonnée X de la cellule voisine
+                    int neighborY = y + vector[1]; // Calcule la coordonnée Y de la cellule voisine
+
+                    // Si la cellule voisine a un bateau null, définit le drapeau et sort de la boucle
+                    if (grid[neighborX][neighborY].getBoat() == null) {
+                        hasNullNeighbor = true;
+                        break;
+                    }
+                }
+
+                // Si la cellule actuelle a un bateau non null et aucune cellule voisine null, l'assigne à randomCell
+                if (currentCell.getBoat() != null && !hasNullNeighbor) {
+                    randomCell = currentCell;
+                }
+            }
+        }
+
+        return randomCell;
+    }
+
+    /**
+     * Checks if a cell can be set up at the given coordinates.
+     *
+     * @param x The x-coordinate of the cell.
+     * @param y The y-coordinate of the cell.
+     * @return {@code true} if the cell can be set up, {@code false} otherwise.
+     */
+    public boolean canSetupCell(int x, int y) {
+        // Check if the coordinates are within the grid boundaries
+        if (x < 0 || x > getColumns() || y < 0 || y > getRows()) {
+            // System.out.print("Overflow\n");
+            return false;
+        }
+
+        // Check each neighboring cell
+        for (int[] vector : VECTORS) {
+            int neighborX = x + vector[0]; // Calculate the x-coordinate of the neighboring cell
+            int neighborY = y + vector[1]; // Calculate the y-coordinate of the neighboring cell
+
+            // Check if the neighboring cell is within the grid boundaries or if it's already occupied
+            if (neighborX < 0 || neighborX > getColumns() || neighborY < 0 || neighborY > getRows() || grid[neighborX][neighborY] != null) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    //----------------------------------------------------------------
+
+    /**
+     * Places a boat randomly on the grid.
+     *
+     * @param length The length of the boat.
+     * @param boat   The boat object to be placed.
+     */
+    public void placeRandomBoat(int length, Boat boat) {
+        Cell cell;
+        int[][] vectors = getVectors(); // Get the available vectors
+
+        while (true) {
+            cell = getRandomCell(); // Get a random cell on the grid
+
+            // Check if all points can be filled
+            boolean canPlace = true;
+            for (int[] vector : vectors) {
+                for (int i = 0; i < length; i++) {
+                    int x = cell.getColumnIndex() + i * vector[0];
+                    int y = cell.getRowIndex() + i * vector[1];
+
+                    if (!canSetupCell(x, y)) {
+                        canPlace = false;
+                        break;
+                    }
+                }
+
+                if (canPlace) {
+                    // Place the boat
+                    for (int i = 0; i < length; i++) {
+                        int x = cell.getColumnIndex() + i * vector[0];
+                        int y = cell.getRowIndex() + i * vector[1];
+                        Cell currentCell = grid[y][x];
+                        currentCell.setBoat(boat.getType());
+                        boat.addCoordinate(new Coordinate(x, y, false));
+                    }
+                    return;
+                }
+
+                canPlace = true;
+            }
+        }
+    }
+
+
+    public boolean placeBoat(Boat boat, Integer x, Integer y, String direction) {
+        Cell cell;
+        int[] vector = getDirectionVector(direction); // Get the available vectors
+
+        cell = getCell(x,y);
+
+        // Check if all points can be filled
+        boolean canPlace = true;
+        for (int i = 0; i < boat.getType().length; i++) {
+            x = cell.getColumnIndex() + i * vector[0];
+            y = cell.getRowIndex() + i * vector[1];
+            if (!canSetupCell(x, y)) {
+                canPlace = false;
+                return canPlace;
+            }
+        }
+
+        if (canPlace) {
+            // Place the boat
+            for (int i = 0; i < boat.getType().length; i++) {
+                x = cell.getColumnIndex() + i * vector[0];
+                y = cell.getRowIndex() + i * vector[1];
+                cell.setBoat(boat.getType());
+                boat.addCoordinate(new Coordinate(x, y, false));
+                boat.getType().isPlaced = true;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    //----------------------------------------------------------------
+
+    /**
+     * Display the grid by printing its contents.
+     */
+    public void show() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("\n");
+
+        for (int i = 0; i < 11; i++) {
+            for (int j = 0; j < 11; j++) {
+                // Display the letter on the first column
+                if (j == 1) {
+                    if (i >= 1) {
+                        sb.append(POSITIONS[i - 1]).append(" ");
+                    }
+                }
+                // Display the position (number) on the first row
+                else if (i == 0) {
+                    if (j == 0) {
+                        sb.append("\\ ");
+                    } else {
+                        sb.append(" ").append(j).append(" ");
+                    }
+                }
+                // Display the grid contents
+                else if (j >= 1) {
+                    if (grid[i - 1][j - 1] == null) {
+                        sb.append(" • ");
+                    } else {
+                        sb.append(" ").append(grid[i - 1][j - 1]).append(" ");
+                    }
+                }
+            }
+            sb.append("\n");
+        }
+
+        System.out.print(sb);
+    }
+    //----------------------------------------------------------------
+
+    /**
+     *
+     * @param length
+     * @return return a boat from the list by his length
+     */
+    public Boat getBoatWithLength(int length){
+        for (Boat boat : myBoats) {
+            if (boat.getType().getLength() == length) {
+                return boat;
+            }
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @return state of the grid
+     */
+
+    public boolean isConfigured(){
+        int counter = 0;
+        for (Boat boat : myBoats) {
+            if (boat.getType().isPlaced) {
+                counter++;
+            }
+        }
+        return counter == myBoats.size();
+    }
 }

@@ -1,18 +1,18 @@
-package socket;
+package socket.server;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import org.jetbrains.annotations.NotNull;
 import services.FormatService;
-import services.expections.InvitationAlreadySentException;
-import services.expections.NoInvitationReceivedException;
-import services.expections.NotConnectedException;
-import services.expections.UserAlreadyInvitedYouException;
-import socket.commands.Command.Role;
+import services.exceptions.InvitationAlreadySentException;
+import services.exceptions.NoInvitationReceivedException;
+import services.exceptions.NotConnectedException;
+import services.exceptions.UserAlreadyInvitedYouException;
+import socket.Command.Role;
+import socket.client.SocketClient;
 
 public class Player extends SocketClient {
 	private String username;
@@ -20,26 +20,38 @@ public class Player extends SocketClient {
 	private String color;
 	private int victories;
 	private int defeats;
-	private LocalDateTime lastConnectionAt;
 	private ArrayList<Player> usersYouInvited;
 	private ArrayList<Player> usersWhoInvitedYou;
 	private Role role;
+	private boolean isBot;
 
-	public Player(Socket s, PrintWriter pw, BufferedReader br) {
-		super(s, pw, br);
-		lastConnectionAt = LocalDateTime.now();
+	public Player(Socket sSender, PrintWriter pwSender, BufferedReader brSender, String username, String password, boolean isBot) {
+		super(sSender, pwSender, brSender);
+
+		this.username = username;
+		this.password = password;
+		this.isBot = isBot;
+		
 		usersYouInvited = new ArrayList<Player>();
 		usersWhoInvitedYou = new ArrayList<Player>();
 		defeats = 0;
 		victories = 0;
 		color = FormatService.getRandomColor();
 		role = Role.ADMIN;
-	}	
-	
-	public void refreshConnection(Socket s, PrintWriter pw, BufferedReader br) {
-		this.setSocket(s);
-		this.setPrintWriter(pw);
-		this.setBufferedReader(br);
+	}
+
+	public Player(@NotNull SocketClient sc, String username, String password) {
+		super(sc.getSocket(), sc.getPrintWriter(), sc.getBufferedReader());
+
+		this.username = username;
+		this.password = password;
+
+		usersYouInvited = new ArrayList<Player>();
+		usersWhoInvitedYou = new ArrayList<Player>();
+		defeats = 0;
+		victories = 0;
+		color = FormatService.getRandomColor();
+		role = Role.ADMIN;
 	}
 	
 	public void setColor(String value) {
@@ -50,20 +62,22 @@ public class Player extends SocketClient {
 			}
 		}
 	}
-	
+
+	public boolean isBot() {
+		return false;
+	}
+
 	public Role getRole() 								{ return role; }
 	public int getDefeats() 							{ return defeats; }
 	public String getColor()							{ return color; }
 	public int getVictories() 							{ return victories; }
 	private String getPassword()						{ return password; }
-	public LocalDateTime getLastConnection()			{ return lastConnectionAt; }
 	public ArrayList<Player> getUsersYouInvited()		{ return usersYouInvited; }
 	public ArrayList<Player> getUsersWhoInvitedYou()	{ return usersWhoInvitedYou; }
 	
 	public void addDefeat()  								{ defeats++; }
 	public void addVictory() 								{ victories++; }
 	public void setRole(Role value)							{ role = value; }
-	public void refreshLastConnection() 					{ lastConnectionAt = LocalDateTime.now(); }
 	public void addInUsersYouInvited(Player client) 		{ usersYouInvited.add(client); }
 	public void addInUsersWhoInvitedYou(Player client) 		{ usersWhoInvitedYou.add(client); }
 	public void removeFromUsersYouInvited(Player client) 	{ usersYouInvited.remove(client); }
@@ -125,68 +139,10 @@ public class Player extends SocketClient {
 
 	public void signOut() throws NotConnectedException {
 		if (!super.isLogged()) throw new NotConnectedException();
-		super.toggleLog();
 		super.clear();
 	}
 
 	public String getUsername() { return username; }
 	public void setUsername(String value) { username = value; }
 	public void setPassword(String value) { password = value; }
-
-	public Thread buildSender() {
-		return new Thread(new Runnable() {
-			String message;
-
-			@Override
-			public void run() {
-				while (true) {
-
-					try {
-						message = getScanner().nextLine();
-						getPrintWriter().println(message);
-						getPrintWriter().flush();
-					} catch (Exception e) {
-						getPrintWriter().println("/q!");
-						getPrintWriter().flush();
-						break;
-					}
-				}
-
-				boolean isClosed = close();
-				System.out.println(isClosed ? "\n\nGoodbye!\n" : "Unable to close the socket.");
-			}
-		});
-	}
-
-	public Thread buildReceiver() {
-		return new Thread(new Runnable() {
-			String message;
-
-			@Override
-			public void run() {
-				try {
-					message = getBufferedReader().readLine();
-					
-					while (message != null) {
-						String[] lines = message.split(";");
-						System.out.print("\n" + String.join("\n", lines) + " ");
-						message = getBufferedReader().readLine();
-					}
-
-					System.out.println("Server out of service");
-					close();
-				} catch (IOException e) {
-					Thread.currentThread().interrupt();
-					System.out.println("\n\nServer out of service ! Please contact the administrator.\n");
-					System.exit(1);
-				}
-			}
-		});
-	}
-
-	public void start(int port) {
-		System.out.print("\nYour address is " + super.getAddress() + ":" + Integer.toString(this.getPort()));
-		buildSender().start();
-		buildReceiver().start();
-	}
 }
