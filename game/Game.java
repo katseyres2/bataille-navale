@@ -4,20 +4,29 @@ import java.util.*;
 
 import game.boat.Boat;
 import game.grid.Grid;
+import services.DiscoveryService;
 import services.FormatService;
 import services.exceptions.OnlyOneActiveGameByPlayer;
 import socket.server.Player;
 import socket.server.Server;
 
 public class Game {
-	private ArrayList<Player> bots = new ArrayList<Player>();
-	private ArrayList<Action> actions = new ArrayList<Action>();
-	private ArrayList<Grid> grids = new ArrayList<Grid>();
+	private final ArrayList<Player> bots = new ArrayList<>();
+	private final ArrayList<Action> actions = new ArrayList<>();
+	private final ArrayList<Grid> grids = new ArrayList<>();
 	private Thread thread = null;
 	private Player firstPlayer;
 	private Player playerTurn;
 	private int turnCount = 0;
 	private Player winner;
+
+	public ArrayList<Grid> getGrids() {
+		return grids;
+	}
+
+	public int getTurnCount() {
+		return turnCount;
+	}
 
 	public void addBot(Player bot) {
 		if (bot == null || bots.contains(bot)) return;
@@ -47,12 +56,12 @@ public class Game {
 		if (playerTurn != player) return "That's not your turn.";
 
 		// Fetch the target grid.
-		Grid targetGrid = findGridByPlayer(target);
+		Grid targetGrid = DiscoveryService.findGrid(target, grids);
 		// get the message from the fire position : you hit, you miss, ...
-		String message = targetGrid.fire(column, row);
-		if (message == null){
-			actionSuccessful = false;
-		}
+//		String message = targetGrid.fire(column, row);
+//		if (message == null){
+//			actionSuccessful = false;
+//		}
 
 		if (!actionSuccessful) return "Action failed.";
 
@@ -60,7 +69,8 @@ public class Game {
 
 		Action action = new Action(player, targetGrid, column, row, turnCount);
 		actions.add(action);
-		return message;
+//		return message;
+		return "DEBUG";
 	}
 
 	/**
@@ -75,19 +85,20 @@ public class Game {
 	public String placePlayerBoat(Player player, int length , int column, int row, String vector) {
 		boolean placedBoat = false;
 		// Fetch the player grid.
-		Grid playerGrid = findGridByPlayer(player);
-		Boat playerBoat = playerGrid.getBoatWithLength(length);
+		Grid playerGrid = DiscoveryService.findGrid(player, grids);
+		Boat.Model playerBoat = DiscoveryService.findModelByLength(length);
+
 		if(playerBoat != null){
 			// get the boat with length
-			placedBoat = playerGrid.placeBoat(playerBoat, column, row, vector);
+//			placedBoat = playerGrid.placeBoat(playerBoat, column, row, vector);
 		}
-		if (!placedBoat)
-			return "Action failed.";
-		else return "Your boat" + playerBoat.getModel().getName()  + "has been placed";
+
+		if (!placedBoat) return "Action failed.";
+		else return "Your boat" + playerBoat.getName()  + "has been placed";
 	}
 
 	public void nextPlayer() {
-		int currentIndex = grids.indexOf(findGridByPlayer(playerTurn));
+		int currentIndex = grids.indexOf(DiscoveryService.findGrid(playerTurn, grids));
 		System.out.println("Current index1 : " + currentIndex);
 		if (currentIndex == grids.size()) currentIndex = 0;
 		System.out.println("Current index2 : " + currentIndex);
@@ -125,19 +136,7 @@ public class Game {
 		System.out.println("ADDGRID END");
 	}
 
-	/**
-	 * return the grid of a player with the player as parameter
-	 * @param player
-	 * @return
-	 */
-	public Grid findGridByPlayer(Player player) {
-		for (Grid g : grids) {
-			if (g.getPlayer() == player) {
-				return g;
-			}
-		}
-		return null;
-	}
+
 
 	/**
 	 * Return the player with his grid as parameter
@@ -154,7 +153,7 @@ public class Game {
 	}
 
 	private void removeGrid(Player player) {
-		Grid grid = findGridByPlayer(player);
+		Grid grid = DiscoveryService.findGrid(player, grids);
 		if (grid == null) return;
 		grids.remove(grid);
 	}
@@ -267,7 +266,7 @@ public class Game {
 					if (lastAction == null || lastAction.getPlayer() != playerTurn) continue;
 
 					// Fetch the grid of the player who must play.
-					Grid currentGrid = findGridByPlayer(playerTurn);
+					Grid currentGrid = DiscoveryService.findGrid(playerTurn,grids);
 					int currentIndex = grids.indexOf(currentGrid);
 					int nextIndex = currentIndex += 1;
 

@@ -1,11 +1,11 @@
 package game.boat;
 
 import game.grid.Cell;
+import game.grid.Vector;
 import org.jetbrains.annotations.NotNull;
 import services.DirectionService;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Boat {
 
@@ -16,10 +16,10 @@ public class Boat {
         DESTROYER("D", "destroyer", 3),
         WARSHIP("W", "warship", 2);
 
-        private String label;
+        private final String label;
 
-        private int length;
-        private String name;
+        private final int length;
+        private final String name;
 
         Model(String label, String name, int length) {
             this.label = label;
@@ -30,52 +30,84 @@ public class Boat {
         public int getLength() {
             return length;
         }
-        public String getLabel() { return label; }
+
+        public String getLabel() {
+            return label;
+        }
+
         public String getName() {
             return name;
         }
     }
 
     private Model model;
-    public List<Cell> coordinates;
+    private ArrayList<Cell> coordinates;
 
-    public boolean isPlaced;
+    private boolean isPlaced;
 
-    public Boat(@NotNull Model model, @NotNull ArrayList<Cell> coordinates) {
+    public int getLength() {
+        return model.getLength();
+    }
+
+    public String getLabel() {
+        return model.label;
+    }
+
+    public String getName() {
+        return model.name;
+    }
+
+    public boolean isSunk() {
+        for (Cell c : coordinates) {
+            if (!c.isDiscovered()) return false;
+        }
+
+        return true;
+    }
+
+    public Boat(Model model, Cell reference, Vector vector) throws InstantiationException {
+        ArrayList<Cell> cells = new ArrayList<>();
+
+        for (int i = 0; i < model.length; i++) {
+            cells.add(new Cell(
+                reference.getRow() + i * vector.getRow(),
+                reference.getColumn() + i * vector.getColumn()
+            ));
+        }
+
+        try {
+             new Boat(model, cells);
+        } catch (InstantiationException e) {
+            throw new InstantiationException();
+        }
+    }
+
+    public Boat(@NotNull Model model, @NotNull ArrayList<Cell> coordinates) throws InstantiationException {
         this.model = model;
         this.isPlaced = model.length != coordinates.size();
 
-        if (!DirectionService.areValidCoordinates(coordinates)) {
-            System.out.println("length is not equal to coordinate count");
-            return;
+        if (!isPlaced || !DirectionService.areValidCoordinates(coordinates)) {
+            throw new InstantiationException();
         }
 
         this.coordinates = coordinates;
     }
 
-    public Model getModel() {
-        return model;
-    }
-
-    public void setModel(Model model) {
-        this.model = model;
-    }
-
-    public List<Cell> getCoordinates() {
+    public ArrayList<Cell> getCoordinates() {
         return coordinates;
     }
 
-    public void setCoordinates(List<Cell> coordinates) {
+    public void setCoordinates(ArrayList<Cell> coordinates) {
         this.coordinates = coordinates;
     }
 
     public boolean isPlaced() {
-        return getCoordinates() != null && getCoordinates().size() == getModel().getLength();
+        return getCoordinates() != null && getCoordinates().size() == model.getLength();
     }
 
-    public void addCell(Cell cell) {
-        getCoordinates().add(cell);
-    }
+//    public void addCell(Cell cell) {
+//        getCoordinates().add(cell);
+//    }
 
 //    public boolean isSink() {
 //        return coordinates.stream().allMatch(Cell::isSink);
