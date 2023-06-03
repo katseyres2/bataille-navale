@@ -6,13 +6,11 @@ import game.grid.Cell;
 import game.grid.Grid;
 import org.jetbrains.annotations.NotNull;
 import services.DiscoveryService;
+import services.ServerResponse;
 import socket.server.Player;
 import socket.server.Server;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Represents a bot player in a game.
@@ -66,7 +64,12 @@ public class Bot extends Player {
         }
 
         // Send the action to the active game
+
+
         Server.getActiveGame(player).sendAction(this, player, action.getColumn(), action.getRow());
+        System.out.println("bien joué sale pauvre");
+
+
     }
 
 
@@ -80,7 +83,7 @@ public class Bot extends Player {
         // Select a random cell from the grid
         Cell cell = grid.getRandomCell(grid.getEmptyCells());
         // Create a new action with the player associated with the grid, the grid itself, the column and row indices of the cell, and the current turn count of the game
-        return new Action(grid.getPlayer(), grid, cell.getColumn(), cell.getRow(), Server.getActiveGame(grid.getPlayer()).getTurnCount());
+        return new Action(grid.getPlayer(), grid, cell.getColumn(), cell.getRow(), Objects.requireNonNull(Server.getActiveGame(grid.getPlayer())).getTurnCount());
     }
 
 
