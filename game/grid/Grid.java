@@ -32,7 +32,7 @@ public class Grid {
 
         for (ArrayList<Cell> p : plate) {
             for (Cell c : p) {
-                if (DiscoveryService.findCellInBoats(c.getRow(), c.getColumn(), boats) != null) {
+                if (DiscoveryService.findCellInBoats(c.getRow(), c.getColumn(), boats) == null) {
                     emptyCells.add(c);
                 }
             }
@@ -139,7 +139,7 @@ public class Grid {
      * @return Une cellule aléatoire qui respecte les conditions.
      */
     public Cell getRandomCell(ArrayList<Cell> haystack) {
-        return haystack.get((new Random().nextInt(haystack.size())));
+        return haystack.get((new Random().nextInt(haystack.size() - 1)));
     }
 
 //    public Cell getCell(int x, int y) {
@@ -209,25 +209,35 @@ public class Grid {
      * Places a boat randomly on the grid.
      *
      */
-    public void placeRandomBoat(Boat.Model model) {
+    private void placeRandomBoat(Boat.Model model) {
         while (true) {
             Cell cell = getRandomCell(getEmptyCells()); // Get a random cell on the grid
 
             // Check if all points can be filled
             for (Vector vector : DirectionService.get4Vectors()) {
                 try {
+//                    System.out.println("C[" + cell.getRow() + "," + cell.getColumn() + "] V[" + vector.getRow() + "," + vector.getColumn() + "]");
                     Boat boat = new Boat(model, cell, vector);
 
-                    if (DirectionService.isBoatAlongBorder(boat, this)) System.out.println("Along border");
-                    else if (DirectionService.isBoatAlongOther(boat, this)) System.out.println("Along other");
-                    else {
+                    if (DirectionService.isBoatAlongBorder(boat, this)) {
+                        System.out.println("Along border");
+                    } else if (DirectionService.isBoatAlongOther(boat, this)) {
+                        System.out.println("Along other");
+                    } else {
+                        System.out.println("New boat");
                         boats.add(boat);
                         return;
                     }
                 } catch (InstantiationException e) {
-                    System.out.println("Error on boat instantiation " + e.getMessage());
+                    //System.out.println("Error on boat instantiation " + e.getMessage());
                 }
             }
+        }
+    }
+
+    public void populateRandomly() {
+        for (Boat.Model model : Boat.Model.values()) {
+            placeRandomBoat(model);
         }
     }
 

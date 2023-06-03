@@ -137,7 +137,6 @@ public class Game {
 	}
 
 
-
 	/**
 	 * Return the player with his grid as parameter
 	 * @param grid
@@ -230,24 +229,27 @@ public class Game {
 		thread = new Thread() {
 			@Override
 			public void run() {
-				List<Grid> gridsNotConfigured;
+//				List<Grid> gridsNotConfigured;
+//
+//				do {
+//					gridsNotConfigured = getGridsNotConfigured();
+//					System.out.println("gridsNotConfigured = " + gridsNotConfigured);
+//
+//					for (Grid notConfiguredYet : gridsNotConfigured) {
+//						sendToClient(notConfiguredYet.getPlayer(), "Place your Boats" + displayPlayerGrids(notConfiguredYet.getPlayer()));
+//					}
+//
+//					try {
+//						Thread.sleep(3000); // decrease loop time
+//					} catch (InterruptedException e) {
+//						System.out.println(e.getMessage());
+//						break;
+//					}
+//				} while(!gridsNotConfigured.isEmpty());
 
-				do {
-					gridsNotConfigured = getGridsNotConfigured();
-					System.out.println("gridsNotConfigured = " + gridsNotConfigured);
-
-					for (Grid notConfiguredYet : gridsNotConfigured) {
-						sendToClient(notConfiguredYet.getPlayer(), "Place your Boats" + displayPlayerGrids(notConfiguredYet.getPlayer()));
-					}
-
-					try {
-						Thread.sleep(3000); // decrease loop time
-					} catch (InterruptedException e) {
-						System.out.println(e.getMessage());
-						break;
-					}
-				} while(!gridsNotConfigured.isEmpty());
-
+				for (Grid grid : grids) {
+					grid.populateRandomly();
+				}
 
 				sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));
 
@@ -280,7 +282,7 @@ public class Game {
 					System.out.println("Sent grid to player " + playerTurn.getUsername());
 					if(currentGrid.allBoatAreSink()){
 						winner = playerTurn;
-						sendToClient(playerTurn, "You WON !!!!");
+						sendToClient(playerTurn, "You WIN !!!!");
 						playerTurn.addVictory();
 						nextPlayer();
 						playerTurn.addDefeat();

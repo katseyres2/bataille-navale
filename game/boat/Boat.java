@@ -75,18 +75,25 @@ public class Boat {
             ));
         }
 
-        try {
-             new Boat(model, cells);
-        } catch (InstantiationException e) {
+        this.model = model;
+        this.isPlaced = model.length == cells.size();
+
+        if (!isPlaced || !DirectionService.areValidCoordinates(cells)) {
+//            if (!isPlaced) System.out.println("isPlaced : " + model.length + ", " + cells.size());
+//            else System.out.println("invalidCoordinates");
             throw new InstantiationException();
         }
+
+        this.coordinates = cells;
     }
 
     public Boat(@NotNull Model model, @NotNull ArrayList<Cell> coordinates) throws InstantiationException {
         this.model = model;
-        this.isPlaced = model.length != coordinates.size();
+        this.isPlaced = model.length == coordinates.size();
 
         if (!isPlaced || !DirectionService.areValidCoordinates(coordinates)) {
+//            if (!isPlaced) System.out.println("isPlaced : " + model.length + ", " + coordinates.size());
+//            else System.out.println("invalidCoordinates");
             throw new InstantiationException();
         }
 

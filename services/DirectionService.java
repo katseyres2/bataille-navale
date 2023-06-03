@@ -153,6 +153,8 @@ public class DirectionService {
             filledCells.addAll(b.getCoordinates());
         }
 
+        System.out.println(boat.getCoordinates() + " " + filledCells);
+
         // iterate on each boat cell
         for (Cell cellReference : boat.getCoordinates()) {
             // for each cell, check all neighbors with the vectors
@@ -161,11 +163,11 @@ public class DirectionService {
                 int nextRow = cellReference.getRow() + v.getRow();
 
                 if (DiscoveryService.findCell(nextRow, nextColumn, filledCells) != null) {
-                    return false;
+                    return true;
                 }
             }
         }
 
-        return true;
+        return false;
     }
 }
