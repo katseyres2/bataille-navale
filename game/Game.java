@@ -1,11 +1,9 @@
 package game;
 import java.lang.Thread.State;
-import java.lang.reflect.Array;
 import java.util.*;
 
 import game.boat.Boat;
 import game.grid.Grid;
-import game.grid.Grid_old;
 import services.FormatService;
 import services.exceptions.OnlyOneActiveGameByPlayer;
 import socket.server.Player;
@@ -85,7 +83,7 @@ public class Game {
 		}
 		if (!placedBoat)
 			return "Action failed.";
-		else return "Your boat" + playerBoat.getType().name  + "has been placed";
+		else return "Your boat" + playerBoat.getModel().getName()  + "has been placed";
 	}
 
 	public void nextPlayer() {
@@ -199,7 +197,7 @@ public class Game {
 		for (Grid grid : grids) {
 			if (grid.getPlayer() == player) continue;
 			output += "-------------------------------- " + grid.getPlayer().getUsername().toUpperCase();
-			output += grid;
+			output += grid.show();
 			output += "--------------------------------;";
 		}
 
@@ -212,11 +210,14 @@ public class Game {
 	 */
 	public List<Grid> getGridsNotConfigured(){
 		List<Grid> notReady  = new ArrayList<>();
-		for ( Grid notConfiguredGrid : grids   ) {
-				if(!notConfiguredGrid.isConfigured()){
-					notReady.add(notConfiguredGrid);
-				}
+		System.out.println("grids = " + grids.size());
+
+		for ( Grid grid : grids) {
+			if(!grid.isConfigured()){
+				notReady.add(grid);
+			}
 		}
+
 		return notReady;
 	}
 
@@ -230,19 +231,23 @@ public class Game {
 		thread = new Thread() {
 			@Override
 			public void run() {
-				List<Grid> gridsNotConfigured = getGridsNotConfigured();
-				do{
+				List<Grid> gridsNotConfigured;
+
+				do {
+					gridsNotConfigured = getGridsNotConfigured();
+					System.out.println("gridsNotConfigured = " + gridsNotConfigured);
+
 					for (Grid notConfiguredYet : gridsNotConfigured) {
 						sendToClient(notConfiguredYet.getPlayer(), "Place your Boats" + displayPlayerGrids(notConfiguredYet.getPlayer()));
-						gridsNotConfigured = getGridsNotConfigured();
 					}
+
 					try {
-						Thread.sleep(30000); // decrease loop time
+						Thread.sleep(3000); // decrease loop time
 					} catch (InterruptedException e) {
 						System.out.println(e.getMessage());
 						break;
 					}
-				}while(!gridsNotConfigured.isEmpty());
+				} while(!gridsNotConfigured.isEmpty());
 
 
 				sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));

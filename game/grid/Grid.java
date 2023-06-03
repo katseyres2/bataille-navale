@@ -1,6 +1,7 @@
 package game.grid;
 
 
+import services.DirectionService;
 import socket.server.Player;
 import game.boat.Boat;
 
@@ -17,12 +18,9 @@ public class Grid {
     private int rows;
     private int columns;
     private Cell[][] grid;
-    final private static ArrayList<Boat> myBoats = new ArrayList<Boat>(5);
-    final private static int[][] VECTORS = getFullVectors();
+    final private static ArrayList<Boat> boats = new ArrayList<Boat>(5);
     static public final String[] POSITIONS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
     private final Player player;
-    private Random random;
-
 
     /**
      * Constructs a Grid_Alex object with the specified player, cells, rows, and columns.
@@ -34,10 +32,8 @@ public class Grid {
     public Grid(Player player, int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
-        this.grid = grid;
         this.player = player;
-//        this.isReady = false;
-        this.grid = new Cell[][]{};
+        this.grid = new Cell[rows][columns];
 
     }
 
@@ -112,74 +108,6 @@ public class Grid {
     //----------------------------------------------------------------
 
     /**
-     * return an array with all vectors
-     * @return
-     */
-    private static int[][] getFullVectors() {
-        return new int[][] {
-                { -1, -1 }, { -1, 0 }, { -1, 1 },
-                { 0, -1 }, { 0, 1 },
-                { 1, -1 }, { 1, 0 }, { 1, 1 }
-        };
-    }
-
-    /**
-     * return array with vector north / south / east / west
-     * @return
-     */
-    private static int[][] getVectors() {
-        return new int[][] {
-                { -1, 0 },
-                { 0, -1 }, { 0, 1 },
-                { 1, 0 },
-        };
-    }
-
-    public int[] getRandomVector(int[][] vectors) {
-        int i = random.nextInt(vectors.length);
-        return vectors[i];
-    }
-
-    /**
-     * get the vector of the direction wanted
-     * @param direction_vectors
-     * @return
-     */
-    public int[] getDirectionVector(String direction_vectors) {
-        int[] output;
-
-        switch (direction_vectors.toLowerCase()) {
-            case "n":
-            case "north":
-            case "nord":
-                output = new int[] { -1, 0 };
-                break;
-            case "s":
-            case "south":
-            case "sud":
-                output = new int[] { 1, 0 };
-                break;
-            case "w":
-            case "west":
-            case "ouest":
-            case "o":
-                output = new int[] { 0, -1 };
-                break;
-            case "e":
-            case "east":
-            case "est":
-                output = new int[] { 0, 1 };
-                break;
-            default:
-                output = null;
-                break;
-        }
-        return output;
-    }
-
-    //----------------------------------------------------------------
-
-    /**
      * Sets up a void grid by initializing cells with null values.
      */
     public void setupVoidGrid() {
@@ -204,6 +132,7 @@ public class Grid {
         Cell randomCell = null; // Cellule aléatoire à retourner
         int maxRows = getColumns() - 1; // Indice maximum de ligne
         int maxColumns = getRows() - 1; // Indice maximum de colonne
+        var random = new Random();
 
         while (randomCell == null) {
             int x = random.nextInt(getColumns()); // Génère un indice de ligne aléatoire
@@ -215,7 +144,7 @@ public class Grid {
                 boolean hasNullNeighbor = false; // Indique si la cellule actuelle a une cellule voisine avec un bateau null
 
                 // Vérifie chaque cellule voisine
-                for (int[] vector : VECTORS) {
+                for (int[] vector : DirectionService.getFullVectors()) {
                     int neighborX = x + vector[0]; // Calcule la coordonnée X de la cellule voisine
                     int neighborY = y + vector[1]; // Calcule la coordonnée Y de la cellule voisine
 
@@ -250,7 +179,7 @@ public class Grid {
                 boolean hasNullNeighbor = false; // Indique si la cellule actuelle a une cellule voisine avec un bateau null
 
                 // Vérifie chaque cellule voisine
-                for (int[] vector : VECTORS) {
+                for (int[] vector : DirectionService.getFullVectors()) {
                     int neighborX = x + vector[0]; // Calcule la coordonnée X de la cellule voisine
                     int neighborY = y + vector[1]; // Calcule la coordonnée Y de la cellule voisine
 
@@ -286,7 +215,7 @@ public class Grid {
         }
 
         // Check each neighboring cell
-        for (int[] vector : VECTORS) {
+        for (int[] vector : DirectionService.getFullVectors()) {
             int neighborX = x + vector[0]; // Calculate the x-coordinate of the neighboring cell
             int neighborY = y + vector[1]; // Calculate the y-coordinate of the neighboring cell
 
@@ -309,7 +238,7 @@ public class Grid {
      */
     public void placeRandomBoat(int length, Boat boat) {
         Cell cell;
-        int[][] vectors = getVectors(); // Get the available vectors
+        int[][] vectors = DirectionService.getVectors(); // Get the available vectors
 
         while (true) {
             cell = getRandomCell(); // Get a random cell on the grid
@@ -334,7 +263,7 @@ public class Grid {
                         int y = cell.getRowIndex() + i * vector[1];
                         Cell currentCell = grid[y][x];
                         currentCell.setBoat(boat);
-                        boat.addCoordinate(new Coordinate(x, y, false));
+                        boat.addCell(new Coordinate(x, y, false));
                     }
                     return;
                 }
@@ -357,13 +286,13 @@ public class Grid {
      */
     public boolean placeBoat(Boat boat, Integer x, Integer y, String direction) {
         Cell cell;
-        int[] vector = getDirectionVector(direction); // Get the available vectors
+        int[] vector = DirectionService.getDirectionVector(direction); // Get the available vectors
 
         cell = getCell(x,y);
 
         // Check if all points can be filled
         boolean canPlace = true;
-        for (int i = 0; i < boat.getType().length; i++) {
+        for (int i = 0; i < boat.getModel().getLength(); i++) {
             x = cell.getColumnIndex() + i * vector[0];
             y = cell.getRowIndex() + i * vector[1];
             if (!canSetupCell(x, y)) {
@@ -373,11 +302,11 @@ public class Grid {
 
         if (canPlace) {
             // Place the boat
-            for (int i = 0; i < boat.getType().length; i++) {
+            for (int i = 0; i < boat.getModel().getLength(); i++) {
                 x = cell.getColumnIndex() + i * vector[0];
                 y = cell.getRowIndex() + i * vector[1];
                 cell.setBoat(boat);
-                boat.addCoordinate(new Coordinate(x, y, false));
+                boat.addCell(new Coordinate(x, y, false));
                 boat.isPlaced = true;
             }
             return true;
@@ -386,43 +315,75 @@ public class Grid {
     }
 
     //----------------------------------------------------------------
+    @Override
+    public String toString() {
+        String output = "\n";
+
+        for (int i = 0; i < 11; i++) {
+            for (int j = 0; j < 11; j++) {
+                // Affiche la lettre sur la première colonne
+                if (j == 1) {
+                    if (i >= 1) {
+                        output += POSITIONS[i - 1] + " ";
+                    }
+                }
+
+                // Affiche la position ( chiffre ) sur la première ligne
+                if (i == 0) {
+                    if (j == 0) {
+                        output += "\\ ";
+                    }
+                    if (j >= 1) {
+                        output += " " + j + " ";
+                    }
+                } else if (j >= 1 && (grid[i - 1][j - 1] == null)) {
+                    output += " . ";
+                } else if (j >= 1 && (grid[i - 1][j - 1] != null)) {
+                    output += " " + grid[i - 1][j - 1] + " ";
+                }
+            }
+
+            if (i - 1 > 0 && i - 1 < Boat.Model.values().length) {
+                Boat.Model tb = Boat.Model.values()[i - 1];
+                output += "          [" + tb.getName() + "] boat : " + tb.getName() + ", length : " + tb.getLength();
+            }
+
+            output += "\n";
+        }
+
+        return output;
+    }
 
     /**
      * Display the grid by printing its contents.
      */
-    public void show() {
-        StringBuilder sb = new StringBuilder();
+    public String show() {
+        System.out.println(grid.length);
+        String output = "\n";
 
-        sb.append("\n");
-
-        for (int i = 0; i < 11; i++) {
-            for (int j = 0; j < 11; j++) {
-                // Display the letter on the first column
+        // iterate on each row
+        for (int i = 0; i < rows; i++) {
+            // iterate on each column
+            for (int j = 0; j < columns; j++) {
                 if (j == 1) {
-                    if (i >= 1) {
-                        sb.append(POSITIONS[i - 1]).append(" ");
-                    }
+                    // Display the letter on the first column
+                    if (i >= 1) output += POSITIONS[i - 1] + " ";
+                } else if (i == 0) {
+                    // Display the position (number) on the first row
+                    if (j == 0) output += "\\ ";
+                    else output += " " + j + " ";
                 }
-                // Display the position (number) on the first row
-                else if (i == 0) {
-                    if (j == 0) {
-                        sb.append("\\ ");
-                    } else {
-                        sb.append(" ").append(j).append(" ");
-                    }
-                }
+
                 // Display the grid contents
-                else if (j >= 1) {
-                    if (grid[i - 1][j - 1] == null) {
-                        sb.append(" • ");
-                    } else {
-                        sb.append(" ").append(grid[i - 1][j - 1]).append(" ");
-                    }
+                else if (j >= 1 && i >= 1) {
+                    if (grid[i - 1][j - 1] == null) output += " - ";
+                    else output += " " + grid[i - 1][j - 1] + " ";
                 }
             }
-            sb.append("\n");
+            output += "\n";
         }
-        System.out.print(sb);
+
+        return output;
     }
     //----------------------------------------------------------------
 
@@ -432,8 +393,8 @@ public class Grid {
      * @return return a boat from the list by his length
      */
     public Boat getBoatWithLength(int length){
-        for (Boat boat : myBoats) {
-            if (boat.getType().getLength() == length && !boat.isPlaced) {
+        for (Boat boat : boats) {
+            if (boat.getModel().getLength() == length && !boat.isPlaced) {
                 return boat;
             }
         }
@@ -446,12 +407,14 @@ public class Grid {
      */
     public boolean isConfigured(){
         int counter = 0;
-        for (Boat boat : myBoats) {
+        System.out.println("myboats = " + boats.size());
+        for (Boat boat : boats) {
+            System.out.println(boat.getModel() + " " + boat.isPlaced + " " + boat.coordinates);
             if (boat.isPlaced) {
                 counter++;
             }
         }
-        return counter == myBoats.size();
+        return counter == boats.size();
     }
 
     /**
@@ -482,12 +445,12 @@ public class Grid {
             if(valuePosition.hasBoat()){
                 valuePosition.setDiscovered();
                 valuePosition.getBoat().getCoordinates().stream()
-                        .filter(coord -> coord.getX() == x && coord.getY() == y)
+                        .filter(coord -> coord.getRowIndex() == x && coord.getColumnIndex() == y)
                         .forEach(coord -> coord.setSink(true));
                 if(valuePosition.getBoat().isSink()){
-                    return "You just sink the boat " + valuePosition.getBoat().getType().getName();
+                    return "You just sink the boat " + valuePosition.getBoat().getModel().getName();
                 }else{
-                    return "You hit the boat" + valuePosition.getBoat().getType().getName();
+                    return "You hit the boat" + valuePosition.getBoat().getModel().getName();
                 }
 
             }else{
@@ -503,6 +466,6 @@ public class Grid {
      * @return
      */
     public boolean allBoatAreSink(){
-        return myBoats.stream().allMatch(Boat::isSink);
+        return boats.stream().allMatch(Boat::isSink);
     }
 }
