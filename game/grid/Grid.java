@@ -1,6 +1,7 @@
 package game.grid;
 
 
+import org.jetbrains.annotations.NotNull;
 import services.DirectionService;
 import services.DiscoveryService;
 import socket.server.Player;
@@ -365,7 +366,7 @@ public class Grid {
 
     /**
      * return a cell from a position in the grid
-     * @return
+     * @return Cell
      */
     public Cell getCellFromPosition(int row, int column){
         return plate.get(row).get(column);
@@ -379,43 +380,34 @@ public class Grid {
         return DiscoveryService.findCellInBoats(row, column, boats) != null;
     }
 
-//    /***
-//     * fire on a position of the grid, update the grid where a fire is land and return a message for the user if
-//     * he touch a boat
-//     * he already hit the position
-//     * he sink a boat
-//     * @param x
-//     * @param y
-//     * @return
-//     */
-//    public String fire(int x, int y) {
-//        Cell valuePosition = getCellWithPosition(x,y);
-//        if(valuePosition != null){
-//            if(valuePosition.isDiscovered()){
-//                return "you already hit this position";
-//            }
-//            if(valuePosition.hasBoat()){
-//                valuePosition.setDiscovered();
-//                valuePosition.getBoat().getCoordinates().stream()
-//                        .filter(coord -> coord.getRowIndex() == x && coord.getColumnIndex() == y)
-//                        .forEach(coord -> coord.setSink(true));
-//                if(valuePosition.getBoat().isSink()){
-//                    return "You just sink the boat " + valuePosition.getBoat().getModel().getName();
-//                }else{
-//                    return "You hit the boat" + valuePosition.getBoat().getModel().getName();
-//                }
-//
-//            }else{
-//                valuePosition.setDiscovered();
-//                return "Sadly, it's only water...";
-//            }
-//        }
-//       return "You are out of the grid";
-//    }
+    /***
+     * fire on a position of the grid, update the grid where a fire is land and return a message for the user if
+     * he touches a boat
+     * he already hit the position
+     * he sinks a boat
+     * @return String
+     */
+    public String fire(@NotNull Cell target) {
+        if (target.isDiscovered()) return "you already hit this position";
+        target.discover();
+
+        if (!DirectionService.isInGrid(target, this)) return "You are out of the grid";;
+
+        Boat boat = DiscoveryService.findBoatWhichHasCell(target, boats);
+        if (boat == null) return "Sadly, it's only water...";
+
+        for (Cell c : boat.getCoordinates()) {
+            if (! c.isDiscovered()) {
+                return "You hit the boat" + boat.getName();
+            }
+        }
+
+        return "You just sink the boat " + boat.getName();
+    }
 
     /**
      * Return true if all the boat in the myboats List are Sink
-     * @return
+     * @return boolean
      */
     public boolean allBoatAreSink(){
         return boats.stream().allMatch(Boat::isSunk);

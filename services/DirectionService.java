@@ -169,7 +169,7 @@ public class DirectionService {
         return false;
     }
 
-    private static boolean isInGrid(@NotNull Cell cell, @NotNull Grid grid) {
+    public static boolean isInGrid(@NotNull Cell cell, @NotNull Grid grid) {
         if (cell.getRow() >= grid.getRows() || cell.getRow() < 0) {
             return false;
         }
