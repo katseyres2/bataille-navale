@@ -224,7 +224,7 @@ public class Grid {
                     } else if (DirectionService.isBoatAlongOther(boat, this)) {
                         System.out.println("Along other");
                     } else {
-                        System.out.println("New boat");
+                        System.out.println("New boat " + boat.getName() + " at" + boat.getCoordinates());
                         boats.add(boat);
                         return;
                     }
@@ -285,38 +285,34 @@ public class Grid {
 //    }
 
     //----------------------------------------------------------------
-    @Override
-    public String toString() {
+
+    public String toString(boolean showBoats) {
         String output = "\n";
 
         for (int i = 0; i < 11; i++) {
             for (int j = 0; j < 11; j++) {
                 // Affiche la lettre sur la première colonne
-                if (j == 1) {
-                    if (i >= 1) {
-                        output += POSITIONS[i - 1] + " ";
-                    }
-                }
+                if (j == 1 && i >= 1) output += POSITIONS[i - 1] + " ";
 
                 // Affiche la position ( chiffre ) sur la première ligne
                 if (i == 0) {
-                    if (j == 0) {
-                        output += "\\ ";
-                    }
+                    if (j == 0) output += "\\ ";
                     if (j >= 1) {
-                        output += " " + j + " ";
+                        output += j > 9 ? " " : "  ";
+                        output += j + " ";
                     }
-                } else if (j >= 1 && (plate.get(i-1).get(j-1) == null)) {
-                    output += " . ";
-                } else if (j >= 1 && (plate.get(i-1).get(j-1) != null)) {
-                    output += " " + plate.get(i-1).get(j-1) + " ";
+                } else if (j >= 1) {
+                    Boat boat = DiscoveryService.findBoatWhichHasCell(plate.get(i-1).get(j-1), boats);
+                    String label = boat != null ? boat.getLabel() : "-";
+
+                    output += plate.get(i-1).get(j-1).isDiscovered() || showBoats ? "  " + label + " " : "  . ";
                 }
             }
 
-            if (i - 1 > 0 && i - 1 < Boat.Model.values().length) {
-                Boat.Model tb = Boat.Model.values()[i - 1];
-                output += "          [" + tb.getName() + "] boat : " + tb.getName() + ", length : " + tb.getLength();
-            }
+//            if (i - 1 > 0 && i - 1 < Boat.Model.values().length) {
+//                Boat.Model tb = Boat.Model.values()[i - 1];
+//                output += "          [" + tb.getName() + "] boat : " + tb.getName() + ", length : " + tb.getLength();
+//            }
 
             output += "\n";
         }

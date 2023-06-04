@@ -40,10 +40,9 @@ public class Boat {
         }
     }
 
-    private Model model;
-    private ArrayList<Cell> coordinates;
+    private final Model model;
+    private final ArrayList<Cell> coordinates;
 
-    private boolean isPlaced;
 
     public int getLength() {
         return model.getLength();
@@ -65,7 +64,7 @@ public class Boat {
         return true;
     }
 
-    public Boat(Model model, Cell reference, Vector vector) throws InstantiationException {
+    public Boat(@NotNull Model model, Cell reference, Vector vector) throws InstantiationException {
         ArrayList<Cell> cells = new ArrayList<>();
 
         for (int i = 0; i < model.length; i++) {
@@ -76,49 +75,15 @@ public class Boat {
         }
 
         this.model = model;
-        this.isPlaced = model.length == cells.size();
 
-        if (!isPlaced || !DirectionService.areValidCoordinates(cells)) {
-//            if (!isPlaced) System.out.println("isPlaced : " + model.length + ", " + cells.size());
-//            else System.out.println("invalidCoordinates");
+        if (model.length != cells.size() || !DirectionService.areValidCoordinates(cells)) {
             throw new InstantiationException();
         }
 
         this.coordinates = cells;
     }
 
-    public Boat(@NotNull Model model, @NotNull ArrayList<Cell> coordinates) throws InstantiationException {
-        this.model = model;
-        this.isPlaced = model.length == coordinates.size();
-
-        if (!isPlaced || !DirectionService.areValidCoordinates(coordinates)) {
-//            if (!isPlaced) System.out.println("isPlaced : " + model.length + ", " + coordinates.size());
-//            else System.out.println("invalidCoordinates");
-            throw new InstantiationException();
-        }
-
-        this.coordinates = coordinates;
-    }
-
     public ArrayList<Cell> getCoordinates() {
         return coordinates;
     }
-
-    public void setCoordinates(ArrayList<Cell> coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    public boolean isPlaced() {
-        return getCoordinates() != null && getCoordinates().size() == model.getLength();
-    }
-
-//    public void addCell(Cell cell) {
-//        getCoordinates().add(cell);
-//    }
-
-//    public boolean isSink() {
-//        return coordinates.stream().allMatch(Cell::isSink);
-//    }
-
-
 }

@@ -190,16 +190,19 @@ public class Game {
 	}
 
 	public String displayPlayerGrids(Player player) {
-		String output = "";
+		Grid currentGrid = null;
+		Grid targetGrid = null;
 
 		for (Grid grid : grids) {
-			if (grid.getPlayer() == player) continue;
-			output += "-------------------------------- " + grid.getPlayer().getUsername().toUpperCase();
-			output += grid.show();
-			output += "--------------------------------;";
+			if (grid.getPlayer() == player) {
+				currentGrid = grid;
+			} else {
+				targetGrid = grid;
+			}
 		}
 
-		return output;
+		return targetGrid.toString(true);
+//		return FormatService.concatenateGrids(currentGrid, targetGrid) + ";";
 	}
 
 	/**
@@ -251,6 +254,7 @@ public class Game {
 					grid.populateRandomly();
 				}
 
+				System.out.println("SEND TO " + playerTurn.getUsername());
 				sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));
 
 				while (winner == null) {
@@ -280,7 +284,8 @@ public class Game {
 					sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));
 
 					System.out.println("Sent grid to player " + playerTurn.getUsername());
-					if(currentGrid.allBoatAreSink()){
+
+					if (currentGrid.allBoatAreSink()) {
 						winner = playerTurn;
 						sendToClient(playerTurn, "You WIN !!!!");
 						playerTurn.addVictory();

@@ -73,6 +73,17 @@ public class DiscoveryService {
         return null;
     }
 
+    public static @Nullable Boat findBoatWhichHasCell(Cell cell, @NotNull ArrayList<Boat> boats) {
+        for (Boat b : boats) {
+            for (Cell c : b.getCoordinates()) {
+                if (c.getRow() == cell.getRow() && c.getColumn() == cell.getColumn()) {
+                    return b;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      *
      * @param length
