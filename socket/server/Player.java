@@ -65,7 +65,7 @@ public class Player extends SocketClient {
 	public int getDefeats() 							{ return defeats; }
 	public String getColor()							{ return color; }
 	public int getVictories() 							{ return victories; }
-	private String getPassword()						{ return password; }
+	public String getPassword()						{ return password; }
 	public ArrayList<Player> getUsersYouInvited()		{ return usersYouInvited; }
 	public ArrayList<Player> getUsersWhoInvitedYou()	{ return usersWhoInvitedYou; }
 	

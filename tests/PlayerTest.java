@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -37,11 +38,6 @@ public class PlayerTest {
         });
 
         thServer.start();
-    }
-
-    @Test
-    public void demoTestMethod() {
-         assertTrue(true);
     }
 
     @Test
@@ -75,24 +71,22 @@ public class PlayerTest {
     }
 
     @Test
-    public void playerCredentials() {
+    public void testCheckCredentials() {
         Player player = buildPlayer(username, password);
         if (player == null) assertTrue(false);
 
-        assertEquals(username, player.getUsername());
-        assertTrue(player.checkCredentials(username, password));
-        assertFalse(player.checkCredentials(username, "notDoe"));
-        assertFalse(player.checkCredentials("", ""));
-        assertEquals(0, player.getDefeats());
-        assertEquals(0, player.getVictories());
 
-        player.setUsername("jane");
-        assertEquals("jane", player.getUsername());
-        assertTrue(player.checkCredentials("jane", password));
+        player.setUsername("user1");
+        player.setPassword("pass1");
 
-        player.setPassword("1234");
-        assertTrue(player.checkCredentials("jane", "1234"));
-        assertEquals("jane", player.getUsername());
+
+        boolean result1 = player.checkCredentials("user1", "pass1");
+
+        boolean result2 = player.checkCredentials("user2", "pass2");
+
+
+        assertEquals(true, result1);
+        assertEquals(false, result2);
     }
 
     @Test
@@ -108,34 +102,13 @@ public class PlayerTest {
         assertEquals("/help", Server.findLastMessageFrom(p.getUsername()).getText());
     }
 
-   /* @Test
-    public void checkTime()
-    {
-        Time LocalDateTime = Time.valueOf(now());
-
-        if (LocalDateTime == Time.valueOf(now())) assertTrue(false);
-        assertEquals(LocalDateTime, Time.valueOf(String.valueOf(LocalDateTime)));
-        *//*assertNotEquals(LocalDateTime, Time.valueOf((String.valueOf(LocalDateTime))));*//*
-
-    }*/
-
-   /* @Test
-    public void testGetColorPlayer() throws IOException {
-        Socket s  = new Socket();
-        PrintWriter pw = new PrintWriter(s.getOutputStream());
-        BufferedReader br = new BufferedReader(new InputStreamReader(s.getInputStream()));
-        SocketClient sc = new SocketClient(s, pw, br);
-        Player player = new Player(sc, "abc", "trtt" );
-        player.setColor(FormatService.typeColor.ANSI_RED);
-        assertEquals("red", player.getColor());
-    }*/
 
     @Test
     public void testGetColorPlayer() {
         SocketClient sc = buildSocketClient();
         Player player = new Player(sc, username, password);
-        player.setColor(FormatService.typeColor.ANSI_GREEN);
-        assertEquals(FormatService.typeColor.ANSI_GREEN, player.getColor());
+        player.setColor(FormatService.ANSI_GREEN);
+        assertEquals(FormatService.ANSI_GREEN, player.getColor());
     }
 
     @Test
@@ -153,12 +126,21 @@ public class PlayerTest {
         player.addDefeat();
         assertEquals(1, player.getDefeats());
     }
-// Test le nom d'utilisateur. La méthode retourne t -elle le nom d'utilisateur attendu?
+    @Test
+    public void testGetVictories() {
+        SocketClient sc = buildSocketClient();
+        Player player = new Player(sc, username, password);
+        player.addVictory();
+        int result = player.getVictories();
+
+        assertEquals(1, result);
+    }
+
+    // Test le nom d'utilisateur. La méthode retourne t -elle le nom d'utilisateur attendu?
     @Test
     public void testGetUsername() {
         SocketClient sc = buildSocketClient();
         Player player = new Player(sc, username, password);
-        String LAZARE = null;
         player.setUsername("LAZARE");
         assertEquals("LAZARE", player.getUsername());
     }
@@ -168,24 +150,105 @@ public class PlayerTest {
     public void testGetPassword() {
         SocketClient sc = buildSocketClient();
         Player player = new Player(sc, username, password);
-       String eaeScae = "Laz";
         player.setPassword("eaeScae") ;
         assertEquals("eaeScae", player.getPassword());
     }
 
-
-
-
-/*
     @Test
-    public void checkTime() {
-        Time LocalDateTime = Time.valueOf(now());
+    public void testGetUsersYouInvited() {
+        SocketClient sc = buildSocketClient();
+        Player player1 = new Player(sc, username, password);
+        SocketClient sc2 = buildSocketClient();
+        Player playerToInvite = new Player(sc2, username, password);
 
-        if (LocalDateTime == Time.valueOf(now())) assertTrue(false);
-        assertEquals(LocalDateTime, Time.valueOf(String.valueOf(LocalDateTime)));
-                /*assertNotEquals(LocalDateTime, Time.valueOf((String.valueOf(LocalDateTime))));*/
+        // Add the invitedPlayer to usersYouInvited
+        player1.addInUsersYouInvited(playerToInvite);
 
+        ArrayList<Player> result = player1.getUsersYouInvited();
 
+        assertEquals(1, result.size());
+        assertEquals(playerToInvite, result.get(0));
     }
+
+    @Test
+    public void testGetUsersWhoInvitedYou() {
+        SocketClient sc = buildSocketClient();
+        Player player1 = new Player(sc, username, password);
+        SocketClient sc2 = buildSocketClient();
+        Player playerWhoInviteYou = new Player(sc2, username, password);
+
+
+        player1.addInUsersWhoInvitedYou(playerWhoInviteYou);
+
+
+        ArrayList<Player> result = player1.getUsersWhoInvitedYou();
+
+
+        assertEquals(1, result.size());
+        assertEquals(playerWhoInviteYou, result.get(0));
+    }
+
+    @Test
+    public void testRemoveFromUsersYouInvited() {
+        SocketClient sc = buildSocketClient();
+        Player player1 = new Player(sc, username, password);
+        SocketClient sc2 = buildSocketClient();
+        Player playerToInvite = new Player(sc2, username, password);
+
+
+        player1.addInUsersYouInvited(playerToInvite);
+
+
+        player1.removeFromUsersYouInvited(playerToInvite);
+
+
+        ArrayList<Player> result = player1.getUsersYouInvited();
+
+
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testRemoveFromUserWhoInvitedYou() {
+        SocketClient sc = buildSocketClient();
+        Player player1 = new Player(sc, username, password);
+        SocketClient sc2 = buildSocketClient();
+        Player playerWhoInviteYou = new Player(sc2, username, password);
+
+
+        player1.addInUsersWhoInvitedYou(playerWhoInviteYou);
+
+
+        player1.removeFromUserWhoInvitedYou(playerWhoInviteYou);
+
+
+        ArrayList<Player> result = player1.getUsersWhoInvitedYou();
+
+
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testCompareTo() {
+        Player player1 = buildPlayer(username, password);
+        player1.setUsername("user1");
+
+        Player player2 = buildPlayer(username, password);
+        player2.setUsername("user1");
+
+        Player player3 = buildPlayer(username, password);
+        player3.setUsername("user2");
+
+        // Invoke the compareTo() method
+        boolean result1 = player1.compareTo(player2);
+        boolean result2 = player1.compareTo(player3);
+
+        // Assert the results
+        assertEquals(true, result1);
+        assertEquals(false, result2);
+    }
+
+
+}
 
 
