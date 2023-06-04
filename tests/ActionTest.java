@@ -4,9 +4,12 @@ import game.Action;
 import game.Game;
 import game.grid.Grid;
 import org.junit.Test;
+import socket.client.SocketClient;
 import socket.server.Player;
+import socket.server.Server;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -17,15 +20,36 @@ import static org.junit.Assert.assertNull;
 
 public class ActionTest {
 
+    static final String host = "127.0.0.1";
+    static final int port = Server.PORT;
+
+    Player buildPlayer(String username, String password) {
+        return new Player(buildSocketClient(), username, password);
+    }
+
+    SocketClient buildSocketClient() {
+        Socket s;
+        PrintWriter pw;
+        BufferedReader br;
+
+        try {
+            s = new Socket(host, port);
+            pw = new PrintWriter(s.getOutputStream());
+            br = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+
+        return new SocketClient(s, pw, br);
+    }
+
     private ArrayList<socket.server.Player> Player;
 //
     @Test
     public void testGetPlayer(){
-        Socket s = new Socket();
-        PrintWriter pw = new PrintWriter(System.out);
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-        Player p = new Player(s, pw, bf, "test", "test");
-        Grid grid = new Grid(p);
+        Player p = buildPlayer("test", "test");
+        Grid grid = new Grid(p,10,10);
         Action action = new Action(p,grid, 2,3,2  );
         Player getPlayer = action.getPlayer();
 
@@ -34,11 +58,8 @@ public class ActionTest {
 
     @Test
     public void testGetTarget() {
-        Socket s = new Socket();
-        PrintWriter pw = new PrintWriter(System.out);
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-        Player p = new Player(s, pw, bf, "test", "test");
-        Grid grid = new Grid(p);
+        Player p = buildPlayer("test", "test");
+        Grid grid = new Grid(p,10,10);
         Action action = new Action(p, grid, 2, 3, 3);
 
         Grid result = action.getTarget();
@@ -48,11 +69,8 @@ public class ActionTest {
 
     @Test
     public void testGetColumn() {
-        Socket s = new Socket();
-        PrintWriter pw = new PrintWriter(System.out);
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-        Player p = new Player(s, pw, bf, "test", "test");
-        Grid grid = new Grid(p);
+        Player p = buildPlayer("test", "test");
+        Grid grid = new Grid(p,10,10);
         int column = 2;
         Action action = new Action(p, grid, column, 3, 3);
 
@@ -65,11 +83,8 @@ public class ActionTest {
 
     @Test
     public void testGetRow() {
-        Socket s = new Socket();
-        PrintWriter pw = new PrintWriter(System.out);
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-        Player p = new Player(s, pw, bf, "test", "test");
-        Grid grid = new Grid(p);
+        Player p = buildPlayer("test", "test");
+        Grid grid = new Grid(p,10,10);
         int row = 2;
         Action action = new Action(p, grid, 3, row, 3);
 
@@ -82,11 +97,8 @@ public class ActionTest {
 
     @Test
     public void testGetTurnCount() {
-        Socket s = new Socket();
-        PrintWriter pw = new PrintWriter(System.out);
-        BufferedReader bf = new BufferedReader(new InputStreamReader(System.in));
-        Player p = new Player(s, pw, bf, "test", "test");
-        Grid grid = new Grid(p);
+        Player p = buildPlayer("test", "test");
+        Grid grid = new Grid(p,10,10);
         int turnCount = 3;
         Action action = new Action(p, grid, 3, 2, turnCount);
 
