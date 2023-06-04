@@ -1,29 +1,35 @@
 package game;
 import java.lang.Thread.State;
-import java.lang.reflect.Array;
 import java.util.*;
 
+import Bots.Bot;
+import game.boat.Boat;
 import game.grid.Grid;
-import game.grid.Grid_old;
+import org.jetbrains.annotations.NotNull;
+import services.DiscoveryService;
 import services.FormatService;
 import services.exceptions.OnlyOneActiveGameByPlayer;
 import socket.server.Player;
 import socket.server.Server;
 
 public class Game {
-	private ArrayList<Player> bots = new ArrayList<Player>();
-	private ArrayList<Action> actions = new ArrayList<Action>();
-	private ArrayList<Grid> grids = new ArrayList<Grid>();
+	private final ArrayList<Player> bots = new ArrayList<>();
+	private final ArrayList<Action> actions = new ArrayList<>();
+	private final ArrayList<Grid> grids = new ArrayList<>();
 	private Thread thread = null;
 	private Player firstPlayer;
 	private Player playerTurn;
 	private int turnCount = 0;
 	private Player winner;
 
-	public void addBot(Player bot) {
-		if (bot == null || bots.contains(bot)) return;
-		bots.add(bot);
+	public ArrayList<Grid> getGrids() {
+		return grids;
 	}
+
+	public int getTurnCount() {
+		return turnCount;
+	}
+
 
 	public boolean hasPlayer(Player player) {
 		for (Grid g : grids) {
@@ -46,14 +52,14 @@ public class Game {
 
 		if (player == target) return "Hey, you target yourself.";
 		if (playerTurn != player) return "That's not your turn.";
-		
-		// Fetch the target grid.
-		Grid targetGrid = findGridByPlayer(target);
 
-		/**
-		 * TODO try to hit a boat on this grid
-		 * targetGrid.askPosition(null);
-		 */
+		// Fetch the target grid.
+		Grid targetGrid = DiscoveryService.findGrid(target, grids);
+		// get the message from the fire position : you hit, you miss, ...
+//		String message = targetGrid.fire(column, row);
+//		if (message == null){
+//			actionSuccessful = false;
+//		}
 
 		if (!actionSuccessful) return "Action failed.";
 
@@ -61,25 +67,36 @@ public class Game {
 
 		Action action = new Action(player, targetGrid, column, row, turnCount);
 		actions.add(action);
-		return null;
+//		return message;
+		return "DEBUG";
 	}
 
+	/**
+	 * place boat of the current player in his grid
+	 * @param player
+	 * @param length
+	 * @param column
+	 * @param row
+	 * @param vector
+	 * @return
+	 */
 	public String placePlayerBoat(Player player, int length , int column, int row, String vector) {
 		boolean placedBoat = false;
-
 		// Fetch the player grid.
-		Grid playerGrid = findGridByPlayer(player);
-		// get the boat with length
-		placedBoat = playerGrid.placeBoat(playerGrid.getBoatWithLength(length), column, row, vector);
+		Grid playerGrid = DiscoveryService.findGrid(player, grids);
+		Boat.Model playerBoat = DiscoveryService.findModelByLength(length);
 
-		if (!placedBoat)
-			return "Action failed.";
+		if(playerBoat != null){
+			// get the boat with length
+//			placedBoat = playerGrid.placeBoat(playerBoat, column, row, vector);
+		}
 
-		return null;
+		if (!placedBoat) return "Action failed.";
+		else return "Your boat" + playerBoat.getName()  + "has been placed";
 	}
 
 	public void nextPlayer() {
-		int currentIndex = grids.indexOf(findGridByPlayer(playerTurn));
+		int currentIndex = grids.indexOf(DiscoveryService.findGrid(playerTurn, grids));
 		System.out.println("Current index1 : " + currentIndex);
 		if (currentIndex == grids.size()) currentIndex = 0;
 		System.out.println("Current index2 : " + currentIndex);
@@ -88,6 +105,11 @@ public class Game {
 		playerTurn = p;
 	}
 
+	/**
+	 * return true if is turn of the current player
+	 * @param player
+	 * @return
+	 */
 	public boolean isPlayerTurn(Player player) {
 		return playerTurn == player;
 	}
@@ -99,30 +121,28 @@ public class Game {
 	}
 
 
-
 	private void addGrid(Player player) throws OnlyOneActiveGameByPlayer {
+		System.out.println("ADDGRID START");
 		if (Server.getActiveGame(player) != null) throw new OnlyOneActiveGameByPlayer();
 
 		for (Grid grid : grids) {
 			if (grid.getPlayer() == player) return;
 		}
 
-//		Grid grid = new Grid(player,null,0,0);
-//		grids.add(grid);
+		Grid grid = new Grid(player,10,10);
+		grids.add(grid);
+		System.out.println("ADDGRID END");
 	}
 
-	public Grid findGridByPlayer(Player player) {
-		for (Grid g : grids) {
-			if (g.getPlayer() == player) {
-				return g;
-			}
-		}
-		return null;
-	}
 
-	private Player findPlayerByGrid(Grid gridOld) {
+	/**
+	 * Return the player with his grid as parameter
+	 * @param grid
+	 * @return
+	 */
+	private Player findPlayerByGrid(Grid grid) {
 		for (Grid g : grids) {
-			if (g == gridOld) {
+			if (g == grid) {
 				return g.getPlayer();
 			}
 		}
@@ -130,24 +150,45 @@ public class Game {
 	}
 
 	private void removeGrid(Player player) {
-		Grid gridOld = findGridByPlayer(player);
-		if (gridOld == null) return;
-		grids.remove(gridOld);
+		Grid grid = DiscoveryService.findGrid(player, grids);
+		if (grid == null) return;
+		grids.remove(grid);
 	}
 
-	public void removeGrid(Grid_old gridOld) {
-		if (gridOld == null) return;
-		grids.remove(gridOld);
+	public void removeGrid(Grid grid) {
+		if (grid == null) return;
+		grids.remove(grid);
 	}
 
+	public void addBot(Player bot) {
+		System.out.println("ADDBOT START");
+		if (bot == null || bots.contains(bot)) return;
+
+		try {
+			addGrid(bot);
+		} catch (OnlyOneActiveGameByPlayer e) {
+			System.out.println(e.getMessage());
+		}
+
+		bots.add(bot);
+		System.out.println("ADDBOT END");
+	}
+
+	/**
+	 *
+	 * @param player
+	 */
 	public void addPlayer(Player player) {
+		System.out.println("ADDPLAYER START");
 		if (player == null) return;
-		
+
 		try {
 			addGrid(player);
 		} catch (OnlyOneActiveGameByPlayer e) {
 			System.out.println(e.getMessage());
 		}
+
+		System.out.println("ADDPLAYER END");
 	}
 
 	public void removePlayer(Player player) {
@@ -161,16 +202,36 @@ public class Game {
 	}
 
 	public String displayPlayerGrids(Player player) {
-		String output = "";
+		Grid currentGrid = null;
+		Grid targetGrid = null;
 
 		for (Grid grid : grids) {
-			if (grid.getPlayer() == player) continue;
-			output += "-------------------------------- " + grid.getPlayer().getUsername().toUpperCase();
-			output += grid;
-			output += "--------------------------------;";
+			if (grid.getPlayer() == player) {
+				currentGrid = grid;
+			} else {
+				targetGrid = grid;
+			}
 		}
 
-		return output;
+		return targetGrid.toString(true);
+//		return FormatService.concatenateGrids(currentGrid, targetGrid) + ";";
+	}
+
+	/**
+	 * get a list of grids where the boats are not all placed yet
+	 * @return
+	 */
+	public List<Grid> getGridsNotConfigured(){
+		List<Grid> notReady  = new ArrayList<>();
+		System.out.println("grids = " + grids.size());
+
+		for ( Grid grid : grids) {
+			if(!grid.isConfigured()){
+				notReady.add(grid);
+			}
+		}
+
+		return notReady;
 	}
 
 	public void run() {
@@ -183,6 +244,33 @@ public class Game {
 		thread = new Thread() {
 			@Override
 			public void run() {
+//				List<Grid> gridsNotConfigured;
+//
+//				do {
+//					gridsNotConfigured = getGridsNotConfigured();
+//					System.out.println("gridsNotConfigured = " + gridsNotConfigured);
+//
+//					for (Grid notConfiguredYet : gridsNotConfigured) {
+//						sendToClient(notConfiguredYet.getPlayer(), "Place your Boats" + displayPlayerGrids(notConfiguredYet.getPlayer()));
+//					}
+//
+//					try {
+//						Thread.sleep(3000); // decrease loop time
+//					} catch (InterruptedException e) {
+//						System.out.println(e.getMessage());
+//						break;
+//					}
+//				} while(!gridsNotConfigured.isEmpty());
+
+//				addBot(new Bot("BotLeBricoleur", Bot.Difficulty.EASY));
+//				addBot(new Bot("BotLer", Bot.Difficulty.EASY));
+
+				for (Grid grid : grids) {
+					System.out.println("-- NEW GRID (" + grid.getPlayer().getUsername() + ") --");
+					grid.populateRandomly();
+				}
+
+				System.out.println("SEND TO " + playerTurn.getUsername());
 				sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));
 
 				while (winner == null) {
@@ -193,14 +281,39 @@ public class Game {
 						break;
 					}
 
-					System.out.println(playerTurn.getUsername() + " turn.");
+					//System.out.println(playerTurn.getUsername() + " turn.");
+					System.out.println(playerTurn.isBot());
+					if(playerTurn.isBot()){
+
+						Bot bot = (Bot) playerTurn;
+						System.out.println("c'est le tour du bot : " + bot.getUsername());
+						bot.run();
+					}else {
+						System.out.println("déchet : " + playerTurn.getUsername());
+
+						// Fetch the grid of the player who must play.
+						Grid currentGrid = DiscoveryService.findGrid(playerTurn,grids);
+						int currentIndex = grids.indexOf(currentGrid);
+						int nextIndex = currentIndex += 1;
+
+						if (currentIndex == grids.size()) nextIndex = 0;
+
+						// Fetch the next grid to play.
+						Grid nextGrid = grids.get(nextIndex);
+						playerTurn = nextGrid.getPlayer();
+
+						continue;
+					}
 
 					Action lastAction = null;
 					if (actions.size() > 0) lastAction = actions.get(actions.size() - 1);
-					if (lastAction == null || lastAction.getPlayer() != playerTurn) continue;
+					if (lastAction == null || lastAction.getPlayer() != playerTurn){
+						System.out.println("pas d'action");
+						continue;
+					}
 
 					// Fetch the grid of the player who must play.
-					Grid currentGrid = findGridByPlayer(playerTurn);
+					Grid currentGrid = DiscoveryService.findGrid(playerTurn,grids);
 					int currentIndex = grids.indexOf(currentGrid);
 					int nextIndex = currentIndex += 1;
 
@@ -212,6 +325,15 @@ public class Game {
 					sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));
 
 					System.out.println("Sent grid to player " + playerTurn.getUsername());
+
+					if (currentGrid.allBoatAreSink()) {
+						winner = playerTurn;
+						sendToClient(playerTurn, "You WIN !!!!");
+						playerTurn.addVictory();
+						nextPlayer();
+						playerTurn.addDefeat();
+						sendToClient(playerTurn, "You LOOSE");
+					}
 				}
 			}
 		};
@@ -219,8 +341,7 @@ public class Game {
 		thread.start();
 	}
 
-	public ArrayList<Player> getPlayers()
-	{
+	public ArrayList<Player> getPlayers() {
 		ArrayList<Player> players = new ArrayList<Player>(){};
 
 		for (Grid grid : grids) {
@@ -230,10 +351,13 @@ public class Game {
 		return players;
 	}
 
-	private void sendToClient(Player player, String message) {
+	private void sendToClient(@NotNull Player player, String message) {
+		if(player.isBot()){
+			return;
+		}
 		while (player.getPrintWriter() == null) {
 			System.out.println("waiting for " + player.getUsername() + " reconnection.");
-			
+
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -252,7 +376,7 @@ public class Game {
 
 	public void stop() {
 		if (thread == null || !thread.isAlive()) return;
-		
+
 		try {
 			thread.wait();
 		} catch (InterruptedException e) {
