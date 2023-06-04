@@ -4,6 +4,7 @@ import java.util.*;
 
 import Bots.Bot;
 import game.boat.Boat;
+import game.grid.Cell;
 import game.grid.Grid;
 import org.jetbrains.annotations.NotNull;
 import services.DiscoveryService;
@@ -43,11 +44,10 @@ public class Game {
 	 * A wrong action example is an overflow position like (22,5) in a grid 10x10.
 	 * @param player the player who sent the coordinates.
 	 * @param target the player to target.
-	 * @param column The vertical coordinate.
-	 * @param row The horizontal coordinate.
+	 * @param cell
 	 * @return true if the action is successful, otherwise false.
 	 */
-	public String sendAction(Player player, Player target, int column, int row) {
+	public String sendAction(Player player, Player target, Cell cell) {
 		boolean actionSuccessful = true;
 
 		if (player == target) return "Hey, you target yourself.";
@@ -56,16 +56,16 @@ public class Game {
 		// Fetch the target grid.
 		Grid targetGrid = DiscoveryService.findGrid(target, grids);
 		// get the message from the fire position : you hit, you miss, ...
-//		String message = targetGrid.fire(column, row);
-//		if (message == null){
-//			actionSuccessful = false;
-//		}
+		String message = targetGrid.fire(cell);
+		if (message == null){
+			actionSuccessful = false;
+		}
 
 		if (!actionSuccessful) return "Action failed.";
 
 		if (player == firstPlayer) turnCount++;
 
-		Action action = new Action(player, targetGrid, column, row, turnCount);
+		Action action = new Action(player, targetGrid, cell.getColumn(), cell.getRow(), turnCount);
 		actions.add(action);
 //		return message;
 		return "DEBUG";
@@ -262,8 +262,8 @@ public class Game {
 //					}
 //				} while(!gridsNotConfigured.isEmpty());
 
-//				addBot(new Bot("BotLeBricoleur", Bot.Difficulty.EASY));
-//				addBot(new Bot("BotLer", Bot.Difficulty.EASY));
+				addBot(new Bot("BotLeBricoleur", Bot.Difficulty.EASY));
+				addBot(new Bot("BotLer", Bot.Difficulty.EASY));
 
 				for (Grid grid : grids) {
 					System.out.println("-- NEW GRID (" + grid.getPlayer().getUsername() + ") --");

@@ -1,8 +1,11 @@
 package socket.commands;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import game.Game;
+import game.grid.Cell;
+import game.grid.Grid;
 import services.DiscoveryService;
 import services.ServerResponse;
 import socket.client.SocketClient;
@@ -47,7 +50,15 @@ public class ActionCommand extends Command {
 		// Fetch the player game.
 		Game currentGame = Server.getActiveGame(player);
 		// Send an action to this game.
-		String response =  currentGame.sendAction(player, targetPlayer, column, row);
+
+		ArrayList<ArrayList<Cell>> gridList = DiscoveryService.findGrid(player, currentGame.getGrids()).getPlate();
+		ArrayList<Cell> cells = new ArrayList<>();
+
+		for (ArrayList<Cell> i : gridList) {
+			cells.addAll(i);
+		}
+
+		String response =  currentGame.sendAction(player, targetPlayer, DiscoveryService.findCell(row, column, cells));
 		
 		if (response != null) return response;
 		return ServerResponse.actionSuccessful;

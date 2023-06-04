@@ -53,20 +53,20 @@ public class Bot extends Player {
         Player player = players.get(random.nextInt(players.size() - 1));
         // Find the grid associated with the selected player
         Grid randomGrid = DiscoveryService.findGrid(player, game.getGrids());
-        Action action = null;
+        Cell cell = null;
 
         // Execute the turn based on the bots difficulty level
         switch (difficulty) {
-            case EASY -> action = startTurnEasy(randomGrid);
-            case MEDIUM -> action = startTurnMedium(randomGrid);
-            case HARD -> action = startTurnHard(randomGrid);
+            case EASY -> cell = startTurnEasy(randomGrid);
+            case MEDIUM -> cell = startTurnMedium(randomGrid);
+            case HARD -> cell = startTurnHard(randomGrid);
             default -> System.out.println("Difficulty is not defined");
         }
 
         // Send the action to the active game
 
 
-        Server.getActiveGame(player).sendAction(this, player, action.getColumn(), action.getRow());
+        Server.getActiveGame(player).sendAction(this, player, cell);
         System.out.println("bien joué sale pauvre");
 
 
@@ -79,11 +79,10 @@ public class Bot extends Player {
      * @param grid The grid on which the bot will perform its action.
      * @return The action chosen by the bot.
      */
-    private @NotNull Action startTurnEasy(@NotNull Grid grid) {
+    private @NotNull Cell startTurnEasy(@NotNull Grid grid) {
         // Select a random cell from the grid
-        Cell cell = grid.getRandomCell(grid.getEmptyCells());
-        // Create a new action with the player associated with the grid, the grid itself, the column and row indices of the cell, and the current turn count of the game
-        return new Action(grid.getPlayer(), grid, cell.getColumn(), cell.getRow(), Objects.requireNonNull(Server.getActiveGame(grid.getPlayer())).getTurnCount());
+        return grid.getRandomCell(grid.getEmptyCells());
+
     }
 
 
@@ -93,7 +92,7 @@ public class Bot extends Player {
      * @param grid The grid on which the bot will perform its action.
      * @return The action chosen by the bot.
      */
-    private @NotNull Action startTurnMedium(@NotNull Grid grid) {
+    private @NotNull Cell startTurnMedium(@NotNull Grid grid) {
         int rowCount = grid.getRows();
         int columnCount = grid.getColumns();
         List<Cell> boatCells = new ArrayList<>();
@@ -111,12 +110,10 @@ public class Bot extends Player {
 
         // Check if there are cells with undiscovered boats and randomly decide whether to choose one or not
         if (!boatCells.isEmpty() && random.nextBoolean()) {
-            Cell randomBoatCell = boatCells.get(random.nextInt(boatCells.size()));
-            return new Action(grid.getPlayer(), grid, randomBoatCell.getColumn(), randomBoatCell.getRow(), Server.getActiveGame(grid.getPlayer()).getTurnCount());
+            return boatCells.get(random.nextInt(boatCells.size()));
         } else {
             // Select a random cell from the grid
-            Cell randomCell = grid.getRandomCell(grid.getEmptyCells());
-            return new Action(grid.getPlayer(), grid, randomCell.getColumn(), randomCell.getRow(), Server.getActiveGame(grid.getPlayer()).getTurnCount());
+            return grid.getRandomCell(grid.getEmptyCells());
         }
     }
 
@@ -127,7 +124,7 @@ public class Bot extends Player {
      * @param grid The grid on which the bot will perform its action.
      * @return The action chosen by the bot.
      */
-    private @NotNull Action startTurnHard(@NotNull Grid grid) {
+    private @NotNull Cell startTurnHard(@NotNull Grid grid) {
         int rowCount = grid.getRows();
         int columnCount = grid.getColumns();
         List<Cell> undiscoveredBoatCells = new ArrayList<>();
@@ -153,8 +150,7 @@ public class Bot extends Player {
             });
 
             // Select the cell with the highest likelihood of containing a boat
-            Cell bestCell = undiscoveredBoatCells.get(0);
-            return new Action(grid.getPlayer(), grid, bestCell.getColumn(), bestCell.getRow(), Server.getActiveGame(grid.getPlayer()).getTurnCount());
+            return undiscoveredBoatCells.get(0);
         } else {
             // If no undiscovered boats are found, execute the turn in "MEDIUM" mode
             return startTurnMedium(grid);
