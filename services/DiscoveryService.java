@@ -61,6 +61,15 @@ public class DiscoveryService {
         return null;
     }
 
+    public static Cell findCellInGrid(int row, int column, Grid grid) {
+        for (Cell cell : grid.getAllCells()) {
+            if (cell.getColumn() == column && cell.getRow() == row) {
+                return cell;
+            }
+        }
+        return null;
+    }
+
     public static Cell findCellInBoats(int row, int column, ArrayList<Boat> haystack) {
         for (Boat b : haystack) {
             for (Cell c : b.getCoordinates()) {
@@ -86,7 +95,7 @@ public class DiscoveryService {
 
     /**
      *
-     * @param length
+     * @param length boat length
      * @return return a boat from the list by his length
      */
     public static Boat.Model findModelByLength(int length) {
@@ -100,8 +109,8 @@ public class DiscoveryService {
 
     /**
      * return the grid of a player with the player as parameter
-     * @param player
-     * @return
+     * @param player player
+     * @return Grid
      */
     public static Grid findGrid(Player player, ArrayList<Grid> grids) {
         for (Grid g : grids) {

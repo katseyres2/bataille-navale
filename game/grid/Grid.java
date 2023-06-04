@@ -1,6 +1,7 @@
 package game.grid;
 
 
+import org.jetbrains.annotations.NotNull;
 import services.DirectionService;
 import services.DiscoveryService;
 import socket.server.Player;
@@ -15,15 +16,33 @@ public class Grid {
 
     public static final int DEFAULT_ROW_COUNT = 10;
     public static final int DEFAULT_COLUMN_COUNT = 10;
-    private int rows;
-    private int columns;
-    private ArrayList<ArrayList<Cell>> plate;
+    private final int rows;
+    private final int columns;
+    private final ArrayList<ArrayList<Cell>> plate;
     final private ArrayList<Boat> boats = new ArrayList<Boat>();
     static public final String[] POSITIONS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
     private final Player player;
 
     public ArrayList<Boat> getBoats() {
         return boats;
+    }
+
+    public ArrayList<Cell> getAllCells() {
+        ArrayList<Cell> output = new ArrayList<>();
+
+        for (ArrayList<Cell> cells : plate) {
+            output.addAll(cells);
+        }
+
+        return output;
+    }
+
+    public ArrayList<Cell> getDiscoveredCells() {
+        ArrayList<Cell> output = new ArrayList<>();
+        for (Cell cell : getAllCells()) {
+            if (cell.isDiscovered()) output.add(cell);
+        }
+        return output;
     }
 
     public ArrayList<Cell> getEmptyCells() {
@@ -62,8 +81,6 @@ public class Grid {
         }
     }
 
-    //----------------------------------------------------------------
-
     /**
      * Returns the number of rows in the grid.
      *
@@ -74,30 +91,12 @@ public class Grid {
     }
 
     /**
-     * Sets the number of rows in the grid.
-     *
-     * @param rows The number of rows to set.
-     */
-    public void setRows(int rows) {
-        this.rows = rows;
-    }
-
-    /**
      * Returns the number of columns in the grid.
      *
      * @return The number of columns.
      */
     public int getColumns() {
         return columns;
-    }
-
-    /**
-     * Sets the number of columns in the grid.
-     *
-     * @param columns The number of columns to set.
-     */
-    public void setColumns(int columns) {
-        this.columns = columns;
     }
 
     /**
@@ -112,97 +111,13 @@ public class Grid {
     public Player getPlayer() { return player; }
 
     /**
-     * Sets the 2D array of cells representing the grid.
-     *
-     * @param plate The 2D array of cells to set.
-     */
-    public void setPlate(ArrayList<ArrayList<Cell>> plate) {
-        this.plate = plate;
-    }
-
-//    /**
-//     * Sets up the specified cell at the given coordinate in the grid.
-//     *
-//     * @param coordinate The coordinate of the cell.
-//     * @param cell       The cell object to set.
-//     */
-//    public void setupCell(Cell coordinate, Cell cell) {
-//        getPlate().get(coordinate.getRowIndex()).get(coordinate.getColumnIndex()) = cell;
-//    }
-
-    //----------------------------------------------------------------
-
-    /**
      * Récupère une cellule aléatoire qui satisfait certaines conditions.
      *
      * @return Une cellule aléatoire qui respecte les conditions.
      */
     public Cell getRandomCell(ArrayList<Cell> cells) {
-        return cells.get((new Random().nextInt(cells.size() - 1)));
+        return cells.get((new Random().nextInt(cells.size())));
     }
-
-//    public Cell getCell(int x, int y) {
-//        Cell selectedCell = null;           // Cellule aléatoire à retourner
-//        int maxRows = getRows() - 1;        // Indice maximum de ligne
-//        int maxColumns = getColumns() - 1;  // Indice maximum de colonne
-//
-//        while (selectedCell == null) {
-//            // Vérifie si les coordonnées de la cellule générée se trouvent à l'intérieur des limites de la grille
-//            if (x > 0 && x < maxRows && y > 0 && y < maxColumns) {
-//                Cell currentCell = grid[x][y]; // Obtient la cellule actuelle aux coordonnées générées
-//                boolean hasNullNeighbor = false; // Indique si la cellule actuelle a une cellule voisine avec un bateau null
-//
-//                // Vérifie chaque cellule voisine
-//                for (int[] vector : DirectionService.get8Vectors()) {
-//                    int neighborX = x + vector[0]; // Calcule la coordonnée X de la cellule voisine
-//                    int neighborY = y + vector[1]; // Calcule la coordonnée Y de la cellule voisine
-//
-//                    // Si la cellule voisine a un bateau null, définit le drapeau et sort de la boucle
-//                    if (grid[neighborX][neighborY].getBoat() == null) {
-//                        hasNullNeighbor = true;
-//                        break;
-//                    }
-//                }
-//
-//                // Si la cellule actuelle a un bateau non null et aucune cellule voisine null, l'assigne à randomCell
-//                if (currentCell.getBoat() != null && !hasNullNeighbor) {
-//                    selectedCell = currentCell;
-//                }
-//            }
-//        }
-//
-//        return selectedCell;
-//    }
-
-    /**
-     * Checks if a cell can be set up at the given coordinates.
-     *
-     * @param x The x-coordinate of the cell.
-     * @param y The y-coordinate of the cell.
-     * @return {@code true} if the cell can be set up, {@code false} otherwise.
-     */
-    public boolean canSetupCell(int x, int y) {
-        // Check if the coordinates are within the grid boundaries
-        if (x < 0 || x > getColumns() || y < 0 || y > getRows()) {
-            // System.out.print("Overflow\n");
-            return false;
-        }
-
-        // Check each neighboring cell
-        for (Vector vector : DirectionService.get8Vectors()) {
-            int neighborX = x + vector.getColumn(); // Calculate the x-coordinate of the neighboring cell
-            int neighborY = y + vector.getRow(); // Calculate the y-coordinate of the neighboring cell
-
-            // Check if the neighboring cell is within the grid boundaries or if it's already occupied
-            if (neighborX < 0 || neighborX > getColumns() || neighborY < 0 || neighborY > getRows() || plate.get(neighborX).get(neighborY) != null) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    //----------------------------------------------------------------
 
     /**
      * Places a boat randomly on the grid.
@@ -212,13 +127,30 @@ public class Grid {
         ArrayList<Vector> vectors = DirectionService.get4Vectors();
 
         while (true) {
-            Cell cell = getRandomCell(getEmptyCells()); // Get a random cell on the grid
+            // Get a random cell on the grid
+            Cell cell = getRandomCell(getEmptyCells());
             Collections.shuffle(vectors);
 
             // Check if all points can be filled
             for (Vector vector : DirectionService.get4Vectors()) {
                 try {
-                    Boat boat = new Boat(model, cell, vector);
+                    ArrayList<Cell> cells = new ArrayList<>();
+
+                    for (int i = 0; i < model.getLength(); i++) {
+                        Cell c = DiscoveryService.findCellInGrid(
+                                cell.getRow() + i * vector.getRow(),
+                                cell.getColumn() + i * vector.getColumn(),
+                                this
+                        );
+
+                        cells.add(c);
+//                        cells.add(new Cell(
+//                                reference.getRow() + i * vector.getRow(),
+//                                reference.getColumn() + i * vector.getColumn()
+//                        ));
+                    }
+
+                    Boat boat = new Boat(model, cells);
 
                     if (DirectionService.isBoatAlongBorder(boat, this)) {
 //                        System.out.println("Along border");
@@ -244,115 +176,33 @@ public class Grid {
         }
     }
 
-//    /**
-//     * place a boat in the grid
-//     * you have to choose a direction ( north, south, east, west ) and point in the grid
-//     * at the point in the grid, the function will check if every position with the lenght of the boat are free
-//     * if all position are free, it will place the boat
-//     * @param x
-//     * @param y
-//     * @param direction
-//     * @return
-//     */
-//    public boolean placeBoat(Boat.Model model, Integer x, Integer y, String direction) {
-//        Boat boat = null;
-//        ArrayList<Cell> selectedCells = new ArrayList<>();
-//        Cell cell;
-//        int[] vector = DirectionService.getDirectionVector(direction); // Get the available vectors
-//
-//        cell = getCell(x,y);
-//
-//        for (int i = 0; i < model.getLength(); i++) {
-//            x = cell.getColumnIndex() + i * vector[0];
-//            y = cell.getRowIndex() + i * vector[1];
-//            if (!canSetupCell(x, y)) {
-//                return false;
-//            }
-//        }
-//
-//        // Place the boat
-//        for (int i = 0; i < model.getLength(); i++) {
-//            x = cell.getColumnIndex() + i * vector[0];
-//            y = cell.getRowIndex() + i * vector[1];
-//            selectedCells.add(new Cell(x, y));
-//        }
-//
-//        try {
-//            boat = new Boat(model, selectedCells);
-//            boats.add(boat);
-//        } catch (InstantiationException e) {
-//            System.out.println("Error on boat instantiation " + e.getMessage());
-//        }
-//
-//        return boat != null;
-//    }
-
-    //----------------------------------------------------------------
-
     public String toString(boolean showBoats) {
-        String output = "\n";
+        StringBuilder output = new StringBuilder("\n");
 
         for (int i = 0; i < 11; i++) {
             for (int j = 0; j < 11; j++) {
-                // Affiche la lettre sur la première colonne
-                if (j == 1 && i >= 1) output += POSITIONS[i - 1] + " ";
+                // Display the letter on the first column
+                if (j == 1 && i >= 1) output.append(POSITIONS[i - 1]).append(" ");
 
-                // Affiche la position ( chiffre ) sur la première ligne
+                // Display position on the first row
                 if (i == 0) {
-                    if (j == 0) output += "\\ ";
+                    if (j == 0) output.append("\\ ");
                     if (j >= 1) {
-                        output += j > 9 ? " " : "  ";
-                        output += j + " ";
+                        output.append(j > 9 ? " " : "  ");
+                        output.append(j).append(" ");
                     }
                 } else if (j >= 1) {
                     Boat boat = DiscoveryService.findBoatWhichHasCell(plate.get(i-1).get(j-1), boats);
                     String label = boat != null ? boat.getLabel() : "-";
 
-                    output += plate.get(i-1).get(j-1).isDiscovered() || showBoats ? "  " + label + " " : "  . ";
+                    output.append(plate.get(i - 1).get(j - 1).isDiscovered() || showBoats ? "  " + label + " " : "  . ");
                 }
             }
 
-//            if (i - 1 > 0 && i - 1 < Boat.Model.values().length) {
-//                Boat.Model tb = Boat.Model.values()[i - 1];
-//                output += "          [" + tb.getName() + "] boat : " + tb.getName() + ", length : " + tb.getLength();
-//            }
-
-            output += "\n";
+            output.append("\n");
         }
 
-        return output;
-    }
-
-    /**
-     * Display the grid by printing its contents.
-     */
-    public String show() {
-        System.out.println(plate.size());
-        String output = "\n";
-
-        // iterate on each row
-        for (int i = 0; i < rows; i++) {
-            // iterate on each column
-            for (int j = 0; j < columns; j++) {
-                if (j == 1) {
-                    // Display the letter on the first column
-                    if (i >= 1) output += POSITIONS[i - 1] + " ";
-                } else if (i == 0) {
-                    // Display the position (number) on the first row
-                    if (j == 0) output += "\\ ";
-                    else output += " " + j + " ";
-                }
-
-                // Display the grid contents
-                else if (j >= 1 && i >= 1) {
-                    if (plate.get(i-1).get(j-1) == null) output += " - ";
-                    else output += " " + plate.get(i-1).get(j-1) + " ";
-                }
-            }
-            output += "\n";
-        }
-
-        return output;
+        return output.toString();
     }
 
     /**
@@ -365,7 +215,7 @@ public class Grid {
 
     /**
      * return a cell from a position in the grid
-     * @return
+     * @return Cell
      */
     public Cell getCellFromPosition(int row, int column){
         return plate.get(row).get(column);
@@ -375,49 +225,50 @@ public class Grid {
         return isEmptyCell(cell.getRow(), cell.getColumn());
     }
 
+    public int getAllAliveBoatCells() {
+        int counter = 0;
+
+        for (Boat b : boats) {
+            counter += b.getCoordinatesNotHit().size();
+        }
+
+        return counter;
+    }
+
     public boolean isEmptyCell(int row, int column) {
         return DiscoveryService.findCellInBoats(row, column, boats) != null;
     }
 
-//    /***
-//     * fire on a position of the grid, update the grid where a fire is land and return a message for the user if
-//     * he touch a boat
-//     * he already hit the position
-//     * he sink a boat
-//     * @param x
-//     * @param y
-//     * @return
-//     */
-//    public String fire(int x, int y) {
-//        Cell valuePosition = getCellWithPosition(x,y);
-//        if(valuePosition != null){
-//            if(valuePosition.isDiscovered()){
-//                return "you already hit this position";
-//            }
-//            if(valuePosition.hasBoat()){
-//                valuePosition.setDiscovered();
-//                valuePosition.getBoat().getCoordinates().stream()
-//                        .filter(coord -> coord.getRowIndex() == x && coord.getColumnIndex() == y)
-//                        .forEach(coord -> coord.setSink(true));
-//                if(valuePosition.getBoat().isSink()){
-//                    return "You just sink the boat " + valuePosition.getBoat().getModel().getName();
-//                }else{
-//                    return "You hit the boat" + valuePosition.getBoat().getModel().getName();
-//                }
-//
-//            }else{
-//                valuePosition.setDiscovered();
-//                return "Sadly, it's only water...";
-//            }
-//        }
-//       return "You are out of the grid";
-//    }
+    /***
+     * fire on a position of the grid, update the grid where a fire is land and return a message for the user if
+     * he touches a boat
+     * he already hit the position
+     * he sinks a boat
+     * @return String
+     */
+    public String fire(@NotNull Cell target) {
+        if (target.isDiscovered()) return "you already hit this position";
+        target.discover();
+
+        if (!DirectionService.isInGrid(target, this)) return "You are out of the grid";
+
+        Boat boat = DiscoveryService.findBoatWhichHasCell(target, boats);
+        if (boat == null) return "Sadly, it's only water...";
+
+        for (Cell c : boat.getCoordinates()) {
+            if (! c.isDiscovered()) {
+                return "You hit the boat" + boat.getName();
+            }
+        }
+
+        return "You just sink the boat " + boat.getName();
+    }
 
     /**
      * Return true if all the boat in the myboats List are Sink
-     * @return
+     * @return boolean
      */
-    public boolean allBoatAreSink(){
+    public boolean allBoatAreSunk(){
         return boats.stream().allMatch(Boat::isSunk);
     }
 }

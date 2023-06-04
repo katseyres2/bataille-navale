@@ -54,7 +54,7 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 
 	public static @Nullable Game getActiveGame(Player player) {
 		for (Game g : games) {
-			System.out.println("HasPlayer : " + g.hasPlayer(player) + " " + g.getPlayers().toString());
+			// System.out.println("HasPlayer : " + g.hasPlayer(player) + " " + g.getPlayers().toString());
 			// if (g.isPlaying() && g.hasPlayer(player)) return g;
 			if (g.hasPlayer(player)) return g;
 		}

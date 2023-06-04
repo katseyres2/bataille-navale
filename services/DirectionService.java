@@ -124,6 +124,10 @@ public class DirectionService {
     }
 
     public static boolean areValidCoordinates(ArrayList<Cell> coordinates) {
+        for (Cell c : coordinates) {
+            if (c == null) return false;
+        }
+
         return (onTheSameColumn(coordinates) && areVerticalNeighbors(coordinates)) ||
                (onTheSameLine(coordinates) && areHorizontalNeighbors(coordinates));
     }
@@ -169,7 +173,7 @@ public class DirectionService {
         return false;
     }
 
-    private static boolean isInGrid(@NotNull Cell cell, @NotNull Grid grid) {
+    public static boolean isInGrid(@NotNull Cell cell, @NotNull Grid grid) {
         if (cell.getRow() >= grid.getRows() || cell.getRow() < 0) {
             return false;
         }
