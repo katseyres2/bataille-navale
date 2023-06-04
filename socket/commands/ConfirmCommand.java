@@ -44,7 +44,7 @@ public class ConfirmCommand extends Command {
 					try {
 						player.tryConfirm(userWhoInvitedYou);
 
-						userWhoInvitedYou.getPrintWriter().println(ServerResponse.sendInvitationMessage(player, userWhoInvitedYou));
+						userWhoInvitedYou.getPrintWriter().println(ServerResponse.sendInvitationMessage(userWhoInvitedYou, player));
 						userWhoInvitedYou.getPrintWriter().flush();
 
 						message.append(ServerResponse.confirmationInvitationSent(userWhoInvitedYou));
