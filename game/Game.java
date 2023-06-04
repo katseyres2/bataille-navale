@@ -2,8 +2,10 @@ package game;
 import java.lang.Thread.State;
 import java.util.*;
 
+import Bots.Bot;
 import game.boat.Boat;
 import game.grid.Grid;
+import org.jetbrains.annotations.NotNull;
 import services.DiscoveryService;
 import services.FormatService;
 import services.exceptions.OnlyOneActiveGameByPlayer;
@@ -28,10 +30,6 @@ public class Game {
 		return turnCount;
 	}
 
-	public void addBot(Player bot) {
-		if (bot == null || bots.contains(bot)) return;
-		bots.add(bot);
-	}
 
 	public boolean hasPlayer(Player player) {
 		for (Grid g : grids) {
@@ -162,6 +160,20 @@ public class Game {
 		grids.remove(grid);
 	}
 
+	public void addBot(Player bot) {
+		System.out.println("ADDBOT START");
+		if (bot == null || bots.contains(bot)) return;
+
+		try {
+			addGrid(bot);
+		} catch (OnlyOneActiveGameByPlayer e) {
+			System.out.println(e.getMessage());
+		}
+
+		bots.add(bot);
+		System.out.println("ADDBOT END");
+	}
+
 	/**
 	 *
 	 * @param player
@@ -250,6 +262,9 @@ public class Game {
 //					}
 //				} while(!gridsNotConfigured.isEmpty());
 
+				addBot(new Bot("BotLeBricoleur", Bot.Difficulty.EASY));
+				addBot(new Bot("BotLer", Bot.Difficulty.EASY));
+
 				for (Grid grid : grids) {
 					grid.populateRandomly();
 				}
@@ -265,11 +280,36 @@ public class Game {
 						break;
 					}
 
-					System.out.println(playerTurn.getUsername() + " turn.");
+					//System.out.println(playerTurn.getUsername() + " turn.");
+					System.out.println(playerTurn.isBot());
+					if(playerTurn.isBot()){
+
+						Bot bot = (Bot) playerTurn;
+						System.out.println("c'est le tour du bot : " + bot.getUsername());
+						bot.run();
+					}else {
+						System.out.println("déchet : " + playerTurn.getUsername());
+
+						// Fetch the grid of the player who must play.
+						Grid currentGrid = DiscoveryService.findGrid(playerTurn,grids);
+						int currentIndex = grids.indexOf(currentGrid);
+						int nextIndex = currentIndex += 1;
+
+						if (currentIndex == grids.size()) nextIndex = 0;
+
+						// Fetch the next grid to play.
+						Grid nextGrid = grids.get(nextIndex);
+						playerTurn = nextGrid.getPlayer();
+
+						continue;
+					}
 
 					Action lastAction = null;
 					if (actions.size() > 0) lastAction = actions.get(actions.size() - 1);
-					if (lastAction == null || lastAction.getPlayer() != playerTurn) continue;
+					if (lastAction == null || lastAction.getPlayer() != playerTurn){
+						System.out.println("pas d'action");
+						continue;
+					}
 
 					// Fetch the grid of the player who must play.
 					Grid currentGrid = DiscoveryService.findGrid(playerTurn,grids);
@@ -310,7 +350,10 @@ public class Game {
 		return players;
 	}
 
-	private void sendToClient(Player player, String message) {
+	private void sendToClient(@NotNull Player player, String message) {
+		if(player.isBot()){
+			return;
+		}
 		while (player.getPrintWriter() == null) {
 			System.out.println("waiting for " + player.getUsername() + " reconnection.");
 
