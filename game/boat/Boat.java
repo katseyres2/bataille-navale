@@ -1,33 +1,38 @@
 package game.boat;
 
+import game.grid.Coordinate;
+
+import java.util.List;
+
 public class Boat {
-    private boolean sink;
-    private int hp;
 
     public enum typeBoat {
-        AIRCRAFT_CARRIER("A", "aircraft carrier", 5),
-        CRUISER("C", "cruiser", 4),
-        SUBMARINE("S", "submarine", 3),
-        DESTROYER("D", "destroyer", 3),
-        WARSHIP("W", "warship", 2);
 
-        public final String label;
-        public final int length;
-        public final String name;
+        AIRCRAFT_CARRIER("A", "aircraft carrier", 5, false),
+        CRUISER("C", "cruiser", 4,false),
+        SUBMARINE("S", "submarine", 3,false),
+        DESTROYER("D", "destroyer", 3,false),
+        WARSHIP("W", "warship", 2,false);
 
-        typeBoat(String label, String name, int length) {
+        public String label;
+        public int length;
+        public String name;
+        public boolean isPlaced;
+
+        typeBoat(String label, String name, int length, boolean isPlaced) {
             this.label = label;
             this.name = name;
             this.length = length;
+            this.isPlaced = false;
         }
 
         public int getLength() {
             return length;
         }
 
-        public String getLabel() {
-            return label;
-        }
+//        public String getLabel() {
+//            return label;
+//        }
 
         public String getName() {
             return name;
@@ -36,32 +41,40 @@ public class Boat {
     }
 
     public typeBoat type;
+    public List<Coordinate> coordinates;
 
-    public Boat(typeBoat type) {
+    public Boat(typeBoat type, List<Coordinate> coordinates) {
         this.type = type;
-        this.sink = false;
-        this.hp = type.length;
+        this.coordinates = coordinates;
+    }
+
+    public typeBoat getType() {
+        return type;
+    }
+
+    public void setType(typeBoat type) {
+        this.type = type;
+    }
+
+    public List<Coordinate> getCoordinates() {
+        return coordinates;
+    }
+
+    public void setCoordinates(List<Coordinate> coordinates) {
+        this.coordinates = coordinates;
+    }
+
+    public boolean isPlaced() {
+        return getCoordinates() != null && getCoordinates().size() == getType().getLength();
+    }
+
+    public void addCoordinate(Coordinate coordinate) {
+        getCoordinates().add(coordinate);
     }
 
     public boolean isSink() {
-        return sink;
+        return coordinates.stream().noneMatch(Coordinate::isSink);
     }
 
-    public int getHp() {
-        return hp;
-    }
-
-    public void getHit() {
-        if (hp != 0) {
-            setHP();
-        }
-        if (hp == 0) {
-            sink = true;
-        }
-    }
-
-    public void setHP() {
-        hp--;
-    }
 
 }

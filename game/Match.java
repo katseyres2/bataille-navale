@@ -21,8 +21,8 @@ public class Match implements Runnable {
 
 	@Override
 	public void run() {
-		gridP1 = new Grid(player1);
-		gridP2 = new Grid(player2);
+		gridP1 = new Grid(player1, Grid.DEFAULT_ROW_COUNT, Grid.DEFAULT_COLUMN_COUNT);
+		gridP2 = new Grid(player2, Grid.DEFAULT_ROW_COUNT, Grid.DEFAULT_COLUMN_COUNT);
 
 		try{
 			// ask to players to place the boast

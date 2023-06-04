@@ -23,12 +23,14 @@ public class Player extends SocketClient {
 	private ArrayList<Player> usersYouInvited;
 	private ArrayList<Player> usersWhoInvitedYou;
 	private Role role;
+	private boolean isBot;
 
-	public Player(Socket sSender, PrintWriter pwSender, BufferedReader brSender, String username, String password) {
+	public Player(Socket sSender, PrintWriter pwSender, BufferedReader brSender, String username, String password, boolean isBot) {
 		super(sSender, pwSender, brSender);
 
 		this.username = username;
 		this.password = password;
+		this.isBot = isBot;
 		
 		usersYouInvited = new ArrayList<Player>();
 		usersWhoInvitedYou = new ArrayList<Player>();
@@ -60,7 +62,11 @@ public class Player extends SocketClient {
 			}
 		}
 	}
-	
+
+	public boolean isBot() {
+		return false;
+	}
+
 	public Role getRole() 								{ return role; }
 	public int getDefeats() 							{ return defeats; }
 	public String getColor()							{ return color; }
@@ -133,7 +139,6 @@ public class Player extends SocketClient {
 
 	public void signOut() throws NotConnectedException {
 		if (!super.isLogged()) throw new NotConnectedException();
-		super.toggleLog();
 		super.clear();
 	}
 

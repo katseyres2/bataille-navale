@@ -1,8 +1,10 @@
 package game;
 import java.lang.Thread.State;
+import java.lang.reflect.Array;
 import java.util.*;
 
 import game.grid.Grid;
+import game.grid.Grid_old;
 import services.FormatService;
 import services.exceptions.OnlyOneActiveGameByPlayer;
 import socket.server.Player;
@@ -17,6 +19,11 @@ public class Game {
 	private Player playerTurn;
 	private int turnCount = 0;
 	private Player winner;
+
+	public void addBot(Player bot) {
+		if (bot == null || bots.contains(bot)) return;
+		bots.add(bot);
+	}
 
 	public boolean hasPlayer(Player player) {
 		for (Grid g : grids) {
@@ -57,6 +64,20 @@ public class Game {
 		return null;
 	}
 
+	public String placePlayerBoat(Player player, int length , int column, int row, String vector) {
+		boolean placedBoat = false;
+
+		// Fetch the player grid.
+		Grid playerGrid = findGridByPlayer(player);
+		// get the boat with length
+		placedBoat = playerGrid.placeBoat(playerGrid.getBoatWithLength(length), column, row, vector);
+
+		if (!placedBoat)
+			return "Action failed.";
+
+		return null;
+	}
+
 	public void nextPlayer() {
 		int currentIndex = grids.indexOf(findGridByPlayer(playerTurn));
 		System.out.println("Current index1 : " + currentIndex);
@@ -77,6 +98,8 @@ public class Game {
 		player.getPrintWriter().flush();
 	}
 
+
+
 	private void addGrid(Player player) throws OnlyOneActiveGameByPlayer {
 		if (Server.getActiveGame(player) != null) throw new OnlyOneActiveGameByPlayer();
 
@@ -84,11 +107,11 @@ public class Game {
 			if (grid.getPlayer() == player) return;
 		}
 
-		Grid grid = new Grid(player);
-		grids.add(grid);
+//		Grid grid = new Grid(player,null,0,0);
+//		grids.add(grid);
 	}
 
-	private Grid findGridByPlayer(Player player) {
+	public Grid findGridByPlayer(Player player) {
 		for (Grid g : grids) {
 			if (g.getPlayer() == player) {
 				return g;
@@ -97,9 +120,9 @@ public class Game {
 		return null;
 	}
 
-	private Player findPlayerByGrid(Grid grid) {
+	private Player findPlayerByGrid(Grid gridOld) {
 		for (Grid g : grids) {
-			if (g == grid) {
+			if (g == gridOld) {
 				return g.getPlayer();
 			}
 		}
@@ -107,14 +130,14 @@ public class Game {
 	}
 
 	private void removeGrid(Player player) {
-		Grid grid = findGridByPlayer(player);
-		if (grid == null) return;
-		grids.remove(grid);
+		Grid gridOld = findGridByPlayer(player);
+		if (gridOld == null) return;
+		grids.remove(gridOld);
 	}
 
-	public void removeGrid(Grid grid) {
-		if (grid == null) return;
-		grids.remove(grid);
+	public void removeGrid(Grid_old gridOld) {
+		if (gridOld == null) return;
+		grids.remove(gridOld);
 	}
 
 	public void addPlayer(Player player) {
@@ -130,11 +153,6 @@ public class Game {
 	public void removePlayer(Player player) {
 		if (player == null) return;
 		removeGrid(player);
-	}
-
-	public void addBot(Player bot) {
-		if (bot == null || bots.contains(bot)) return;
-		bots.add(bot);
 	}
 
 	public void removeBot(Player bot) {
@@ -191,7 +209,6 @@ public class Game {
 					// Fetch the next grid to play.
 					Grid nextGrid = grids.get(nextIndex);
 					playerTurn = nextGrid.getPlayer();
-
 					sendToClient(playerTurn, "That's your turn.;" + displayPlayerGrids(playerTurn) + FormatService.colorizeString(playerTurn.getColor(), "(" + playerTurn.getUsername() + ")--|"));
 
 					System.out.println("Sent grid to player " + playerTurn.getUsername());

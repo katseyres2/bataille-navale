@@ -1,49 +1,54 @@
 package socket.server;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Set;
 
+import services.DiscoveryService;
+import services.LoaderService;
 import socket.Command;
-import socket.commands.*;
+import socket.client.SocketClient;
 
 public class ServerCommandHandler {
-	public static final ArrayList<Command> COMMANDS = new ArrayList<Command>(Arrays.asList(
-		new HelpCommand(),
-		new UserListCommand(),
-		new SignOutCommand(),
-		new HelpCommand(),
-		new SignInCommand(),
-		new InviteCommand(),
-		new ConfirmCommand(),
-		new SignUpCommand(),
-		new InfoCommand(),
-		new ActionCommand(),
-		new SurrendCommand(),
-		new GameStateCommand(),
-		new HistoryCommand()
-	));
+	public static final ArrayList<Command> commands = new ArrayList<>();
 
-	public static String executeCommand(String line, Socket s, PrintWriter pw, BufferedReader br, ArrayList<Player> players) {
-		if (line == null || s == null || pw == null || br == null || players == null) return "";
+	/**
+	 * Add all elements from the package "socket.commands".
+	 * All classes in this package must inherit from the parent class Command.
+	 */
+	public static void populateCommands() {
+		// extract all classes from the package "socket.commands"
+		Set<Class> classes = LoaderService.findAllClassesUsingClassLoader("socket.commands");
 
-		String messageToSend = "";
-		Player player = null;
-		String[] args = line.split(" ");
-
-		for (Player p : players) {
-			if (p.getSocket() == s) {
-				player = p;
-				break;
+		// iterate on each class
+		for (Class myClass : classes) {
+			try {
+				// call the constructor to build a new instance for this class
+				Constructor inst = myClass.getConstructor(null);
+				// instantiate a new object and cast it in Command type
+				Command cmd = (Command)inst.newInstance();
+				// add the new command in the command list
+				commands.add(cmd);
+			} catch (InstantiationException|IllegalAccessException|NoSuchMethodException|InvocationTargetException ignored) {
+				System.out.println("Something went wrong during populateCommands.");
 			}
 		}
+	}
 
-		for (Command c : COMMANDS) {
+	public static String executeCommand(String line, SocketClient client, ArrayList<Player> players) {
+		if (line == null) return "";
+
+		System.out.println("From client : " + line);
+
+		String messageToSend = "";
+		String[] args = line.split(" ");
+
+		for (Command c : commands) {
 			if (c.getName().contains(args[0])) {
-				messageToSend += c.execute(args, player, players, s, pw, br);
-				return messageToSend;
+				String response = c.execute(args, client, players);
+				System.out.println("To   client : " + response);
+				return messageToSend + response;
 			}
 		}
 

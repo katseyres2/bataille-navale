@@ -1,11 +1,11 @@
 package socket.commands;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 
 import game.Game;
+import services.DiscoveryService;
+import services.ServerResponse;
+import socket.client.SocketClient;
 import socket.server.Player;
 import socket.Command;
 import socket.server.Server;
@@ -17,9 +17,13 @@ public class GameStateCommand extends Command {
 	}
 
 	@Override
-	public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+	public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+		Player player = DiscoveryService.findOneBy(client, players);
+		if (player == null) return ServerResponse.notConnected;
+
 		Game activeGame = Server.getActiveGame(player);
-		String header = activeGame.isPlayerTurn(player) ? "That's your turn.;" : "";
+		if (activeGame == null) return ServerResponse.noGame;
+		String header = activeGame.isPlayerTurn(player) ? ServerResponse.yourTurn : "";
 		return header + activeGame.displayPlayerGrids(player);
 	}
 	

@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import org.jetbrains.annotations.NotNull;
+import socket.client.SocketClient;
 import socket.server.Player;
 import services.FormatService;
 import socket.Command;
@@ -24,15 +25,16 @@ public class SignUpCommand extends Command {
 	/**
      * Create a new Client with new credentials
      */
-	public String execute(String[] args, Player player, @NotNull ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+	public String execute(String[] args, SocketClient client, @NotNull ArrayList<Player> players) {
 		String message = "";
 		boolean usernameAlreadyExists = false;
 		String username;
 		String password;
+		Player connectedPlayer = null;
 
 		for (Player p : players) {
-			if (p.getSocket() == socket) {
-				player = p;
+			if (p.getSocket() == client.getSocket()) {
+				connectedPlayer = p;
 				break;
 			}
 		}
@@ -43,7 +45,7 @@ public class SignUpCommand extends Command {
 			message += "The username must have up to "+ FormatService.USERNAME_MAX_LENGTH +" characters.";
 		} else if (args[2].length() > FormatService.PASSWORD_MAX_LENGTH) {
 			message += "The password must have up to "+ FormatService.PASSWORD_MAX_LENGTH +" characters.";
-		} else if (player != null) {
+		} else if (connectedPlayer != null) {
 			message += "You're already connected.";
 		} else {
 			username = args[1];
@@ -58,12 +60,11 @@ public class SignUpCommand extends Command {
 			}
 			
 			if (! usernameAlreadyExists) {
-				player = new Player(socket, pw, br, username, password);
-				player.toggleLog();
-				players.add(player);
+				Player newPlayer = new Player(client.getSocket(), client.getPrintWriter(), client.getBufferedReader(), username, password, false);
+				players.add(newPlayer);
 				
-				message += "Your have created a new account, welcome " + player.getUsername() + ".;;";
-				message +=  (new UserListCommand()).execute(args, player, players, socket, pw, br);
+				message += "Your have created a new account, welcome " + username + ".;;";
+				message +=  (new UserListCommand()).execute(args, client, players);
 			}
 		}
 

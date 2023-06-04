@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import services.ServerResponse;
+import socket.client.SocketClient;
 import socket.server.Player;
 import socket.Command;
 
@@ -20,7 +22,7 @@ public class PingCommand extends Command {
 		);
     }
 
-    public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
-		  return "pong!";
-	  }
+    public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+		  return ServerResponse.pong;
+    }
 }
