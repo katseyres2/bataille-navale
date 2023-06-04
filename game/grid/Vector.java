@@ -1,19 +1,23 @@
 package game.grid;
 
 public class Vector {
-    private final int vertical;
-    private final int horizontal;
+    private final int column;
+    private final int row;
 
     public Vector(int vertical, int horizontal) {
-        this.horizontal = horizontal;
-        this.vertical = vertical;
+        this.row = horizontal;
+        this.column = vertical;
+    }
+
+    public String toString() {
+        return "[" + row + "," + column + "]";
     }
 
     public int getRow() {
-        return horizontal;
+        return row;
     }
 
     public int getColumn() {
-        return vertical;
+        return column;
     }
 }

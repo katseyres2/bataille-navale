@@ -153,8 +153,6 @@ public class DirectionService {
             filledCells.addAll(b.getCoordinates());
         }
 
-        System.out.println(boat.getCoordinates() + " " + filledCells);
-
         // iterate on each boat cell
         for (Cell cellReference : boat.getCoordinates()) {
             // for each cell, check all neighbors with the vectors
@@ -169,5 +167,26 @@ public class DirectionService {
         }
 
         return false;
+    }
+
+    private static boolean isInGrid(@NotNull Cell cell, @NotNull Grid grid) {
+        if (cell.getRow() >= grid.getRows() || cell.getRow() < 0) {
+            return false;
+        }
+
+        if (cell.getColumn() >= grid.getColumns() || cell.getColumn() < 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean isBoatInGrid(Boat boat, Grid grid) {
+        for (Cell c : boat.getCoordinates()) {
+            if (!isInGrid(c, grid)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -262,10 +262,11 @@ public class Game {
 //					}
 //				} while(!gridsNotConfigured.isEmpty());
 
-				addBot(new Bot("BotLeBricoleur", Bot.Difficulty.EASY));
-				addBot(new Bot("BotLer", Bot.Difficulty.EASY));
+//				addBot(new Bot("BotLeBricoleur", Bot.Difficulty.EASY));
+//				addBot(new Bot("BotLer", Bot.Difficulty.EASY));
 
 				for (Grid grid : grids) {
+					System.out.println("-- NEW GRID (" + grid.getPlayer().getUsername() + ") --");
 					grid.populateRandomly();
 				}
 

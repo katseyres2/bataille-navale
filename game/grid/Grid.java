@@ -6,8 +6,7 @@ import services.DiscoveryService;
 import socket.server.Player;
 import game.boat.Boat;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Represents the grid used in the game for a specific player.
@@ -138,8 +137,8 @@ public class Grid {
      *
      * @return Une cellule aléatoire qui respecte les conditions.
      */
-    public Cell getRandomCell(ArrayList<Cell> haystack) {
-        return haystack.get((new Random().nextInt(haystack.size() - 1)));
+    public Cell getRandomCell(ArrayList<Cell> cells) {
+        return cells.get((new Random().nextInt(cells.size() - 1)));
     }
 
 //    public Cell getCell(int x, int y) {
@@ -210,26 +209,30 @@ public class Grid {
      *
      */
     private void placeRandomBoat(Boat.Model model) {
+        ArrayList<Vector> vectors = DirectionService.get4Vectors();
+
         while (true) {
             Cell cell = getRandomCell(getEmptyCells()); // Get a random cell on the grid
+            Collections.shuffle(vectors);
 
             // Check if all points can be filled
             for (Vector vector : DirectionService.get4Vectors()) {
                 try {
-//                    System.out.println("C[" + cell.getRow() + "," + cell.getColumn() + "] V[" + vector.getRow() + "," + vector.getColumn() + "]");
                     Boat boat = new Boat(model, cell, vector);
 
                     if (DirectionService.isBoatAlongBorder(boat, this)) {
-                        System.out.println("Along border");
+//                        System.out.println("Along border");
                     } else if (DirectionService.isBoatAlongOther(boat, this)) {
-                        System.out.println("Along other");
+//                        System.out.println("Along other");
+                    } else if (!DirectionService.isBoatInGrid(boat, this)) {
+//                        System.out.println("Boat not in grid");
                     } else {
-                        System.out.println("New boat " + boat.getName() + " at" + boat.getCoordinates());
+                        System.out.println("New boat " + boat.getName() + " at " + boat.getCoordinates());
                         boats.add(boat);
                         return;
                     }
                 } catch (InstantiationException e) {
-                    //System.out.println("Error on boat instantiation " + e.getMessage());
+//                    System.out.println("Error on boat instantiation " + e.getMessage());
                 }
             }
         }
