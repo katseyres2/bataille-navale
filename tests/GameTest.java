@@ -3,6 +3,7 @@ package tests;
 import game.Game;
 import game.grid.Grid;
 import org.junit.jupiter.api.Test;
+import socket.client.SocketClient;
 import socket.server.Player;
 
 import java.util.ArrayList;
@@ -19,11 +20,12 @@ public class GameTest {
     @Test
    public void testGetPlayers() {
         //creation instance contenant la méthode getPlayer
-        Game game = new Game();
+        SocketClient sc = new SocketClient();
+        Game game = new Game()
         game.addPlayer(null);
 //ajouter des joueurs tests
-        Player player1 = new Player("Max");
-        Player player2 = new Player("Lud");
+        Player player1 = new Player(SocketClient "sc", "LUD","lock" );
+        Player player2 = new Player(");
 // ajout des grilles joueurs
         Grid grid1 = new Grid(player1);
         Grid grid2 = new Grid(player2);
