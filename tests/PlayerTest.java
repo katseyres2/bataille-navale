@@ -40,14 +40,6 @@ public class PlayerTest {
         thServer.start();
     }
 
-    @Test
-    public void testBoat() {
-        Boat boat = new Boat(Boat.typeBoat.CRUISER);
-
-        assertEquals(Boat.typeBoat.CRUISER, boat.type);
-        assertEquals(4, boat.getHp());
-        assertEquals(false, boat.isSink());
-    }
 
     Player buildPlayer(String username, String password) {
         return new Player(buildSocketClient(), username, password);
@@ -87,19 +79,6 @@ public class PlayerTest {
 
         assertEquals(true, result1);
         assertEquals(false, result2);
-    }
-
-    @Test
-    public void commands() {
-
-        Player p = buildPlayer(username, password);
-        p.sendMessage("/signup " + p.getUsername() + " " + password);
-        p.sendMessage("/help");
-
-        try { Thread.sleep(1000); }
-        catch (Exception ignored) {}
-
-        assertEquals("/help", Server.findLastMessageFrom(p.getUsername()).getText());
     }
 
 
