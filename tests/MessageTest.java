@@ -39,3 +39,5 @@ public class MessageTest {
         assertEquals(test, message.getText());
     }
 }
+
+
