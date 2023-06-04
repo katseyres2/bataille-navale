@@ -177,7 +177,7 @@ public class Grid {
     }
 
     public String toString(boolean showBoats) {
-        StringBuilder output = new StringBuilder("\n");
+        StringBuilder output = new StringBuilder("\n" + player.getUsername() + "\n");
 
         for (int i = 0; i < 11; i++) {
             for (int j = 0; j < 11; j++) {
