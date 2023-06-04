@@ -86,7 +86,7 @@ public class DiscoveryService {
 
     /**
      *
-     * @param length
+     * @param length boat length
      * @return return a boat from the list by his length
      */
     public static Boat.Model findModelByLength(int length) {
@@ -100,8 +100,8 @@ public class DiscoveryService {
 
     /**
      * return the grid of a player with the player as parameter
-     * @param player
-     * @return
+     * @param player player
+     * @return Grid
      */
     public static Grid findGrid(Player player, ArrayList<Grid> grids) {
         for (Grid g : grids) {

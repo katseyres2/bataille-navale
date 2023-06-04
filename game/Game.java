@@ -161,7 +161,7 @@ public class Game {
 	}
 
 	public void addBot(Player bot) {
-		System.out.println("ADDBOT START");
+		System.out.println("ADD BOT START");
 		if (bot == null || bots.contains(bot)) return;
 
 		try {
@@ -171,15 +171,15 @@ public class Game {
 		}
 
 		bots.add(bot);
-		System.out.println("ADDBOT END");
+		System.out.println("ADD BOT END");
 	}
 
 	/**
 	 *
-	 * @param player
+	 * @param player player
 	 */
 	public void addPlayer(Player player) {
-		System.out.println("ADDPLAYER START");
+		System.out.println("ADD PLAYER START");
 		if (player == null) return;
 
 		try {
@@ -188,7 +188,7 @@ public class Game {
 			System.out.println(e.getMessage());
 		}
 
-		System.out.println("ADDPLAYER END");
+		System.out.println("ADD PLAYER END");
 	}
 
 	public void removePlayer(Player player) {
@@ -202,19 +202,13 @@ public class Game {
 	}
 
 	public String displayPlayerGrids(Player player) {
-		Grid currentGrid = null;
-		Grid targetGrid = null;
-
 		for (Grid grid : grids) {
-			if (grid.getPlayer() == player) {
-				currentGrid = grid;
-			} else {
-				targetGrid = grid;
+			if (grid.getPlayer() != player) {
+				return grid.toString(true);
 			}
 		}
 
-		return targetGrid.toString(true);
-//		return FormatService.concatenateGrids(currentGrid, targetGrid) + ";";
+		return "No grid";
 	}
 
 	/**
@@ -342,7 +336,7 @@ public class Game {
 	}
 
 	public ArrayList<Player> getPlayers() {
-		ArrayList<Player> players = new ArrayList<Player>(){};
+		ArrayList<Player> players = new ArrayList<>(){};
 
 		for (Grid grid : grids) {
 			players.add(grid.getPlayer());
