@@ -1,80 +1,89 @@
 package game.boat;
 
-import game.grid.Coordinate;
+import game.grid.Cell;
+import game.grid.Vector;
+import org.jetbrains.annotations.NotNull;
+import services.DirectionService;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class Boat {
 
-    public enum typeBoat {
+    public enum Model {
+        AIRCRAFT_CARRIER("A", "aircraft carrier", 5),
+        CRUISER("C", "cruiser", 4),
+        SUBMARINE("S", "submarine", 3),
+        DESTROYER("D", "destroyer", 3),
+        WARSHIP("W", "warship", 2);
 
-        AIRCRAFT_CARRIER("A", "aircraft carrier", 5, false),
-        CRUISER("C", "cruiser", 4,false),
-        SUBMARINE("S", "submarine", 3,false),
-        DESTROYER("D", "destroyer", 3,false),
-        WARSHIP("W", "warship", 2,false);
+        private final String label;
 
-        public String label;
-        public int length;
-        public String name;
-        public boolean isPlaced;
+        private final int length;
+        private final String name;
 
-        typeBoat(String label, String name, int length, boolean isPlaced) {
+        Model(String label, String name, int length) {
             this.label = label;
             this.name = name;
             this.length = length;
-            this.isPlaced = false;
         }
 
         public int getLength() {
             return length;
         }
 
-//        public String getLabel() {
-//            return label;
-//        }
+        public String getLabel() {
+            return label;
+        }
 
         public String getName() {
             return name;
         }
-
     }
 
-    public typeBoat type;
-    public List<Coordinate> coordinates;
+    private final Model model;
+    private final ArrayList<Cell> coordinates;
 
-    public Boat(typeBoat type, List<Coordinate> coordinates) {
-        this.type = type;
-        this.coordinates = coordinates;
+
+    public int getLength() {
+        return model.getLength();
     }
 
-    public typeBoat getType() {
-        return type;
+    public String getLabel() {
+        return model.label;
     }
 
-    public void setType(typeBoat type) {
-        this.type = type;
+    public String getName() {
+        return model.name;
     }
 
-    public List<Coordinate> getCoordinates() {
+    public boolean isSunk() {
+        for (Cell c : coordinates) {
+            if (!c.isDiscovered()) return false;
+        }
+
+        return true;
+    }
+
+    public Boat(@NotNull Model model, Cell reference, Vector vector) throws InstantiationException {
+        ArrayList<Cell> cells = new ArrayList<>();
+
+        for (int i = 0; i < model.length; i++) {
+            cells.add(new Cell(
+                reference.getRow() + i * vector.getRow(),
+                reference.getColumn() + i * vector.getColumn()
+            ));
+        }
+
+        this.model = model;
+
+        if (model.length != cells.size() || !DirectionService.areValidCoordinates(cells)) {
+            throw new InstantiationException();
+        }
+
+        this.coordinates = cells;
+    }
+
+    public ArrayList<Cell> getCoordinates() {
         return coordinates;
     }
-
-    public void setCoordinates(List<Coordinate> coordinates) {
-        this.coordinates = coordinates;
-    }
-
-    public boolean isPlaced() {
-        return getCoordinates() != null && getCoordinates().size() == getType().getLength();
-    }
-
-    public void addCoordinate(Coordinate coordinate) {
-        getCoordinates().add(coordinate);
-    }
-
-    public boolean isSink() {
-        return coordinates.stream().noneMatch(Coordinate::isSink);
-    }
-
-
 }
