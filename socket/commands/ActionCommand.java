@@ -52,4 +52,5 @@ public class ActionCommand extends Command {
 		if (response != null) return response;
 		return ServerResponse.actionSuccessful;
 	}
+	
 }

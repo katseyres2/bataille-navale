@@ -28,7 +28,7 @@ public class InviteCommand extends Command {
 		if (player == null) return ServerResponse.notConnected;
 
 		StringBuilder message = new StringBuilder();
-
+		
 		if (args.length != 2) {
 			message.append(ServerResponse.wrongNumberOfParameters);
 		} else if (args[1].compareTo(player.getUsername()) == 0) {
@@ -37,26 +37,29 @@ public class InviteCommand extends Command {
 			message.append(ServerResponse.alreadyInGame);
 		} else {
 			String username = args[1];
-
-			// try to find the user you want invite
+			boolean playerMatch = false;
+			
 			for (Player userToInvite : players) {
-				// if you find the user and if he's connected
 				if (userToInvite.isLogged() && userToInvite.getUsername().compareTo(username) == 0) {
+					playerMatch = true;
+					Game game = Server.getActiveGame(player);
+
 					try {
-						// try to invite the user, if you can't invite it throws an exception
 						player.tryInvite(userToInvite);
+
 						userToInvite.getPrintWriter().println(ServerResponse.receiveAnInvitationFrom(player, userToInvite));
 						userToInvite.getPrintWriter().flush();
-
 						message.append(ServerResponse.invitationSentTo(userToInvite));
 
-						player.addInUsersYouInvited(userToInvite);    // add in your list the user you invited
-						userToInvite.addInUsersWhoInvitedYou(player); // add in the invited user your invitation
+						for (Player cli : players) {
+							if (cli.compareTo(player)) {
+								cli.addInUsersYouInvited(userToInvite);
+							}
+						}
 
-						Game game = new Game();
-						System.out.println("BEFORE");
+						userToInvite.addInUsersWhoInvitedYou(player);
+//						Game game = new Game();
 						game.addPlayer(player);
-						System.out.println("AFTER");
 						Server.pushGame(game);
 					} catch (UserAlreadyInvitedYouException e) {
 						message.append(ServerResponse.youAlreadyReceivedAnInvitation(userToInvite));
@@ -64,12 +67,13 @@ public class InviteCommand extends Command {
 						message.append(ServerResponse.youAlreadySentAnInvitation(userToInvite));
 					}
 
-					return message.toString();
+					break;
 				}
 			}
 
-			message.append(ServerResponse.playerNotFound);
-			return message.toString();
+			if (! playerMatch) {
+				message.append(ServerResponse.playerNotFound);
+			}
 		}
 
 		return message.toString();

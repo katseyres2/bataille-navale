@@ -20,7 +20,6 @@ public class ServerResponse {
     public static final String notYouTurn = "It's not your turn";
     public static final String notPlayingGame = "You are not playing a game";
     public static final String pong = "pong";
-    public static final String unsupportedCommand = "Unsupported command";
 
     public static String welcome(Player player) {
         return "Welcome back " + player.getUsername() + ".";
