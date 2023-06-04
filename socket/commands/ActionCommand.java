@@ -58,7 +58,7 @@ public class ActionCommand extends Command {
 			cells.addAll(i);
 		}
 
-		String response =  currentGame.sendAction(player, targetPlayer, DiscoveryService.findCell(row, column, cells));
+		String response =  currentGame.sendAction(player, targetPlayer, row, column);
 		
 		if (response != null) return response;
 		return ServerResponse.actionSuccessful;

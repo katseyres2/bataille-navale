@@ -1,5 +1,6 @@
 package game;
 
+import game.grid.Cell;
 import game.grid.Grid;
 import socket.server.Player;
 
@@ -9,6 +10,10 @@ public class Action {
 	private int column; // the column index of the target cell
 	private int row; // the row index of the target cell
 	private int turnCount; // the turn count at which the action was made
+
+	public Cell getCell() {
+		return new Cell(row, column);
+	}
 
 	/**
 	 * Constructor for the Action class
@@ -64,6 +69,11 @@ public class Action {
 	 */
 	public int getTurnCount() {
 		return turnCount;
+	}
+
+	@Override
+	public String toString() {
+		return "(" + row + "," + column + ")";
 	}
 }
 

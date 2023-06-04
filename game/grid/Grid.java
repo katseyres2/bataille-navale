@@ -27,6 +27,24 @@ public class Grid {
         return boats;
     }
 
+    public ArrayList<Cell> getAllCells() {
+        ArrayList<Cell> output = new ArrayList<>();
+
+        for (ArrayList<Cell> cells : plate) {
+            output.addAll(cells);
+        }
+
+        return output;
+    }
+
+    public ArrayList<Cell> getDiscoveredCells() {
+        ArrayList<Cell> output = new ArrayList<>();
+        for (Cell cell : getAllCells()) {
+            if (cell.isDiscovered()) output.add(cell);
+        }
+        return output;
+    }
+
     public ArrayList<Cell> getEmptyCells() {
         ArrayList<Cell> emptyCells = new ArrayList<>();
 
@@ -98,7 +116,7 @@ public class Grid {
      * @return Une cellule aléatoire qui respecte les conditions.
      */
     public Cell getRandomCell(ArrayList<Cell> cells) {
-        return cells.get((new Random().nextInt(cells.size() - 1)));
+        return cells.get((new Random().nextInt(cells.size())));
     }
 
     /**
@@ -116,21 +134,37 @@ public class Grid {
             // Check if all points can be filled
             for (Vector vector : DirectionService.get4Vectors()) {
                 try {
-                    Boat boat = new Boat(model, cell, vector);
+                    ArrayList<Cell> cells = new ArrayList<>();
+
+                    for (int i = 0; i < model.getLength(); i++) {
+                        Cell c = DiscoveryService.findCellInGrid(
+                                cell.getRow() + i * vector.getRow(),
+                                cell.getColumn() + i * vector.getColumn(),
+                                this
+                        );
+
+                        cells.add(c);
+//                        cells.add(new Cell(
+//                                reference.getRow() + i * vector.getRow(),
+//                                reference.getColumn() + i * vector.getColumn()
+//                        ));
+                    }
+
+                    Boat boat = new Boat(model, cells);
 
                     if (DirectionService.isBoatAlongBorder(boat, this)) {
-                        System.out.println("Along border");
+//                        System.out.println("Along border");
                     } else if (DirectionService.isBoatAlongOther(boat, this)) {
-                        System.out.println("Along other");
+//                        System.out.println("Along other");
                     } else if (!DirectionService.isBoatInGrid(boat, this)) {
-                        System.out.println("Boat not in grid");
+//                        System.out.println("Boat not in grid");
                     } else {
                         System.out.println("New boat " + boat.getName() + " at " + boat.getCoordinates());
                         boats.add(boat);
                         return;
                     }
                 } catch (InstantiationException e) {
-                    System.out.println("Error on boat instantiation " + e.getMessage());
+//                    System.out.println("Error on boat instantiation " + e.getMessage());
                 }
             }
         }
@@ -191,6 +225,16 @@ public class Grid {
         return isEmptyCell(cell.getRow(), cell.getColumn());
     }
 
+    public int getAllAliveBoatCells() {
+        int counter = 0;
+
+        for (Boat b : boats) {
+            counter += b.getCoordinatesNotHit().size();
+        }
+
+        return counter;
+    }
+
     public boolean isEmptyCell(int row, int column) {
         return DiscoveryService.findCellInBoats(row, column, boats) != null;
     }
@@ -206,7 +250,7 @@ public class Grid {
         if (target.isDiscovered()) return "you already hit this position";
         target.discover();
 
-        if (!DirectionService.isInGrid(target, this)) return "You are out of the grid";;
+        if (!DirectionService.isInGrid(target, this)) return "You are out of the grid";
 
         Boat boat = DiscoveryService.findBoatWhichHasCell(target, boats);
         if (boat == null) return "Sadly, it's only water...";
@@ -224,7 +268,7 @@ public class Grid {
      * Return true if all the boat in the myboats List are Sink
      * @return boolean
      */
-    public boolean allBoatAreSink(){
+    public boolean allBoatAreSunk(){
         return boats.stream().allMatch(Boat::isSunk);
     }
 }

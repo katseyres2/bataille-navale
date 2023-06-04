@@ -44,15 +44,23 @@ public class Bot extends Player {
     /*
      * Executes the bots turn in the game.
      */
-    public void run() {
+    public Action run() {
+//        System.out.println("run START");
         // Retrieve the active game in which the bot is playing
         Game game = Server.getActiveGame(this);
         // Retrieve the list of players in the game
         ArrayList<Player> players = game.getPlayers();
-        // Select a random player from the available players
-        Player player = players.get(random.nextInt(players.size() - 1));
-        // Find the grid associated with the selected player
-        Grid randomGrid = DiscoveryService.findGrid(player, game.getGrids());
+//        System.out.println("Player : " + players);
+        Grid randomGrid = null;
+
+        do {
+            // Select a random player from the available players
+            Player player = players.get(random.nextInt(players.size()));
+            // Find the grid associated with the selected player
+            randomGrid = DiscoveryService.findGrid(player, game.getGrids());
+//            System.out.println("Select target " + player.getUsername());
+        } while (randomGrid.getPlayer() == this);
+
         Cell cell = null;
 
         // Execute the turn based on the bots difficulty level
@@ -63,13 +71,8 @@ public class Bot extends Player {
             default -> System.out.println("Difficulty is not defined");
         }
 
-        // Send the action to the active game
-
-
-        Server.getActiveGame(player).sendAction(this, player, cell);
-        System.out.println("bien joué sale pauvre");
-
-
+//        System.out.println("run END");
+        return new Action(this, randomGrid, cell.getColumn(), cell.getRow(), game.getTurnCount());
     }
 
 
@@ -81,8 +84,12 @@ public class Bot extends Player {
      */
     private @NotNull Cell startTurnEasy(@NotNull Grid grid) {
         // Select a random cell from the grid
-        return grid.getRandomCell(grid.getEmptyCells());
+        ArrayList<ArrayList<Cell>> cells = grid.getPlate();
 
+        var random = new Random();
+        int randRow = random.nextInt(cells.size());
+        int randCol = random.nextInt(cells.get(0).size());
+        return grid.getPlate().get(randRow).get(randCol);
     }
 
 

@@ -124,6 +124,10 @@ public class DirectionService {
     }
 
     public static boolean areValidCoordinates(ArrayList<Cell> coordinates) {
+        for (Cell c : coordinates) {
+            if (c == null) return false;
+        }
+
         return (onTheSameColumn(coordinates) && areVerticalNeighbors(coordinates)) ||
                (onTheSameLine(coordinates) && areHorizontalNeighbors(coordinates));
     }

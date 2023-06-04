@@ -61,6 +61,15 @@ public class DiscoveryService {
         return null;
     }
 
+    public static Cell findCellInGrid(int row, int column, Grid grid) {
+        for (Cell cell : grid.getAllCells()) {
+            if (cell.getColumn() == column && cell.getRow() == row) {
+                return cell;
+            }
+        }
+        return null;
+    }
+
     public static Cell findCellInBoats(int row, int column, ArrayList<Boat> haystack) {
         for (Boat b : haystack) {
             for (Cell c : b.getCoordinates()) {

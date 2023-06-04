@@ -64,17 +64,9 @@ public class Boat {
         return true;
     }
 
-    public Boat(@NotNull Model model, Cell reference, Vector vector) throws InstantiationException {
-        ArrayList<Cell> cells = new ArrayList<>();
-
-        for (int i = 0; i < model.length; i++) {
-            cells.add(new Cell(
-                reference.getRow() + i * vector.getRow(),
-                reference.getColumn() + i * vector.getColumn()
-            ));
-        }
-
+    public Boat(@NotNull Model model, ArrayList<Cell> cells) throws InstantiationException {
         this.model = model;
+        System.out.println(cells);
 
         if (model.length != cells.size() || !DirectionService.areValidCoordinates(cells)) {
             throw new InstantiationException();
@@ -85,5 +77,25 @@ public class Boat {
 
     public ArrayList<Cell> getCoordinates() {
         return coordinates;
+    }
+
+    public ArrayList<Cell> getCoordinatesNotHit() {
+        ArrayList<Cell> output = new ArrayList<>();
+
+        for (Cell c : coordinates) {
+            if (!c.isDiscovered()) output.add(c);
+        }
+
+        return output;
+    }
+
+    public String toString() {
+        String output = model.label + ": ";
+
+        for (Cell c : coordinates) {
+            output += c + " ";
+        }
+
+        return output;
     }
 }
