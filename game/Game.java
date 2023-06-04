@@ -299,7 +299,9 @@ public class Game {
 						Action action = ((Bot)playerTurn).run();
 //						System.out.println("sendAction BEFORE");
 						String response = sendAction(playerTurn, action.getTarget().getPlayer(), action.getCell().getRow(), action.getCell().getColumn());
-						System.out.println(action.getPlayer().getUsername() + " plays " + action.toString() + " for grid " + action.getTarget().getPlayer().getUsername() + ", output = " + response + " alive=" + action.getTarget().getAllAliveBoatCells() + ", disc=" + action.getTarget().getDiscoveredCells().size());
+
+						System.out.println(action.getTarget().toString(false));
+//						System.out.println(action.getPlayer().getUsername() + " plays " + action.toString() + " for grid " + action.getTarget().getPlayer().getUsername() + ", output = " + response + " alive=" + action.getTarget().getAllAliveBoatCells() + ", disc=" + action.getTarget().getDiscoveredCells().size());
 					} else {
 						// Fetch the grid of the player who must play.
 						Grid currentGrid = DiscoveryService.findGrid(playerTurn,grids);
