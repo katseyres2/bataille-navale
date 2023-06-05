@@ -25,7 +25,7 @@ public class UserListCommand extends Command {
 
 		for (int i = 0; i < players.size(); i++) {
 			if (player == null || players.get(i).getUsername().compareTo(player.getUsername()) == 0) continue;
-			message += " | " + players.get(i).getUsername() + " " + (players.get(i).isLogged() ? "online" : "offline").toUpperCase() + ", "
+			message += " | (" + (players.get(i).isBot() ? "BOT" : "PLAYER") + ") " + players.get(i).getUsername() + " " + (players.get(i).isLogged() ? "online" : "offline").toUpperCase() + ", "
 						+ FormatService.LocalDateTimeToString(players.get(i).getLastConnection())
 						+ ", V = " + players.get(i).getVictories() + ", D = " + players.get(i).getDefeats()
 						+ ";";

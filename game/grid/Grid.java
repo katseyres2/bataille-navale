@@ -18,7 +18,7 @@ public class Grid {
     public static final int DEFAULT_COLUMN_COUNT = 10;
     private final int rows;
     private final int columns;
-    private final ArrayList<ArrayList<Cell>> plate;
+    private final ArrayList<ArrayList<Cell>> grid;
     final private ArrayList<Boat> boats = new ArrayList<Boat>();
     static public final String[] POSITIONS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
     private final Player player;
@@ -30,7 +30,7 @@ public class Grid {
     public ArrayList<Cell> getAllCells() {
         ArrayList<Cell> output = new ArrayList<>();
 
-        for (ArrayList<Cell> cells : plate) {
+        for (ArrayList<Cell> cells : grid) {
             output.addAll(cells);
         }
 
@@ -48,7 +48,7 @@ public class Grid {
     public ArrayList<Cell> getEmptyCells() {
         ArrayList<Cell> emptyCells = new ArrayList<>();
 
-        for (ArrayList<Cell> p : plate) {
+        for (ArrayList<Cell> p : grid) {
             for (Cell c : p) {
                 if (DiscoveryService.findCellInBoats(c.getRow(), c.getColumn(), boats) == null) {
                     emptyCells.add(c);
@@ -70,14 +70,14 @@ public class Grid {
         this.rows = rows;
         this.columns = columns;
         this.player = player;
-        this.plate = new ArrayList<>();
+        this.grid = new ArrayList<>();
 
         for (int row=0; row<rows; row++) {
             var tmp = new ArrayList<Cell>();
             for (int col=0; col<columns; col++) {
                 tmp.add(new Cell(row,col));
             }
-            plate.add(tmp);
+            grid.add(tmp);
         }
     }
 
@@ -104,8 +104,8 @@ public class Grid {
      *
      * @return The 2D array of cells.
      */
-    public ArrayList<ArrayList<Cell>> getPlate() {
-        return plate;
+    public ArrayList<ArrayList<Cell>> getGrid() {
+        return grid;
     }
 
     public Player getPlayer() { return player; }
@@ -176,35 +176,6 @@ public class Grid {
         }
     }
 
-    public String toString(boolean showBoats) {
-        StringBuilder output = new StringBuilder("\n" + player.getUsername() + "\n");
-
-        for (int i = 0; i < 11; i++) {
-            for (int j = 0; j < 11; j++) {
-                // Display the letter on the first column
-                if (j == 1 && i >= 1) output.append(POSITIONS[i - 1]).append(" ");
-
-                // Display position on the first row
-                if (i == 0) {
-                    if (j == 0) output.append("\\ ");
-                    if (j >= 1) {
-                        output.append(j > 9 ? " " : "  ");
-                        output.append(j).append(" ");
-                    }
-                } else if (j >= 1) {
-                    Boat boat = DiscoveryService.findBoatWhichHasCell(plate.get(i-1).get(j-1), boats);
-                    String label = boat != null ? boat.getLabel() : "-";
-
-                    output.append(plate.get(i - 1).get(j - 1).isDiscovered() || showBoats ? "  " + label + " " : "  . ");
-                }
-            }
-
-            output.append("\n");
-        }
-
-        return output.toString();
-    }
-
     /**
      * return true if all boats are placed in the grid
      * @return state of the grid
@@ -218,7 +189,7 @@ public class Grid {
      * @return Cell
      */
     public Cell getCellFromPosition(int row, int column){
-        return plate.get(row).get(column);
+        return grid.get(row).get(column);
     }
 
     public boolean isEmptyCell(Cell cell) {
@@ -250,7 +221,7 @@ public class Grid {
         if (target.isDiscovered()) return "you already hit this position";
         target.discover();
 
-        if (!DirectionService.isInGrid(target, this)) return "You are out of the grid";
+        if (!DirectionService.isCellInGrid(target, this)) return "You are out of the grid";
 
         Boat boat = DiscoveryService.findBoatWhichHasCell(target, boats);
         if (boat == null) return "Sadly, it's only water...";

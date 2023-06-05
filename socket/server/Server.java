@@ -29,8 +29,8 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 		super(LOG_PATH);
 	}
 
-	private ArrayList<Player> players = new ArrayList<Player>();
-	private static ArrayList<Game> games = new ArrayList<Game>();
+	private static final ArrayList<Player> players = new ArrayList<Player>();
+	private static final ArrayList<Game> games = new ArrayList<Game>();
 	private static LEVEL logLevel = LEVEL.INFO;
 	private static final Path LOG_PATH = Path.of("../data/server.log");
 	public static final Path CREDENTIALS_PATH = Path.of("../data/credentials.txt");
@@ -50,6 +50,17 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 		if (games.contains(game) || game == null) return;
 		games.add(game);
 		System.out.println("GAME END");
+	}
+
+	public static boolean addPlayer(Player player) {
+		for (Player p : players) {
+			if (p.getUsername() == player.getUsername()) {
+				return false;
+			}
+		}
+
+		players.add(player);
+		return true;
 	}
 
 	public static @Nullable Game getActiveGame(Player player) {
@@ -163,9 +174,16 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 		});
 	}
 
+	private static void populateBots() {
+		addPlayer(new Bot("BotLeBricoleur", Bot.Difficulty.EASY));
+		addPlayer(new Bot("BotLer", Bot.Difficulty.EASY));
+	}
+
 	public void start(int port) {
 		final ServerSocket serverSocket;
 		ServerCommandHandler.populateCommands();
+		populateBots();
+
 		String data = readFile(LEVEL.DEBUG);
 		if (data.length() > 0) {
 			for (String credentials : data.split("\n")) {
