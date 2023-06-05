@@ -3,8 +3,10 @@ package services;
 import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Random;
 
+import game.grid.Cell;
 import game.grid.Grid;
 import socket.server.Player;
 
@@ -67,6 +69,19 @@ public class FormatService {
 
 		String formatUsername = FormatService.formatSpace(FormatService.USERNAME_MAX_LENGTH, username, true);
 		return "[" + FormatService.LocalDateTimeToString(FormatService.getCurrentTime()) + " " + formatUsername + "] ";
+	}
+
+	public static String concatenateGrids(Grid grid1, Grid grid2) {
+		String output = "";
+
+		String[] g1 = grid1.toString(false).split("\n");
+		String[] g2 = grid2.toString(true).split("\n");
+
+		for (int i=0; i<g1.length; i++) {
+			output += g1[i] + "  |  " + g2[i] + "\n";
+		}
+
+		return output + "\n";
 	}
 
 	public static String toMessage(Socket socket, String msg) {
