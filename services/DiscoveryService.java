@@ -1,5 +1,6 @@
 package services;
 
+import game.Game;
 import game.boat.Boat;
 import game.grid.Cell;
 import game.grid.Grid;
@@ -23,6 +24,13 @@ public class DiscoveryService {
         var elements = findBy(needle, haystack);
         if (elements.size() == 0) return null;
         return elements.get(0);
+    }
+
+    public static Player findPlayerInGameByUsername(String username, Game game) {
+        for (Player p : game.getPlayers()) {
+            if (p.getUsername() == username) return p;
+        }
+        return null;
     }
 
     public static @Nullable Player findOneBy(Socket socket, @NotNull ArrayList<Player> players) {

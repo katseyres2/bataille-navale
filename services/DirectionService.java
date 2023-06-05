@@ -173,21 +173,17 @@ public class DirectionService {
         return false;
     }
 
-    public static boolean isInGrid(@NotNull Cell cell, @NotNull Grid grid) {
-        if (cell.getRow() >= grid.getRows() || cell.getRow() < 0) {
+    public static boolean isCellInGrid(Cell cell, @NotNull Grid grid) {
+        if (cell == null || cell.getRow() >= grid.getRows() || cell.getRow() < 0) {
             return false;
         }
 
-        if (cell.getColumn() >= grid.getColumns() || cell.getColumn() < 0) {
-            return false;
-        }
-
-        return true;
+        return cell.getColumn() < grid.getColumns() && cell.getColumn() >= 0;
     }
 
-    public static boolean isBoatInGrid(Boat boat, Grid grid) {
+    public static boolean isBoatInGrid(@NotNull Boat boat, Grid grid) {
         for (Cell c : boat.getCoordinates()) {
-            if (!isInGrid(c, grid)) {
+            if (!isCellInGrid(c, grid)) {
                 return false;
             }
         }

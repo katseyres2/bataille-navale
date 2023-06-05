@@ -53,6 +53,10 @@ public class Player extends SocketClient {
 		color = FormatService.getRandomColor();
 		role = Role.ADMIN;
 	}
+
+	public String toString() {
+		return "(" + username + ",V=" + victories + ",D=" + defeats + ")";
+	}
 	
 	public void setColor(String value) {
 		for (String color : FormatService.colors) {

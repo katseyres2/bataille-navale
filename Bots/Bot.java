@@ -6,7 +6,6 @@ import game.grid.Cell;
 import game.grid.Grid;
 import org.jetbrains.annotations.NotNull;
 import services.DiscoveryService;
-import services.ServerResponse;
 import socket.server.Player;
 import socket.server.Server;
 
@@ -39,6 +38,10 @@ public class Bot extends Player {
     public Bot(String username, Difficulty difficulty) {
         super(null, null, null, username, null, true);
         this.difficulty = difficulty;
+    }
+
+    public boolean isLogged() {
+        return true;
     }
 
     /*
@@ -76,6 +79,7 @@ public class Bot extends Player {
     }
 
 
+
     /**
      * Executes the bots turn when the difficulty is set to "EASY".
      *
@@ -84,12 +88,12 @@ public class Bot extends Player {
      */
     private @NotNull Cell startTurnEasy(@NotNull Grid grid) {
         // Select a random cell from the grid
-        ArrayList<ArrayList<Cell>> cells = grid.getPlate();
+        ArrayList<ArrayList<Cell>> cells = grid.getGrid();
 
         var random = new Random();
         int randRow = random.nextInt(cells.size());
         int randCol = random.nextInt(cells.get(0).size());
-        return grid.getPlate().get(randRow).get(randCol);
+        return grid.getGrid().get(randRow).get(randCol);
     }
 
 
