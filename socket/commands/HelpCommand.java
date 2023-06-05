@@ -22,7 +22,7 @@ public class HelpCommand extends Command {
 
 		for (Command command : ServerCommandHandler.commands) {
 			if (command.hasPermission(role)) {
-				int totalLength = 40;
+				int totalLength = 60;
 				int fillWithSpace = totalLength - command.getName().length() - command.getParameters().length();
 				message += " | " + command.getName() + " " + command.getParameters() + " ".repeat(fillWithSpace) + " : " + command.getHelp() + ";";
 			}

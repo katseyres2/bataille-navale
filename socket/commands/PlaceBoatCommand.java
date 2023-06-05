@@ -12,6 +12,7 @@ import socket.server.Server;
 import java.util.ArrayList;
 
 
+
 public class PlaceBoatCommand extends Command {
 
     public PlaceBoatCommand() {
@@ -23,7 +24,13 @@ public class PlaceBoatCommand extends Command {
         );
     }
 
-
+    /**
+     * get the active game and place the boat of the player
+     * @param args all space-separated elements from the user input.
+     * @param SocketClient
+     * @param players the players the server holds.
+     * @return
+    -     */
     public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
         Player player = DiscoveryService.findOneBy(client, players);
         if (player == null) return ServerResponse.notConnected;
@@ -33,6 +40,7 @@ public class PlaceBoatCommand extends Command {
         String vector;
 
         try {
+            // peut être inverser axe x et y
             row = FormatService.convertCoordLetter(args[1].substring(0, 1));
             column = Integer.parseInt(args[1].substring(1)) - 1;
             length = Integer.parseInt(args[2]);

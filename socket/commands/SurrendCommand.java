@@ -26,7 +26,7 @@ public class SurrendCommand extends Command {
 		if (activeGame == null) return ServerResponse.notPlayingGame;
 		if (!activeGame.isPlayerTurn(player)) return ServerResponse.notYouTurn ;
 
-		return ServerResponse.youCantSurrend;
+		return ServerResponse.youCantSurrender;
 	}
 	
 }
