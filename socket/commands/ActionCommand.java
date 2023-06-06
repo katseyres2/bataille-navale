@@ -53,4 +53,5 @@ public class ActionCommand extends Command {
 
 		return currentGame.sendAction(player, targetPlayer, row, column);
 	}
+	
 }
