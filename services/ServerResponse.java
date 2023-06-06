@@ -26,6 +26,14 @@ public class ServerResponse {
      */
     public static final String playerNotFound = "Player not found";
 
+    public static String playerNotFound(String username) {
+        return playerNotFound + " : " + username;
+    }
+
+    public static String isNotBot(Player player) {
+        return "Is not bot : " + player.getUsername();
+    }
+
     /**
      * Success message: Action successful.
      */
