@@ -3,7 +3,10 @@ package socket.commands;
 import java.util.ArrayList;
 
 import game.Game;
+import game.grid.Cell;
+import game.grid.Grid;
 import services.DiscoveryService;
+import services.FormatService;
 import services.ServerResponse;
 import socket.client.SocketClient;
 import socket.server.Player;
@@ -13,7 +16,7 @@ import socket.server.Server;
 public class ActionCommand extends Command {
 
 	public ActionCommand() {
-		super("/action", new String[] {}, new String[] {"player", "row", "column"}, Role.AUTHENTICATED, "Send an action to your grid for the current game.");
+		super("/action", new String[] {}, new String[] {"player", "letter", "number"}, Role.AUTHENTICATED, "Send an action to your grid for the current game.");
 	}
 
 	@Override
@@ -46,11 +49,9 @@ public class ActionCommand extends Command {
 
 		// Fetch the player game.
 		Game currentGame = Server.getActiveGame(player);
-		// Send an action to this game.
-		String response =  currentGame.sendAction(player, targetPlayer, column, row);
-		
-		if (response != null) return response;
-		return ServerResponse.actionSuccessful;
+		if (currentGame == null) return ServerResponse.notPlayingGame;
+
+		return currentGame.sendAction(player, targetPlayer, row, column);
 	}
 	
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import game.Game;
 import services.DiscoveryService;
+import services.FormatService;
 import services.ServerResponse;
 import socket.client.SocketClient;
 import socket.server.Player;
@@ -23,7 +24,9 @@ public class GameStateCommand extends Command {
 
 		Game activeGame = Server.getActiveGame(player);
 		if (activeGame == null) return ServerResponse.noGame;
-		String header = activeGame.isPlayerTurn(player) ? ServerResponse.yourTurn : "";
+
+		String header = FormatService.showPlayers(activeGame) + "\n";
+		header += activeGame.isPlayerTurn(player) ? ServerResponse.yourTurn : "";
 		return header + activeGame.displayPlayerGrids(player);
 	}
 	
