@@ -131,6 +131,10 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 		System.out.println("GAME END");
 	}
 
+	public static void removeGame(Game game) {
+		boolean res = games.remove(game);
+	}
+
 	/**
 	 * Adds a player to the list of connected players.
 	 *

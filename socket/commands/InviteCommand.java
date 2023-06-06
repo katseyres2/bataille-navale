@@ -54,7 +54,11 @@ public class InviteCommand extends Command {
 			String username = args[1];
 
 			Game game = Server.getActiveGame(player);
-			if (game == null) game = new Game();
+
+			if (game == null) {
+				game = new Game();
+				game.addPlayer(player);
+			}
 
 			// Try to find the user you want to invite
 			for (Player userToInvite : players) {
@@ -65,7 +69,6 @@ public class InviteCommand extends Command {
 						return message.toString();
 					}
 
-					game.addPlayer(player);
 					Server.pushGame(game);
 
 					if (userToInvite.isBot()) {
