@@ -275,7 +275,7 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 							player.refreshLastConnection();
 							messageToSend = player.getColor() + "# " + FormatService.ANSI_RESET +
 									messageToSend.replace(";", ";" + player.getColor() + "# " + FormatService.ANSI_RESET) +
-									";;" + player.getColor() + "(" + player.getUsername() + ")--|" +
+									";" + player.getColor() + "(" + player.getUsername() + ")--|" +
 									FormatService.ANSI_RESET;
 						}
 
