@@ -39,7 +39,7 @@ public class Main {
 			final PrintWriter pw;
 
 			try {
-				String host = "127.0.0.1";
+				String host = "10.1.20.240";
 				// String host = "45.147.97.136";
 				System.out.println(host + ":" + Server.PORT);
 				s = new Socket(host, Server.PORT);
