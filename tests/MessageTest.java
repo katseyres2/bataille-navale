@@ -1,7 +1,7 @@
 package tests;
 
+import Bots.Bot;
 import org.junit.jupiter.api.Test;
-import org.w3c.dom.Text;
 import socket.Message;
 import socket.client.SocketClient;
 import socket.server.Player;
@@ -12,10 +12,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.sql.Time;
-import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDate;
-import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -47,14 +43,14 @@ public class MessageTest {
     }
     @Test
     public void testGetTime() {
-        Player p = buildPlayer("test", "test");
+        Player p = new Bot("LOCO",Bot.Difficulty.HARD);
         Message message = new Message("ceci est un test", p);
         assertNotNull(message.getTime());
     }
 
     @Test
     public void testGetText() {
-        Player p = buildPlayer("test", "test");
+        Player p = new Bot("LOCO",Bot.Difficulty.HARD);
         Message message = new Message("ceci est un test", p);
         String test = "ceci est un test";
         assertEquals(test, message.getText());

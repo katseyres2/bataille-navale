@@ -1,7 +1,6 @@
 package tests;
 
 import game.Game;
-import game.grid.Grid;
 import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import socket.client.SocketClient;
@@ -13,15 +12,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTest {
 
-    private Game game;
+    private Game game = new Game();
     private Player player1;
     private Player player2;
     static final String host = "127.0.0.1";
@@ -73,7 +70,7 @@ public class GameTest {
         game.addPlayer(player2);
 
         // Make player1's turn
-        game.nextPlayer();
+        game.getNextGrid();
 
         // Send a valid action from player1 to player2
         String result = game.sendAction(player1, player2, 3, 4);
@@ -98,15 +95,15 @@ public class GameTest {
         game.addPlayer(player2);
 
         // Make player1's turn
-        game.nextPlayer();
+        game.getNextGrid();
         assertEquals(player1, game.isPlayerTurn(player1));
 
         // Make player2's turn
-        game.nextPlayer();
+        game.getNextGrid();
         assertEquals(player2, game.isPlayerTurn(player2));
 
         // Make player1's turn again
-        game.nextPlayer();
+        game.getNextGrid();
         assertEquals(player1, game.isPlayerTurn(player1));
     }
 
@@ -117,7 +114,7 @@ public class GameTest {
         game.addPlayer(player2);
 
 
-        game.nextPlayer();
+        game.getNextGrid();
 
         assertTrue(game.isPlayerTurn(player1));
         assertFalse(game.isPlayerTurn(player2));

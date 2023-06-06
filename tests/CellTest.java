@@ -1,6 +1,5 @@
 package tests;
 
-import game.boat.Boat;
 import game.grid.Cell;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,7 @@ class CellTest {
 
     @Test
    public void testToString() {
-        Cell cell = new Cell(1, 2, Boat.typeBoat.CRUISER);
+        Cell cell = new Cell(1, 2);
         String exp = "(1,2)";
         String actual = cell.toString();
         Assert.assertEquals(exp,"(1,2)");
@@ -20,18 +19,18 @@ class CellTest {
     }
 
     @Test
-   public void getRowIndex() {
-        Cell cell = new Cell(1, 2, Boat.typeBoat.CRUISER);
+   public void getRow() {
+        Cell cell = new Cell(1, 2);
         int exp = 1;
-        int actual = cell.getRowIndex();
+        int actual = cell.getRow();
         Assert.assertEquals(exp, 1);
     }
 
     @Test
-   public void getColumnIndex() {
-        Cell cell = new Cell(1, 2, Boat.typeBoat.CRUISER);
+   public void getColumn() {
+        Cell cell = new Cell(1, 2);
         int exp = 2;
-        int actual = cell.getColumnIndex();
+        int actual = cell.getColumn();
         Assert.assertEquals(exp, 2);
     }
 

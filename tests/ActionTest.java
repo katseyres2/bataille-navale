@@ -1,7 +1,7 @@
 package tests;
 
+import Bots.Bot;
 import game.Action;
-import game.Game;
 import game.grid.Grid;
 import org.junit.Test;
 import socket.client.SocketClient;
@@ -16,18 +16,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class ActionTest {
 
     static final String host = "127.0.0.1";
     static final int port = Server.PORT;
 
-    Player buildPlayer(String username, String password) {
-        return new Player(buildSocketClient(), username, password);
-    }
 
-    SocketClient buildSocketClient() {
+        SocketClient buildSocketClient() {
         Socket s;
         PrintWriter pw;
         BufferedReader br;
@@ -48,7 +44,7 @@ public class ActionTest {
 //
     @Test
     public void testGetPlayer(){
-        Player p = buildPlayer("test", "test");
+        Player p = new Bot("LOCO",Bot.Difficulty.HARD);
         Grid grid = new Grid(p,10,10);
         Action action = new Action(p,grid, 2,3,2  );
         Player getPlayer = action.getPlayer();
@@ -58,7 +54,7 @@ public class ActionTest {
 
     @Test
     public void testGetTarget() {
-        Player p = buildPlayer("test", "test");
+        Player p = new Bot("LOCO",Bot.Difficulty.HARD);;
         Grid grid = new Grid(p,10,10);
         Action action = new Action(p, grid, 2, 3, 3);
 
@@ -69,7 +65,7 @@ public class ActionTest {
 
     @Test
     public void testGetColumn() {
-        Player p = buildPlayer("test", "test");
+        Player p = new Bot("LOCO",Bot.Difficulty.HARD);
         Grid grid = new Grid(p,10,10);
         int column = 2;
         Action action = new Action(p, grid, column, 3, 3);
@@ -83,7 +79,7 @@ public class ActionTest {
 
     @Test
     public void testGetRow() {
-        Player p = buildPlayer("test", "test");
+        Player p = new Bot("LOCO",Bot.Difficulty.HARD);
         Grid grid = new Grid(p,10,10);
         int row = 2;
         Action action = new Action(p, grid, 3, row, 3);
@@ -97,7 +93,7 @@ public class ActionTest {
 
     @Test
     public void testGetTurnCount() {
-        Player p = buildPlayer("test", "test");
+        Player p = new Bot("LOCO",Bot.Difficulty.HARD);
         Grid grid = new Grid(p,10,10);
         int turnCount = 3;
         Action action = new Action(p, grid, 3, 2, turnCount);
