@@ -72,6 +72,11 @@ public class Action {
 	}
 
 	@Override
+	/**
+	 * Returns a string representation of the object.
+	 *
+	 * @return A string representing the object.
+	 */
 	public String toString() {
 		return "(" + row + "," + column + ")";
 	}

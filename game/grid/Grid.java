@@ -23,10 +23,20 @@ public class Grid {
     static public final String[] POSITIONS = { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J" };
     private final Player player;
 
+    /**
+     * Returns the list of boats placed on the grid.
+     *
+     * @return The list of boats.
+     */
     public ArrayList<Boat> getBoats() {
         return boats;
     }
 
+    /**
+     * Returns all the cells in the grid.
+     *
+     * @return The list of all cells.
+     */
     public ArrayList<Cell> getAllCells() {
         ArrayList<Cell> output = new ArrayList<>();
 
@@ -37,14 +47,25 @@ public class Grid {
         return output;
     }
 
+    /**
+     * Returns the discovered cells on the grid.
+     *
+     * @return The list of discovered cells.
+     */
     public ArrayList<Cell> getDiscoveredCells() {
         ArrayList<Cell> output = new ArrayList<>();
         for (Cell cell : getAllCells()) {
-            if (cell.isDiscovered()) output.add(cell);
+            if (cell.isDiscovered())
+                output.add(cell);
         }
         return output;
     }
 
+    /**
+     * Returns the empty cells on the grid.
+     *
+     * @return The list of empty cells.
+     */
     public ArrayList<Cell> getEmptyCells() {
         ArrayList<Cell> emptyCells = new ArrayList<>();
 
