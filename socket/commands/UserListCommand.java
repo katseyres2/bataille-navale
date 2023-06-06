@@ -2,12 +2,17 @@ package socket.commands;
 
 import java.util.ArrayList;
 
+import Bots.Bot;
+import game.Game;
 import services.DiscoveryService;
 import services.ServerResponse;
 import socket.client.SocketClient;
 import socket.server.Player;
 import services.FormatService;
 import socket.Command;
+import socket.server.Server;
+
+import static services.DiscoveryService.findPlayerInGameByUsername;
 
 public class UserListCommand extends Command {
 
@@ -36,8 +41,15 @@ public class UserListCommand extends Command {
 			if (player == null || players.get(i).getUsername().compareTo(player.getUsername()) == 0)
 				continue;
 
-			message += " | (" + (players.get(i).isBot() ? "BOT" : "PLAYER") + ") "
-					+ players.get(i).getUsername() + " "
+			Bot bot = null;
+			if(players.get(i).isBot()){
+				bot = (Bot)player;
+			}
+
+			Game activeGame = Server.getActiveGame(players.get(i));
+
+			message += " | (" + (players.get(i).isBot() ? "BOT " + bot.getDifficulty() : "PLAYER") + ") "
+					+ players.get(i).getUsername() + " " + (activeGame != null ? "In Game" : "") + " "
 					+ (players.get(i).isLogged() ? "online" : "offline").toUpperCase() + ", "
 					+ FormatService.LocalDateTimeToString(players.get(i).getLastConnection())
 					+ ", V = " + players.get(i).getVictories() + ", D = " + players.get(i).getDefeats()
