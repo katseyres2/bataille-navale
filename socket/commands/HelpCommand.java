@@ -38,7 +38,7 @@ public class HelpCommand extends Command {
 	public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
 		Player player = DiscoveryService.findOneBy(client, players);
 
-		String message = "List Of Commands\n-----------------\n";
+		String message = "List Of Commands\n |-----------------\n";
 		Role role = player != null ? player.getRole() : Role.UNDEFINED;
 
 		for (Command command : ServerCommandHandler.commands) {

@@ -48,6 +48,16 @@ public class Bot extends Player {
         return true;
     }
 
+    /**
+     * Retrieves the current difficulty level.
+     *
+     * @return The current difficulty level.
+     */
+    public Difficulty getDifficulty() {
+        return difficulty;
+    }
+
+
     /*
      * Executes the bots turn in the game.
      */
