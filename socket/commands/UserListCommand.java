@@ -41,18 +41,25 @@ public class UserListCommand extends Command {
 			if (player == null || players.get(i).getUsername().compareTo(player.getUsername()) == 0)
 				continue;
 
-			Bot bot = null;
-			if(players.get(i).isBot()){
-				bot = (Bot)player;
+			Player target = players.get(i);
+
+			String difficulty = null;
+			if(target.isBot()){
+				Bot bot = (Bot)player;
+				switch (bot.getDifficulty()) {
+					case EASY -> difficulty = "EASY";
+					case MEDIUM -> difficulty = "MEDIUM";
+					case HARD -> difficulty = "HARD"
+				}
 			}
 
-			Game activeGame = Server.getActiveGame(players.get(i));
+			Game activeGame = Server.getActiveGame(target);
 
-			message += " | (" + (players.get(i).isBot() ? "BOT " + bot.getDifficulty() : "PLAYER") + ") "
-					+ players.get(i).getUsername() + " " + (activeGame != null ? "In Game" : "") + " "
-					+ (players.get(i).isLogged() ? "online" : "offline").toUpperCase() + ", "
-					+ FormatService.LocalDateTimeToString(players.get(i).getLastConnection())
-					+ ", V = " + players.get(i).getVictories() + ", D = " + players.get(i).getDefeats()
+			message += " | (" + (target.isBot() ? "BOT " + difficulty: "PLAYER") + ") "
+					+ target.getUsername() + " " + (activeGame != null ? "In Game" : "") + " "
+					+ (target.isLogged() ? "online" : "offline").toUpperCase() + ", "
+					+ FormatService.LocalDateTimeToString(target.getLastConnection())
+					+ ", V = " + target.getVictories() + ", D = " + target.getDefeats()
 					+ ";\n";
 		}
 
