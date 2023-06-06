@@ -11,36 +11,40 @@ import socket.server.Server;
 
 import java.util.ArrayList;
 
-
-
 public class PlaceBoatCommand extends Command {
 
+    /**
+     * Constructs a PlaceBoatCommand object.
+     */
     public PlaceBoatCommand() {
-        super("/placeboat",
+        super(
+                "/placeboat",
                 null,
-                new String[]{"coord", "length","vector"},
+                new String[]{"coord", "length", "vector"},
                 Command.Role.AUTHENTICATED,
-                "give coordonate for placing boat."
+                "Give coordinates for placing a boat."
         );
     }
 
     /**
-     * get the active game and place the boat of the player
-     * @param args all space-separated elements from the user input.
-     * @param SocketClient
-     * @param players the players the server holds.
-     * @return
-    -     */
+     * Executes the placeboat command to place a boat for the player in the active game.
+     *
+     * @param args    The command arguments.
+     * @param client  The SocketClient object associated with the command.
+     * @param players The list of players in the game.
+     * @return The result message of the command execution.
+     */
     public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
         Player player = DiscoveryService.findOneBy(client, players);
         if (player == null) return ServerResponse.notConnected;
 
         if (args.length != 3) return ServerResponse.wrongNumberOfParameters;
+
         int row, column, length;
         String vector;
 
         try {
-            // peut être inverser axe x et y
+            // Convert the coordinate letters to row value.
             row = FormatService.convertCoordLetter(args[1].substring(0, 1));
             column = Integer.parseInt(args[1].substring(1)) - 1;
             length = Integer.parseInt(args[2]);
@@ -50,14 +54,15 @@ public class PlaceBoatCommand extends Command {
             return ServerResponse.wrongParameterFormat;
         }
 
-        if(vector == null) return "";
+        if (vector == null) return "";
 
-        // Fetch the player game.
+        // Fetch the active game of the player.
         Game currentGame = Server.getActiveGame(player);
-        // Send an action to this game.
-        String response =  currentGame.placePlayerBoat(player, length,column, row, vector);
+        // Place the boat for the player in the game.
+        String response = currentGame.placePlayerBoat(player, length, column, row, vector);
 
         if (response != null) return response;
+
         return ServerResponse.actionSuccessful;
     }
 }
