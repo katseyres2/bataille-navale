@@ -71,6 +71,10 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 		}
 	}
 
+	public static ArrayList<Player> getPlayers() {
+		return players;
+	}
+
 	/**
 	 * Sets the log level for server logging.
 	 *

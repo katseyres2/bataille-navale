@@ -61,6 +61,13 @@ public class DiscoveryService {
         return null;
     }
 
+    public static Player findPlayerByUsername(String username, ArrayList<Player> players) {
+        for (Player p : players) {
+            if (p.getUsername().compareTo(username) == 0) return p;
+        }
+        return null;
+    }
+
     /**
      * Finds the player that corresponds to the specified socket in the list of players.
      *

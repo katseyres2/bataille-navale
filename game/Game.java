@@ -303,7 +303,7 @@ public class Game {
 	}
 
 	public void run() {
-		grids.clear();
+//		grids.clear();
 
 		if (grids.size() < 2) return;
 		int index = (new Random()).nextInt(grids.size());
