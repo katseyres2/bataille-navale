@@ -339,26 +339,34 @@ public class Game {
 					// there are actions but the last one is not from the current player
 					if (lastAction.getPlayer() != currentGrid.getPlayer()) continue;
 
-					if (currentGrid.allBoatAreSunk()) {
+					if (lastAction.getTarget().allBoatAreSunk()) {
 						// the game has a winner
-						winner = Game.this.currentGrid.getPlayer();
-						System.out.println("And the winner is " + currentGrid.getPlayer().getUsername() + " !!!");
-						winner.addVictory();
 
-						for (Player p : getPlayers()) {
-							sendToClient(currentGrid.getPlayer(), p == winner ? "You win!" : "You loose");
+						Game.this.removeGrid(lastAction.getTarget());
+
+						if(getGrids().size() == 1){
+							winner = getGrids().get(0).getPlayer();
+							System.out.println("And the winner is " + winner.getUsername() + " !!!");
+							winner.addVictory();
+
+							for (Player p : getPlayers()) {
+								sendToClient(p, p == winner ? "You win!" : "You loose");
+							}
+
+							break;
 						}
-					} else {
-						// go to the next grid
-						currentGrid = getNextGrid();
-						sendToClient(
+					}
+
+					// go to the next grid
+					currentGrid = getNextGrid();
+					sendToClient(
 							currentGrid.getPlayer(),
 							"That's your turn.;"
-								+ displayPlayerGrids(currentGrid.getPlayer())
-								+ FormatService.colorizeString(Game.this.currentGrid.getPlayer().getColor(),
-							"(" + Game.this.currentGrid.getPlayer().getUsername() + ")--|")
-						);
-					}
+									+ displayPlayerGrids(currentGrid.getPlayer())
+									+ FormatService.colorizeString(Game.this.currentGrid.getPlayer().getColor(),
+									"(" + Game.this.currentGrid.getPlayer().getUsername() + ")--|")
+					);
+
 				}
 			}
 		};

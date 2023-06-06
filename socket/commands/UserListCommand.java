@@ -30,7 +30,7 @@ public class UserListCommand extends Command {
 		Player player = DiscoveryService.findOneBy(client, players);
 		if (player == null) return ServerResponse.notConnected;
 
-		String message = "List Of Users;\n".concat("--------------;\n |");
+		String message = "List Of Users;\n".concat(" |--------------;\n");
 
 		for (int i = 0; i < players.size(); i++) {
 			if (player == null || players.get(i).getUsername().compareTo(player.getUsername()) == 0)
