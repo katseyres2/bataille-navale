@@ -47,6 +47,8 @@ class CellTest {
 //    }
 
     @Test
-  public void alreadyDiscovered() {
+  public void testIsDiscovered() {
+    Cell cell = new Cell(4, 4);
+    Assert.assertFalse(cell.isDiscovered());
     }
 }

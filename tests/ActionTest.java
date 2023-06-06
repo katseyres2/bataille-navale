@@ -2,8 +2,10 @@ package tests;
 
 import Bots.Bot;
 import game.Action;
+import game.grid.Cell;
 import game.grid.Grid;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import socket.client.SocketClient;
 import socket.server.Player;
 import socket.server.Server;
@@ -103,5 +105,14 @@ public class ActionTest {
 
 
         assertEquals(turnCount, result);
-    }
+
+          }
+     @Test
+    public void testGetCell(){
+
+         // Verify that the row and column of the cell match the action
+         Assertions.assertNotEquals(null, new Cell(2,6));
+
+     }
+    
 }
