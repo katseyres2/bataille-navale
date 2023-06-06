@@ -1,6 +1,5 @@
 package tests;
 
-import game.boat.Boat;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import services.FormatService;
@@ -17,7 +16,6 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static socket.Command.Role.ADMIN;
 
 public class PlayerTest {
@@ -98,6 +96,8 @@ public class PlayerTest {
         assertEquals(ADMIN, player.getRole());
     }
 //sert pour tester si la méthode gestdefats retourne correctement la defaite enregistrée
+
+
     @Test
     public void testGetDefeats() {
         SocketClient sc = buildSocketClient();
