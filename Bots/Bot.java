@@ -40,9 +40,7 @@ public class Bot extends Player {
         this.difficulty = difficulty;
     }
 
-    public Difficulty getDifficulty() {
-        return difficulty;
-    }
+
 
     public boolean isLogged() {
         return true;
