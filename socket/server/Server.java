@@ -214,7 +214,7 @@ public class Server extends LogService implements IServer,ISocketBuilder {
 			public void run() {
 				while (true) {
 					for (Player player : players) {
-						if (player.isLogged() && !player.getLastConnection().plus(5, ChronoUnit.MINUTES).isAfter(FormatService.getCurrentTime())) {
+						if (player.isLogged() && !player.getLastConnection().plus(3, ChronoUnit.MINUTES).isAfter(FormatService.getCurrentTime())) {
 							player.clear();
 							appendFile(LEVEL.INFO, FormatService.serverLogPrefix(player) + "timeout connection, kick user.");
 						}
