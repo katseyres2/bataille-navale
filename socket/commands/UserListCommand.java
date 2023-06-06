@@ -2,12 +2,15 @@ package socket.commands;
 
 import java.util.ArrayList;
 
+import Bots.Bot;
+import game.Game;
 import services.DiscoveryService;
 import services.ServerResponse;
 import socket.client.SocketClient;
 import socket.server.Player;
 import services.FormatService;
 import socket.Command;
+import socket.server.Server;
 
 public class UserListCommand extends Command {
 
@@ -30,20 +33,35 @@ public class UserListCommand extends Command {
 		Player player = DiscoveryService.findOneBy(client, players);
 		if (player == null) return ServerResponse.notConnected;
 
-		String message = "List Of Users;\n".concat(" |--------------;\n");
+		String message = "List Of Users;\n".concat(" |--------------\n");
 
 		for (int i = 0; i < players.size(); i++) {
 			if (player == null || players.get(i).getUsername().compareTo(player.getUsername()) == 0)
 				continue;
 
-			message += " | (" + (players.get(i).isBot() ? "BOT" : "PLAYER") + ") "
-					+ players.get(i).getUsername() + " "
-					+ (players.get(i).isLogged() ? "online" : "offline").toUpperCase() + ", "
-					+ FormatService.LocalDateTimeToString(players.get(i).getLastConnection())
-					+ ", V = " + players.get(i).getVictories() + ", D = " + players.get(i).getDefeats()
-					+ ";\n";
-		}
+			Player target = players.get(i);
 
-		return message += " |;\n |------------";
+			String difficulty = null;
+			if(target.isBot()){
+				Bot bot = (Bot)target;
+				switch (bot.getDifficulty()) {
+					case EASY -> difficulty = "EASY";
+					case MEDIUM -> difficulty = "MEDIUM";
+					case HARD -> difficulty = "HARD";
+				}
+			}
+
+			Game activeGame = Server.getActiveGame(target);
+
+			message += " | (" + (target.isBot() ? "BOT " + difficulty: "PLAYER") + ") "
+					+ target.getUsername() + " " + (activeGame != null ? "IN GAME" : "Not IN GAME") + " "
+					+ (target.isLogged() ? "online" : "offline").toUpperCase() + ", "
+					+ FormatService.LocalDateTimeToString(target.getLastConnection())
+					+ ", V = " + target.getVictories() + ", D = " + target.getDefeats()
+					+ "\n";
+		}
+		message += " | \n";
+		message += " |---------------";
+		return message;
 	}
 }
