@@ -1,4 +1,5 @@
 package game;
+import java.io.PrintWriter;
 import java.lang.Thread.State;
 import java.util.*;
 
@@ -24,18 +25,35 @@ public class Game {
 	private int turnCount = 0;
 	private Player winner;
 
+	/**
+	 * Get the list of grids in the game.
+	 *
+	 * @return The list of grids.
+	 */
 	public ArrayList<Grid> getGrids() {
 		return grids;
 	}
 
+	/**
+	 * Get the turn count of the game.
+	 *
+	 * @return The turn count.
+	 */
 	public int getTurnCount() {
 		return turnCount;
 	}
 
-
+	/**
+	 * Check if the specified player is part of the game.
+	 *
+	 * @param player The player to check.
+	 * @return true if the player is in the game, false otherwise.
+	 */
 	public boolean hasPlayer(Player player) {
 		for (Grid g : grids) {
-			if (g.getPlayer() == player) return true;
+			if (g.getPlayer() == player) {
+				return true;
+			}
 		}
 		return false;
 	}
@@ -104,39 +122,52 @@ public class Game {
 	}
 
 	/**
-	 * return true if is turn of the current player
-	 * @param player
-	 * @return
+	 * Check if it is the turn of the specified player.
+	 *
+	 * @param player The player to check.
+	 * @return true if it is the turn of the player, false otherwise.
 	 */
 	public boolean isPlayerTurn(Player player) {
 		return currentGrid != null && currentGrid.getPlayer() == player;
 	}
 
+	/**
+	 * Ask the specified player for an action.
+	 *
+	 * @param player The player to ask for an action.
+	 */
 	public void askActionToPlayer(Player player) {
-		if (!player.isLogged()) return;
-		player.getPrintWriter().println("/sendaction");
-		player.getPrintWriter().flush();
+		if (!player.isLogged()) {
+			return;
+		}
+		PrintWriter writer = player.getPrintWriter();
+		writer.println("/sendaction");
+		writer.flush();
 	}
-
 
 	private void addGrid(Player player) throws OnlyOneActiveGameByPlayer {
 		System.out.println("ADDGRID START");
-		if (Server.getActiveGame(player) != null) throw new OnlyOneActiveGameByPlayer();
-
-		for (Grid grid : grids) {
-			if (grid.getPlayer() == player) return;
+		if (Server.getActiveGame(player) != null) {
+			throw new OnlyOneActiveGameByPlayer();
 		}
 
-		Grid grid = new Grid(player,10,10);
+		for (Grid grid : grids) {
+			if (grid.getPlayer() == player) {
+				return;
+			}
+		}
+
+		Grid grid = new Grid(player, 10, 10);
 		grids.add(grid);
 		System.out.println("ADDGRID END");
 	}
 
 
 	/**
-	 * Return the player with his grid as parameter
-	 * @param grid
-	 * @return
+	 * Return the player associated with the specified grid.
+	 *
+	 * @param grid The grid to find the player for.
+	 * @return The player associated with the grid, or null if not found.
 	 */
 	private Player findPlayerByGrid(Grid grid) {
 		for (Grid g : grids) {
@@ -147,24 +178,41 @@ public class Game {
 		return null;
 	}
 
+	/**
+	 * Remove the grid associated with the specified player from the game.
+	 *
+	 * @param player The player whose grid should be removed.
+	 */
 	private void removeGrid(Player player) {
 		Grid grid = DiscoveryService.findGrid(player, grids);
-		if (grid == null) return;
-		grids.remove(grid);
-	}
-
-	public void removeGrid(Grid grid) {
-		if (grid == null) return;
+		if (grid == null) {
+			return;
+		}
 		grids.remove(grid);
 	}
 
 	/**
+	 * Remove the specified grid from the game.
 	 *
-	 * @param player player
+	 * @param grid The grid to remove.
+	 */
+	public void removeGrid(Grid grid) {
+		if (grid == null) {
+			return;
+		}
+		grids.remove(grid);
+	}
+
+	/**
+	 * Add a player to the game.
+	 *
+	 * @param player The player to add.
 	 */
 	public void addPlayer(Player player) {
 		System.out.println("ADD PLAYER START");
-		if (player == null) return;
+		if (player == null) {
+			return;
+		}
 
 		try {
 			addGrid(player);
@@ -175,36 +223,60 @@ public class Game {
 		System.out.println("ADD PLAYER END");
 	}
 
+	/**
+	 * Remove a player from the game.
+	 *
+	 * @param player The player to remove.
+	 */
 	public void removePlayer(Player player) {
-		if (player == null) return;
+		if (player == null) {
+			return;
+		}
 		removeGrid(player);
 	}
 
+	/**
+	 * Remove a bot from the game.
+	 *
+	 * @param bot The bot to remove.
+	 */
 	public void removeBot(Player bot) {
-		if (bot == null) return;
+		if (bot == null) {
+			return;
+		}
 		bots.remove(bot);
 	}
 
+	/**
+	 * Display the grids associated with a player.
+	 *
+	 * @param player The player whose grids to display.
+	 * @return The formatted string representation of the player's grids.
+	 */
 	public String displayPlayerGrids(Player player) {
 		String output = "";
 
 		for (Grid grid : grids) {
-			output += FormatService.showGrid( grid.getPlayer() == player , grid);
+			output += FormatService.showGrid(grid.getPlayer() == player, grid);
 		}
 
 		return output;
 	}
 
 	/**
-	 * get a list of grids where the boats are not all placed yet
-	 * @return
+	 * Retrieves a list of grids where the boats are not all placed yet.
+	 *
+	 * @return The list of grids that are not yet configured.
 	 */
-	public List<Grid> getGridsNotConfigured(){
-		List<Grid> notReady  = new ArrayList<>();
+	public List<Grid> getGridsNotConfigured() {
+		List<Grid> notReady = new ArrayList<>();
+
+		// Print the size of the grids list for debugging purposes
 		System.out.println("grids = " + grids.size());
 
-		for ( Grid grid : grids) {
-			if(!grid.isConfigured()){
+		// Iterate through each grid and check if it is not configured
+		for (Grid grid : grids) {
+			if (!grid.isConfigured()) {
 				notReady.add(grid);
 			}
 		}
@@ -212,12 +284,21 @@ public class Game {
 		return notReady;
 	}
 
+	/**
+	 * Retrieves the next grid to play.
+	 *
+	 * @return The next grid to play.
+	 */
 	public Grid getNextGrid() {
 		int currentIndex = grids.indexOf(currentGrid);
 		int nextIndex = currentIndex += 1;
-		if (currentIndex == grids.size()) nextIndex = 0;
 
-		// Fetch the next grid to play.
+		// If the current index is at the end of the list, wrap around to the beginning
+		if (currentIndex == grids.size()) {
+			nextIndex = 0;
+		}
+
+		// Fetch the next grid to play
 		return grids.get(nextIndex);
 	}
 
@@ -285,67 +366,98 @@ public class Game {
 		thread.start();
 	}
 
+	/**
+	 * Retrieves the list of players associated with the game.
+	 *
+	 * @return the list of players
+	 */
 	public ArrayList<Player> getPlayers() {
-		ArrayList<Player> players = new ArrayList<>(){};
+		ArrayList<Player> players = new ArrayList<>();  // Create a new ArrayList to store the players
 
 		for (Grid grid : grids) {
-			players.add(grid.getPlayer());
+			players.add(grid.getPlayer());  // Add each player associated with a grid to the list
 		}
 
 		return players;
 	}
 
+	/**
+	 * Sends a message to the client associated with the player.
+	 *
+	 * @param player  the player to send the message to
+	 * @param message the message to send
+	 */
 	private void sendToClient(@NotNull Player player, String message) {
-		if(player.isBot()){
-			return;
+		if (player.isBot()) {
+			return;  // If the player is a bot, return without sending the message
 		}
+
 		while (player.getPrintWriter() == null) {
-			System.out.println("waiting for " + player.getUsername() + " reconnection.");
+			System.out.println("Waiting for " + player.getUsername() + " to reconnect.");  // Print a waiting message
 
 			try {
-				Thread.sleep(500);
+				Thread.sleep(500);  // Wait for 500 milliseconds
 			} catch (InterruptedException e) {
 				System.out.println(e.getMessage());
 			}
 		}
 
-		player.getPrintWriter().println(message);
-		player.getPrintWriter().flush();
+		player.getPrintWriter().println(message);  // Send the message to the player's PrintWriter
+		player.getPrintWriter().flush();  // Flush the PrintWriter to ensure the message is sent immediately
 	}
 
+	/**
+	 * Resumes the execution of the game thread.
+	 * If the thread state is not WAITING, the method returns without doing anything.
+	 */
 	public void resume() {
-		if (thread.getState() != State.WAITING) return;
-		thread.notify();
+		if (thread.getState() != State.WAITING) return;  // If the thread state is not WAITING, return without resuming
+		thread.notify();  // Notify the thread to resume execution
 	}
 
+	/**
+	 * Stops the execution of the game thread.
+	 * If the thread is null or not alive, the method returns without doing anything.
+	 */
 	public void stop() {
-		if (thread == null || !thread.isAlive()) return;
+		if (thread == null || !thread.isAlive()) return;  // If the thread is null or not alive, return without stopping
 
 		try {
-			thread.wait();
+			thread.wait();  // Wait for the thread to complete
 		} catch (InterruptedException e) {
 			System.out.println(e.getMessage());
 		}
 	}
 
+	/**
+	 * Kills the game thread by interrupting it.
+	 * If the thread is null, the method returns without doing anything.
+	 */
 	public void kill() {
-		if (thread == null) return;
-		thread.interrupt();
+		if (thread == null) return;  // If the thread is null, return without killing
+
+		thread.interrupt();  // Interrupt the thread to stop its execution
 	}
 
+	/**
+	 * Animates a message by printing each letter with a pause between each letter and a pause after the full message.
+	 *
+	 * @param message  the message to animate
+	 * @param pauseMs  the pause duration in milliseconds after each letter
+	 */
 	public void animateMessage(String message, int pauseMs) {
 		for (String letter : message.split("")) {
-			System.out.print(letter);
+			System.out.print(letter);  // Print each letter
 
 			try {
-				Thread.sleep(20);
+				Thread.sleep(20);  // Pause for 20 milliseconds
 			} catch (Exception e) {
 				System.out.println("ERROR");
 			}
 		}
 
 		try {
-			Thread.sleep(pauseMs);
+			Thread.sleep(pauseMs);  // Pause after the full message
 		} catch (Exception e) {
 			System.out.println("ERROR");
 		}

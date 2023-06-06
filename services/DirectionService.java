@@ -11,8 +11,9 @@ import java.util.Random;
 
 public class DirectionService {
     /**
-     * return array with vector north / south / east / west
-     * @return
+     * Returns an array with north/south/east/west vectors.
+     *
+     * @return The array of vectors.
      */
     public static ArrayList<Vector> get4Vectors() {
         ArrayList<Vector> output = new ArrayList<>();
@@ -24,34 +25,35 @@ public class DirectionService {
     }
 
     /**
-     * get the vector of the direction wanted
-     * @param direction_vectors
-     * @return
+     * Gets the vector corresponding to the specified direction.
+     *
+     * @param direction The direction string.
+     * @return The vector representing the direction.
      */
-    public static int[] getDirectionVector(String direction_vectors) {
+    public static int[] getDirectionVector(String direction) {
         int[] output;
 
-        switch (direction_vectors.toLowerCase()) {
+        switch (direction.toLowerCase()) {
             case "n":
             case "north":
             case "nord":
-                output = new int[] { -1, 0 };
+                output = new int[] {-1, 0};
                 break;
             case "s":
             case "south":
             case "sud":
-                output = new int[] { 1, 0 };
+                output = new int[] {1, 0};
                 break;
             case "w":
             case "west":
             case "ouest":
             case "o":
-                output = new int[] { 0, -1 };
+                output = new int[] {0, -1};
                 break;
             case "e":
             case "east":
             case "est":
-                output = new int[] { 0, 1 };
+                output = new int[] {0, 1};
                 break;
             default:
                 output = null;
@@ -60,6 +62,12 @@ public class DirectionService {
         return output;
     }
 
+    /**
+     * Returns a random vector from the provided list of vectors.
+     *
+     * @param vectors The list of vectors.
+     * @return A random vector.
+     */
     private static Vector getRandomVector(ArrayList<Vector> vectors) {
         int i = (new Random()).nextInt(vectors.size());
         return vectors.get(i);
@@ -79,6 +87,12 @@ public class DirectionService {
         return output;
     }
 
+    /**
+     * Checks if all coordinates are on the same line.
+     *
+     * @param coordinates The list of coordinates.
+     * @return {@code true} if all coordinates are on the same line, {@code false} otherwise.
+     */
     private static boolean onTheSameLine(@NotNull ArrayList<Cell> coordinates) {
         if (coordinates.size() == 0) return false;
         int reference = coordinates.get(0).getRow();
@@ -90,6 +104,12 @@ public class DirectionService {
         return true;
     }
 
+    /**
+     * Checks if all coordinates are on the same column.
+     *
+     * @param coordinates The list of coordinates.
+     * @return {@code true} if all coordinates are on the same column, {@code false} otherwise.
+     */
     private static boolean onTheSameColumn(@NotNull ArrayList<Cell> coordinates) {
         if (coordinates.size() == 0) return false;
         int reference = coordinates.get(0).getColumn();
@@ -101,6 +121,12 @@ public class DirectionService {
         return true;
     }
 
+    /**
+     * Checks if the coordinates are vertical neighbors.
+     *
+     * @param coordinates The list of coordinates.
+     * @return {@code true} if the coordinates are vertical neighbors, {@code false} otherwise.
+     */
     private static boolean areVerticalNeighbors(@NotNull ArrayList<Cell> coordinates) {
         coordinates.sort((a,b) -> Math.min(a.getRow(), b.getRow()));
 
@@ -112,6 +138,12 @@ public class DirectionService {
         return true;
     }
 
+    /**
+     * Checks if the given coordinates are horizontal neighbors.
+     *
+     * @param coordinates The list of coordinates.
+     * @return {@code true} if the coordinates are horizontal neighbors, {@code false} otherwise.
+     */
     private static boolean areHorizontalNeighbors(@NotNull ArrayList<Cell> coordinates) {
         coordinates.sort((a,b) -> Math.min(a.getColumn(), b.getColumn()));
 
@@ -123,15 +155,28 @@ public class DirectionService {
         return true;
     }
 
+    /**
+     * Checks if the given coordinates are valid.
+     *
+     * @param coordinates The list of coordinates.
+     * @return {@code true} if the coordinates are valid, {@code false} otherwise.
+     */
     public static boolean areValidCoordinates(ArrayList<Cell> coordinates) {
         for (Cell c : coordinates) {
             if (c == null) return false;
         }
 
-        return (onTheSameColumn(coordinates) && areVerticalNeighbors(coordinates)) ||
-               (onTheSameLine(coordinates) && areHorizontalNeighbors(coordinates));
+        return (onTheSameColumn(coordinates) && areVerticalNeighbors(coordinates))
+                || (onTheSameLine(coordinates) && areHorizontalNeighbors(coordinates));
     }
 
+    /**
+     * Checks if the boat is placed along the border of the grid.
+     *
+     * @param boat The boat object.
+     * @param grid The grid object.
+     * @return {@code true} if the boat is along the border, {@code false} otherwise.
+     */
     public static boolean isBoatAlongBorder(@NotNull Boat boat, Grid grid) {
         int counter = 0;
 
@@ -142,28 +187,43 @@ public class DirectionService {
         return counter == boat.getLength();
     }
 
+    /**
+     * Checks if the given cell is along the border of the grid.
+     *
+     * @param cell The cell to check.
+     * @param grid The grid object.
+     * @return {@code true} if the cell is along the border, {@code false} otherwise.
+     */
     private static boolean isCellAlongBorder(@NotNull Cell cell, Grid grid) {
         return cell.getRow() == 0 ||
-               cell.getColumn() == 0 ||
-               cell.getRow() == grid.getColumns() - 1 ||
-               cell.getColumn() == grid.getColumns() - 1;
+                cell.getColumn() == 0 ||
+                cell.getRow() == grid.getColumns() - 1 ||
+                cell.getColumn() == grid.getColumns() - 1;
     }
 
+    /**
+     * Checks if the boat is placed adjacent to any other boat on the grid.
+     *
+     * @param boat The boat object.
+     * @param grid The grid object.
+     * @return {@code true} if the boat is adjacent to another boat, {@code false} otherwise.
+     */
     public static boolean isBoatAlongOther(Boat boat, @NotNull Grid grid) {
         ArrayList<Cell> filledCells = new ArrayList<>();
 
-        // fill the array with all cells with a boat
+        // Fill the array with all cells containing a boat
         for (Boat b : grid.getBoats()) {
             filledCells.addAll(b.getCoordinates());
         }
 
-        // iterate on each boat cell
+        // Iterate over each cell of the boat
         for (Cell cellReference : boat.getCoordinates()) {
-            // for each cell, check all neighbors with the vectors
+            // For each cell, check all neighbors with the vectors
             for (Vector v : get4Vectors()) {
                 int nextColumn = cellReference.getColumn() + v.getColumn();
                 int nextRow = cellReference.getRow() + v.getRow();
 
+                // Check if the neighbor cell contains a boat
                 if (DiscoveryService.findCell(nextRow, nextColumn, filledCells) != null) {
                     return true;
                 }
@@ -173,6 +233,13 @@ public class DirectionService {
         return false;
     }
 
+    /**
+     * Checks if the given cell is within the boundaries of the grid.
+     *
+     * @param cell The cell to check.
+     * @param grid The grid object.
+     * @return {@code true} if the cell is within the grid, {@code false} otherwise.
+     */
     public static boolean isCellInGrid(Cell cell, @NotNull Grid grid) {
         if (cell == null || cell.getRow() >= grid.getRows() || cell.getRow() < 0) {
             return false;
@@ -181,6 +248,13 @@ public class DirectionService {
         return cell.getColumn() < grid.getColumns() && cell.getColumn() >= 0;
     }
 
+    /**
+     * Checks if the boat is completely within the grid boundaries.
+     *
+     * @param boat The boat object.
+     * @param grid The grid object.
+     * @return {@code true} if the boat is within the grid, {@code false} otherwise.
+     */
     public static boolean isBoatInGrid(@NotNull Boat boat, Grid grid) {
         for (Cell c : boat.getCoordinates()) {
             if (!isCellInGrid(c, grid)) {

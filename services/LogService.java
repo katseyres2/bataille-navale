@@ -4,7 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Service for logging messages to a file.
+ */
 public class LogService {
+
+	/**
+	 * Enumeration representing log levels.
+	 */
 	public static enum LEVEL {
 		INFO,
 		DEBUG,
@@ -12,16 +19,27 @@ public class LogService {
 		ERROR,
 	}
 
-    private Path path;
-    
-    public LogService(Path path) {
-        this.path = path;
-    }
+	private Path path;
 
-    public void appendFile(LEVEL level, String text) {
-		if (! Files.exists(path)) {
+	/**
+	 * Constructs a LogService object with the specified file path.
+	 *
+	 * @param path The path to the log file.
+	 */
+	public LogService(Path path) {
+		this.path = path;
+	}
+
+	/**
+	 * Appends the specified text to the log file.
+	 *
+	 * @param level The log level.
+	 * @param text  The text to be appended.
+	 */
+	public void appendFile(LEVEL level, String text) {
+		if (!Files.exists(path)) {
 			try {
-				Files.createFile(path);			
+				Files.createFile(path);
 			} catch (IOException e) {
 				System.out.println(e.getMessage());
 			}
@@ -35,9 +53,15 @@ public class LogService {
 		}
 	}
 
-    public String readFile(LEVEL type) {
+	/**
+	 * Reads the contents of the log file.
+	 *
+	 * @param type The log level to filter the output.
+	 * @return The contents of the log file as a string.
+	 */
+	public String readFile(LEVEL type) {
 		String output = "";
-		
+
 		if (Files.exists(path)) {
 			try {
 				output = Files.readString(path);

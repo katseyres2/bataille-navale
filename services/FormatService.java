@@ -32,22 +32,53 @@ public class FormatService {
 	public static final int USERNAME_MAX_LENGTH = 20;
 	public static final int PASSWORD_MAX_LENGTH = 20;
 
+	/**
+	 * Generates a random color from the available colors.
+	 *
+	 * @return The randomly generated color.
+	 */
 	public static String getRandomColor() {
-		return  colors[(new Random()).nextInt(colors.length - 1)];
+		return colors[(new Random()).nextInt(colors.length - 1)];
 	}
 
+	/**
+	 * Converts a LocalDateTime object to a formatted string representation.
+	 *
+	 * @param dateTime The LocalDateTime object to convert.
+	 * @return The formatted string representation of the LocalDateTime.
+	 */
 	public static String LocalDateTimeToString(LocalDateTime dateTime) {
 		return DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss").format(dateTime);
 	}
 
+	/**
+	 * Retrieves the current system time as a LocalDateTime object.
+	 *
+	 * @return The current system time.
+	 */
 	public static LocalDateTime getCurrentTime() {
 		return LocalDateTime.now();
 	}
 
+	/**
+	 * Formats a word with leading or trailing spaces to achieve a desired length.
+	 *
+	 * @param length    The desired length of the formatted string.
+	 * @param word      The word to format.
+	 * @param alignLeft Determines if the word should be left-aligned or right-aligned.
+	 * @return The formatted string.
+	 */
 	public static String formatSpace(int length, String word, boolean alignLeft) {
 		return (alignLeft == true ? word : "") + " ".repeat(length - word.length()) + (alignLeft == true ? "" : word);
 	}
 
+	/**
+	 * Applies color to a string value.
+	 *
+	 * @param color The color to apply to the value.
+	 * @param value The value to be colorized.
+	 * @return The colorized string.
+	 */
 	public static String colorizeString(String color, String value) {
 		String output = value;
 
@@ -60,11 +91,17 @@ public class FormatService {
 		return output;
 	}
 
+	/**
+	 * Generates the log prefix for a given player.
+	 *
+	 * @param user The player for which to generate the log prefix.
+	 * @return The log prefix string.
+	 */
 	public static String serverLogPrefix(Player user) {
 		String username;
 
-		if (user instanceof Player && user != null && ((Player)user).getUsername() != null) {
-			username = ((Player)user).getUsername();
+		if (user instanceof Player && user != null && ((Player) user).getUsername() != null) {
+			username = ((Player) user).getUsername();
 		} else {
 			username = "?";
 		}
@@ -73,23 +110,38 @@ public class FormatService {
 		return "[" + FormatService.LocalDateTimeToString(FormatService.getCurrentTime()) + " " + formatUsername + "] ";
 	}
 
+	/**
+	 * Concatenates the string representations of two grids side by side.
+	 *
+	 * @param grid1 The first grid to concatenate.
+	 * @param grid2 The second grid to concatenate.
+	 * @return The concatenated grid string.
+	 */
 	public static String concatenateGrids(Grid grid1, Grid grid2) {
 		StringBuilder output = new StringBuilder();
 
 		String[] g1 = showGrid(false, grid1).split("\n");
 		String[] g2 = showGrid(true, grid2).split("\n");
 
-		for (int i=0; i<g1.length; i++) {
+		for (int i = 0; i < g1.length; i++) {
 			output.append(g1[i]).append("  |  ").append(g2[i]).append("\n");
 		}
 
 		return output + "\n";
 	}
 
+	/**
+	 * Converts a message to a formatted log string for a specific socket.
+	 *
+	 * @param socket The socket to which the message is sent.
+	 * @param msg    The message to convert.
+	 * @return The formatted log string.
+	 */
 	public static String toMessage(Socket socket, String msg) {
 		String output = "";
 
-		output += "["+ FormatService.LocalDateTimeToString(FormatService.getCurrentTime()) +"]   TO=\"" + socket.getLocalAddress().getHostAddress() + ":" + socket.getPort() + "\", ";
+		output += "[" + FormatService.LocalDateTimeToString(FormatService.getCurrentTime()) + "]   TO=\"" +
+				socket.getLocalAddress().getHostAddress() + ":" + socket.getPort() + "\", ";
 		output += "MESSAGE=\"";
 
 		if (msg.contains(";")) {
@@ -124,10 +176,17 @@ public class FormatService {
 		return coord;
 	}
 
+	/**
+	 * Generates a string representation of the grid.
+	 *
+	 * @param showBoats Indicates whether to show boats on the grid.
+	 * @param grid      The grid to display.
+	 * @return The string representation of the grid.
+	 */
 	public static String showGrid(boolean showBoats, Grid grid) {
-		String username = FormatService.colorizeString(grid.getPlayer().getColor() ,grid.getPlayer().getUsername());
+		String username = FormatService.colorizeString(grid.getPlayer().getColor(), grid.getPlayer().getUsername());
 		int horizontalLengthSpaces = 1 + grid.getColumns() * 3;
-		String divider = "-".repeat(horizontalLengthSpaces + 2*3) + "\n";
+		String divider = "-".repeat(horizontalLengthSpaces + 2 * 3) + "\n";
 		String title = "|       " + username + " ".repeat(horizontalLengthSpaces - username.length()) + "      |\n";
 
 		StringBuilder output = new StringBuilder("\n" + divider);
@@ -135,28 +194,30 @@ public class FormatService {
 		output.append(divider);
 
 		output.append("|  /");
-		for (int i=0; i<grid.getColumns(); i++) output.append("  ").append(i);
+		for (int i = 0; i < grid.getColumns(); i++) {
+			output.append("  ").append(i);
+		}
 		output.append("  |\n");
 
 		for (Cell c : grid.getAllCells()) {
-//			if (c.getColumn() == 0) output.append(Grid.POSITIONS[c.getRow()]);
-			if (c.getColumn() == 0) output.append("|  " + c.getRow());
+			if (c.getColumn() == 0) {
+				output.append("|  ").append(c.getRow());
+			}
 			Boat boat = DiscoveryService.findBoatWhichHasCell(c, grid.getBoats());
 			String label;
 
 			/*
-			* variables = discovered, boat, visible
-			*
-			* !discovered !boat !visible  -> ?
-			* !discovered !boat  visible  -> ?
-			* !discovered  boat !visible  -> ?
-			* !discovered  boat  visible  -> LETTER
-			*  discovered !boat !visible  -> .
-			*  discovered !boat  visible  -> X
-			*  discovered  boat !visible  -> o
-			*  discovered  boat  visible  -> o
-			* */
-
+			 * Variables: discovered, boat, visible
+			 *
+			 * !discovered !boat !visible  -> ?
+			 * !discovered !boat  visible  -> ?
+			 * !discovered  boat !visible  -> ?
+			 * !discovered  boat  visible  -> LETTER
+			 *  discovered !boat !visible  -> .
+			 *  discovered !boat  visible  -> X
+			 *  discovered  boat !visible  -> o
+			 *  discovered  boat  visible  -> o
+			 */
 			if (!c.isDiscovered()) {
 				label = boat != null && showBoats ? boat.getLabel() : ".";
 			} else {
@@ -167,50 +228,23 @@ public class FormatService {
 				}
 			}
 
-			output.append("  " + label);
-			if (c.getColumn() == grid.getColumns() - 1) output.append("  |\n");
+			output.append("  ").append(label);
+			if (c.getColumn() == grid.getColumns() - 1) {
+				output.append("  |\n");
+			}
 		}
 
 		output.append(divider);
-//
-//		for (int i = 0; i < grid.getRows() + 1; i++) {
-//			for (int j = 0; j < grid.getColumns(); j++) {
-//				// Display the letter on the first column
-//				if (j == 1 && i >= 1) output.append(Grid.POSITIONS[i - 1]).append(" ");
-//
-//				// Display position on the first row
-//				if (i == 0) {
-//					if (j == 0) output.append("\\ ");
-//					if (j >= 1) {
-//						output.append(j > 9 ? " " : "  ");
-//						output.append(j).append(" ");
-//					}
-//				} else if (j >= 1) {
-//					Boat boat = DiscoveryService.findBoatWhichHasCell(grid.getGrid().get(i-1).get(j-1), grid.getBoats());
-//
-//					// "?" if not discovered, not visible
-//					// "." if discovered, not visible, no boat
-//					// "o" if discovered, not visible + visible, boat
-//					// "X" if discovered, visible, not boat
-//					// "<Letter>" if not discovered, visible, boat
-//
-//					String label = "^";
-//					if (cell != null && !cell.isDiscovered() && !showBoats) label = "  ? ";
-//					else if (cell != null && cell.isDiscovered() && !showBoats && boat == null) label = "  . ";
-//					else if (cell != null && cell.isDiscovered() && boat != null) label = "  o ";
-//					else if (cell != null && cell.isDiscovered() && showBoats && boat == null) label = "  X ";
-//					else if (cell != null && !cell.isDiscovered() && showBoats && boat != null) label = "  " + boat.getLabel() + " ";
-//
-//					output.append(label);
-//				}
-//			}
-//
-//			output.append("\n");
-//		}
 
 		return output.toString();
 	}
 
+	/**
+	 * Generates a string representation of the players in the game.
+	 *
+	 * @param game The game containing the players.
+	 * @return The string representation of the players.
+	 */
 	public static String showPlayers(Game game) {
 		StringBuilder output = new StringBuilder();
 
