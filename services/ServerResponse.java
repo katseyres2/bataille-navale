@@ -115,6 +115,7 @@ public class ServerResponse {
      * Error message: The player is not connected.
      */
     public static final String playerNotConnected = "The player is not connected";
+    public static final String notYouTurn = "Is not your turn";
 
     /**
      * Generates the message when a bot is invited.

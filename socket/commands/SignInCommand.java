@@ -9,17 +9,29 @@ import socket.server.Player;
 import socket.Command;
 
 public class SignInCommand extends Command {
-    public SignInCommand() {
-		super("/signin",
-			null,
-			new String[]{"username",
-			"password"},
-			Command.Role.UNDEFINED,
-			"Connect to you account."
-		);
-    }
 
-    public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+	/**
+	 * Constructs a SignInCommand object.
+	 */
+	public SignInCommand() {
+		super(
+				"/signin",
+				null,
+				new String[]{"username", "password"},
+				Command.Role.UNDEFINED,
+				"Connect to your account."
+		);
+	}
+
+	/**
+	 * Executes the signin command to authenticate a player.
+	 *
+	 * @param args    The command arguments.
+	 * @param client  The SocketClient object associated with the command.
+	 * @param players The list of players in the game.
+	 * @return The result message of the command execution.
+	 */
+	public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
 		Player player = DiscoveryService.findOneBy(client, players);
 
 		String message = "";
@@ -46,7 +58,7 @@ public class SignInCommand extends Command {
 							message += ServerResponse.connectedOnAnotherDevice;
 						} else {
 							p.refreshConnection(client.getSocket(), client.getPrintWriter(), client.getBufferedReader());
-							message += ServerResponse.welcome(p) ;
+							message += ServerResponse.welcome(p);
 						}
 					} else {
 						message += ServerResponse.invalidCredentials;
@@ -56,7 +68,7 @@ public class SignInCommand extends Command {
 				}
 			}
 
-			if (! usernameMatched) {
+			if (!usernameMatched) {
 				message += ServerResponse.playerNotFound;
 			}
 		}

@@ -13,18 +13,34 @@ import services.exceptions.UserAlreadyInvitedYouException;
 import socket.Command;
 import socket.server.Server;
 
+/**
+ * The InviteCommand class represents a command to invite friends to play a new game.
+ * It extends the Command class.
+ */
 public class InviteCommand extends Command {
-    public InviteCommand() {
-        super(
-            "/invite",
-            null,
-            new String[]{"username"},
-            Command.Role.AUTHENTICATED,
-            "Invite your friends to play a new game."
-        );
-    }
 
-    public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+	/**
+	 * Constructs an InviteCommand object.
+	 */
+	public InviteCommand() {
+		super(
+				"/invite",
+				null,
+				new String[]{"username"},
+				Command.Role.AUTHENTICATED,
+				"Invite your friends to play a new game."
+		);
+	}
+
+	/**
+	 * Executes the invite command to invite a friend to play a game.
+	 *
+	 * @param args    The command arguments.
+	 * @param client  The SocketClient object associated with the command.
+	 * @param players The list of players in the game.
+	 * @return The result message of the command execution.
+	 */
+	public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
 		Player player = DiscoveryService.findOneBy(client, players);
 		if (player == null) return ServerResponse.notConnected;
 
@@ -40,9 +56,9 @@ public class InviteCommand extends Command {
 			Game game = Server.getActiveGame(player);
 			if (game == null) game = new Game();
 
-			// try to find the user you want invite
+			// Try to find the user you want to invite
 			for (Player userToInvite : players) {
-				// if you find the user and if he's connected
+				// If you find the user and if they're connected
 				if (userToInvite.getUsername().compareTo(username) == 0) {
 					if (!userToInvite.isLogged()) {
 						message.append(ServerResponse.playerNotConnected);
@@ -57,15 +73,15 @@ public class InviteCommand extends Command {
 						message.append(ServerResponse.botInvited((Bot) userToInvite));
 					} else {
 						try {
-							// try to invite the user, if you can't invite it throws an exception
+							// Try to invite the user, if you can't invite, it throws an exception
 							player.tryInvite(userToInvite);
 							userToInvite.getPrintWriter().println(ServerResponse.receiveAnInvitationFrom(player, userToInvite));
 							userToInvite.getPrintWriter().flush();
 
 							message.append(ServerResponse.invitationSentTo(userToInvite));
 
-							player.addInUsersYouInvited(userToInvite);    // add in your list the user you invited
-							userToInvite.addInUsersWhoInvitedYou(player); // add in the invited user your invitation
+							player.addInUsersYouInvited(userToInvite);    // Add the invited user to your list of invitations
+							userToInvite.addInUsersWhoInvitedYou(player); // Add the inviter to the invited user's list of invitations
 
 						} catch (UserAlreadyInvitedYouException e) {
 							message.append(ServerResponse.youAlreadyReceivedAnInvitation(userToInvite));
