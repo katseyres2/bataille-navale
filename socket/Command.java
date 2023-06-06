@@ -70,6 +70,7 @@ public abstract class Command implements ICommand {
 	 * @return True if the role has permission, false otherwise.
 	 */
 	public boolean hasPermission(Role value) {
+		if(value == Role.ADMIN)return true;
 		return value == this.role;
 	}
 
