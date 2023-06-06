@@ -322,7 +322,7 @@ public class Game {
 				while (winner == null) {
 					System.out.println("TURN : " + currentGrid.getPlayer());
 					try {
-						Thread.sleep(50); // decrease loop time
+						Thread.sleep(10); // decrease loop time
 					} catch (InterruptedException e) {
 						System.out.println(e.getMessage());
 						break;
@@ -353,6 +353,7 @@ public class Game {
 								sendToClient(p, p == winner ? "You win!" : "You loose");
 							}
 
+							Server.removeGame(Server.getActiveGame(firstGrid.getPlayer()));
 							break;
 						}
 					}
@@ -366,8 +367,8 @@ public class Game {
 									+ FormatService.colorizeString(Game.this.currentGrid.getPlayer().getColor(),
 									"(" + Game.this.currentGrid.getPlayer().getUsername() + ")--|")
 					);
-
 				}
+
 			}
 		};
 
