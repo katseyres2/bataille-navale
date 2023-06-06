@@ -68,7 +68,7 @@ public class Player extends SocketClient {
 	}
 
 	public boolean isBot() {
-		return isBot;
+		return false;
 	}
 
 	public Role getRole() 								{ return role; }
