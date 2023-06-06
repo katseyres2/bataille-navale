@@ -1,5 +1,6 @@
 package services;
 
+import Bots.Bot;
 import socket.server.Player;
 
 public class ServerResponse {
@@ -16,10 +17,19 @@ public class ServerResponse {
     public static final String connectedOnAnotherDevice = "You're connected on another device";
     public static final String invalidCredentials = "Invalid credentials";
     public static final String seeYouSoon = "You're disconnected, see you soon";
-    public static final String youCantSurrend = "You can't surrend yet";
+    public static final String youCantSurrender = "You can't surrender yet";
     public static final String notYouTurn = "It's not your turn";
     public static final String notPlayingGame = "You are not playing a game";
     public static final String pong = "pong";
+    public static final String unsupportedCommand = "Unsupported command";
+    public static final String botCreated = "Bot created";
+    public static final String notEnoughPlayers = "Not enough players";
+    public static final String gameStarted = "The game starts";
+    public static final String playerNotConnected = "The player is not connected";
+
+    public static String botInvited(Bot bot)  {
+        return "Bot " + bot.getUsername() + " invited";
+    }
 
     public static String welcome(Player player) {
         return "Welcome back " + player.getUsername() + ".";
