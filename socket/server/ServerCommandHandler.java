@@ -14,32 +14,40 @@ public class ServerCommandHandler {
 	public static final ArrayList<Command> commands = new ArrayList<>();
 
 	/**
-	 * Add all elements from the package "socket.commands".
-	 * All classes in this package must inherit from the parent class Command.
+	 * Populates the list of commands.
+	 * This method adds all classes from the "socket.commands" package that inherit from the Command class.
 	 */
 	public static void populateCommands() {
-		// extract all classes from the package "socket.commands"
+		// Extract all classes from the package "socket.commands"
 		Set<Class> classes = LoaderService.findAllClassesUsingClassLoader("socket.commands");
 
-		// iterate on each class
+		// Iterate over each class
 		for (Class myClass : classes) {
 			try {
-				// call the constructor to build a new instance for this class
+				// Call the constructor to build a new instance for this class
 				Constructor inst = myClass.getConstructor(null);
-				// instantiate a new object and cast it in Command type
-				Command cmd = (Command)inst.newInstance();
-				// add the new command in the command list
+				// Instantiate a new object and cast it to the Command type
+				Command cmd = (Command) inst.newInstance();
+				// Add the new command to the command list
 				commands.add(cmd);
-			} catch (InstantiationException|IllegalAccessException|NoSuchMethodException|InvocationTargetException ignored) {
+			} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException ignored) {
 				System.out.println("Something went wrong during populateCommands.");
 			}
 		}
 	}
 
+	/**
+	 * Executes a command based on the provided line.
+	 *
+	 * @param line    The command line received from the client.
+	 * @param client  The SocketClient object representing the client connection.
+	 * @param players The list of players in the server.
+	 * @return The response message to be sent back to the client.
+	 */
 	public static String executeCommand(String line, SocketClient client, ArrayList<Player> players) {
 		if (line == null) return "";
 
-		System.out.println("From client : " + line);
+		System.out.println("From client: " + line);
 
 		String messageToSend = "";
 		String[] args = line.split(" ");
@@ -47,7 +55,7 @@ public class ServerCommandHandler {
 		for (Command c : commands) {
 			if (c.getName().compareTo(args[0]) == 0) {
 				String response = c.execute(args, client, players);
-				System.out.println("To   client : " + response);
+				System.out.println("To client: " + response);
 				return messageToSend + response;
 			}
 		}
@@ -55,7 +63,12 @@ public class ServerCommandHandler {
 		return notFound();
 	}
 
+	/**
+	 * Generates a "command not found" message.
+	 *
+	 * @return The "command not found" message.
+	 */
 	private static String notFound() {
-		return "Command not found, please send the command /help for more information.";
+		return "Command not found. Please send the command /help for more information.";
 	}
 }

@@ -76,7 +76,6 @@ public class Grid {
                 }
             }
         }
-
         return emptyCells;
     }
 
@@ -245,6 +244,8 @@ public class Grid {
         if (!DirectionService.isCellInGrid(target, this)) return "You are out of the grid";
 
         Boat boat = DiscoveryService.findBoatWhichHasCell(target, boats);
+
+
         if (boat == null) return "Sadly, it's only water...";
 
         for (Cell c : boat.getCoordinates()) {
