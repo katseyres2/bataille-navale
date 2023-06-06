@@ -59,6 +59,15 @@ public class Game {
 	}
 
 	/**
+	 * Retrieves the current grid.
+	 *
+	 * @return The current grid.
+	 */
+	public Grid getCurrentGrid() {
+		return currentGrid;
+	}
+
+	/**
 	 * The action is successful if the player played its turned successfully.
 	 * A wrong action example is an overflow position like (22,5) in a grid 10x10.
 	 * @param player the player who sent the coordinates.
@@ -360,11 +369,16 @@ public class Game {
 
 					// go to the next grid
 					currentGrid = getNextGrid();
-					sendToClient(
-							currentGrid.getPlayer(),
-							"That's your turn.;"
-									+ displayPlayerGrids(currentGrid.getPlayer())
-									+ FormatService.colorizeString(Game.this.currentGrid.getPlayer().getColor(),
+
+					sendToClient(currentGrid.getPlayer(), displayPlayerGrids(currentGrid.getPlayer()));
+
+					for (Player p : getPlayers()) {
+						if(p == currentGrid.getPlayer()){
+							sendToClient(p, lastAction.getPlayer().getUsername() + " attacked " + lastAction.getTarget().getPlayer().getUsername() + " to position " + lastAction.getRow() + " / " + lastAction.getColumn());
+						}
+					}
+
+					sendToClient(currentGrid.getPlayer(), "That's your turn.;" + FormatService.colorizeString(Game.this.currentGrid.getPlayer().getColor(),
 									"(" + Game.this.currentGrid.getPlayer().getUsername() + ")--|")
 					);
 				}

@@ -1,6 +1,7 @@
 package services;
 
 import Bots.Bot;
+import game.Game;
 import socket.server.Player;
 /**
  * Class that provides server response messages.
@@ -53,6 +54,10 @@ public class ServerResponse {
      * Info message: That's your turn.
      */
     public static final String yourTurn = "That's your turn";
+
+    public static String isTurnOf(Player player){
+      return "Turn of " + player.getUsername();
+    }
 
     /**
      * Error message: You can't invite yourself.

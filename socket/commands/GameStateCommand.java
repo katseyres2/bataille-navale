@@ -47,9 +47,11 @@ public class GameStateCommand extends Command {
 
 		// Build the header with player information and turn status.
 		String header = FormatService.showPlayers(activeGame) + "\n";
-		header += activeGame.isPlayerTurn(player) ? ServerResponse.yourTurn : "";
-
+		header += activeGame.displayPlayerGrids(player);
 		// Build the complete response with player grids.
-		return header + activeGame.displayPlayerGrids(player);
+		header += activeGame.isPlayerTurn(player) ? ServerResponse.yourTurn : ServerResponse.isTurnOf(activeGame.getCurrentGrid().getPlayer());
+
+		// send response
+		return header;
 	}
 }

@@ -39,9 +39,9 @@ public class Main {
 			final PrintWriter pw;
 
 			try {
-				String host = "10.1.20.240";
+				String host = "127.0.0.1";
 				// String host = "45.147.97.136";
-				System.out.println(host + ":" + Server.PORT);
+				System.out.println(host + 1 + ":" + Server.PORT);
 				s = new Socket(host, Server.PORT);
 				pw = new PrintWriter(s.getOutputStream());
 				br = new BufferedReader(new InputStreamReader(s.getInputStream()));
