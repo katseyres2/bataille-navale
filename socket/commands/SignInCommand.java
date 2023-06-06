@@ -1,39 +1,50 @@
 package socket.commands;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.ArrayList;
 
+import services.DiscoveryService;
+import services.ServerResponse;
+import socket.client.SocketClient;
 import socket.server.Player;
 import socket.Command;
 
 public class SignInCommand extends Command {
-    public SignInCommand() {
-		super("/signin",
-			null,
-			new String[]{"username",
-			"password"},
-			Command.Role.UNDEFINED,
-			"Connect to you account."
-		);
-    }
 
-    public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
+	/**
+	 * Constructs a SignInCommand object.
+	 */
+	public SignInCommand() {
+		super(
+				"/signin",
+				null,
+				new String[]{"username", "password"},
+				Command.Role.UNDEFINED,
+				"Connect to your account."
+		);
+	}
+
+	/**
+	 * Executes the signin command to authenticate a player.
+	 *
+	 * @param args    The command arguments.
+	 * @param client  The SocketClient object associated with the command.
+	 * @param players The list of players in the game.
+	 * @return The result message of the command execution.
+	 */
+	public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+		Player player = DiscoveryService.findOneBy(client, players);
+
 		String message = "";
 		String username;
 		String password;
 		boolean usernameMatched = false;
 
-		for (Player p : players) {
-			if (p.getSocket() == socket) {
-				message += "You're already connected.";
-				return message;
-			}
+		if (DiscoveryService.findOneBy(player, players) != null) {
+			return message + ServerResponse.alreadyConnected;
 		}
 
 		if (args.length != 3) {
-			message += "You must specify <username> <password>.";
+			message += ServerResponse.wrongNumberOfParameters;
 		} else {
 			username = args[1];
 			password = args[2];
@@ -44,22 +55,21 @@ public class SignInCommand extends Command {
 
 					if (p.checkCredentials(username, password)) {
 						if (p.isLogged()) {
-							message += "You're connected on another device.";
+							message += ServerResponse.connectedOnAnotherDevice;
 						} else {
-							p.toggleLog();
-							p.refreshConnection(socket, pw, br);
-							message += "Welcome back " + p.getUsername() + ".";
+							p.refreshConnection(client.getSocket(), client.getPrintWriter(), client.getBufferedReader());
+							message += ServerResponse.welcome(p);
 						}
 					} else {
-						message += "Invalid credentials.";
+						message += ServerResponse.invalidCredentials;
 					}
 
 					break;
 				}
 			}
 
-			if (! usernameMatched) {
-				message += "The user " + username + " does not exist.";
+			if (!usernameMatched) {
+				message += ServerResponse.playerNotFound;
 			}
 		}
 

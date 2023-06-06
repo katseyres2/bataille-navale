@@ -5,28 +5,42 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import services.DiscoveryService;
+import services.ServerResponse;
+import socket.client.SocketClient;
 import socket.server.Player;
 import socket.Command;
 
 public class SignOutCommand extends Command {
+
+    /**
+     * Constructs a SignOutCommand object.
+     */
     public SignOutCommand() {
-        super("/signout",
-        null,
-        null,
-        Command.Role.AUTHENTICATED,
-        "Disconnect from your account."
+        super(
+                "/signout",
+                null,
+                null,
+                Command.Role.AUTHENTICATED,
+                "Disconnect from your account."
         );
     }
 
-    public String execute(String[] args, Player player, ArrayList<Player> players, Socket socket, PrintWriter pw, BufferedReader br) {
-		for (Player p : players) {
-			if (p.getSocket() == player.getSocket()) {
-				p.clear();													// Assigns null to all socket parameters.
-				if (p.isLogged()) p.toggleLog();							// Sets to isLogged to false.
-				break;
-			}
-		}
+    /**
+     * Executes the signout command to disconnect a player.
+     *
+     * @param args    The command arguments.
+     * @param client  The SocketClient object associated with the command.
+     * @param players The list of players in the game.
+     * @return The result message of the command execution.
+     */
+    public String execute(String[] args, SocketClient client, ArrayList<Player> players) {
+        Player player = DiscoveryService.findOneBy(client, players);
 
-		return "You're disconnected, see you soon.";
-	}
+        if (player == null)
+            return ServerResponse.notConnected;
+
+        player.clear();
+        return ServerResponse.seeYouSoon;
+    }
 }
